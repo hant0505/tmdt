@@ -1,6 +1,7 @@
-/vendor
-/var
-/generated
-/pub/static
-/pub/media
-/app/etc/env.php
+
+magento/vendor/
+magento/var/
+magento/generated/
+magento/pub/static/
+magento/pub/media/
+magento/app/etc/env.php

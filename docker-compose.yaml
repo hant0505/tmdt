@@ -37,14 +37,24 @@ services:
     image: redis:7
     container_name: magento_redis
 
-  elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:8.19.12
-    container_name: magento_es
+  opensearch:
+    image: opensearchproject/opensearch:2.19.1
+    container_name: magento_os
     environment:
       - discovery.type=single-node
-      - xpack.security.enabled=false
+      - plugins.security.disabled=true
+      - OPENSEARCH_INITIAL_ADMIN_PASSWORD=Magento123!@#  # <--- THÊM DÒNG NÀY
+      - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
     ports:
       - "9200:9200"
+      - "9600:9600"
 
 volumes:
   mysql_data:
