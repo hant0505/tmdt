@@ -1,0 +1,10 @@
+<?php /** @var \TeknTek\HelloWorld\Block\ProductList $block */ ?>
+<h2>Danh sách sản phẩm mẫu của tôi:</h2>
+<ul>
+    <?php foreach ($block->getProducts() as $product): ?>
+        <li>
+            <strong><?php echo $product->getName(); ?></strong> - 
+            Price: <?php echo number_format($product->getPrice(), 0, ',', '.'); ?> VND
+        </li>
+    <?php endforeach; ?>
+</ul>

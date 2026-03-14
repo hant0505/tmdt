@@ -12,9 +12,11 @@ class Index extends Action
         parent::__construct($context);
     }
 
+
     public function execute()
     {
-        echo "Hello Magento";
-        exit;
+        // Trả về Page object để Magento tự load Layout XML
+        return $this->resultFactory->create(\Magento\Framework\Controller\ResultFactory::TYPE_PAGE);
     }
+
 }
