@@ -366,6 +366,6 @@ return [
         'PayPal_BraintreeGiftWrapping' => 1,
         'PayPal_BraintreeGraphQl' => 1,
         'PayPal_BraintreeReward' => 1,
-        'TeknTek_HelloWorld' => 1
+        'Vendor_Weather' => 1
     ]
 ];
