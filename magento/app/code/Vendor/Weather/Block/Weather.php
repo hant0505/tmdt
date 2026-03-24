@@ -20,11 +20,10 @@ class Weather extends Template
 
     public function getCity()
     {
-        // $city = $this->getRequest()->getParam('city');
-
-        // if ($city) {
-        //     return $city;
-        // }
+        $city = $this->getRequest()->getParam('city');
+        if ($city) {
+            return $city;
+        }
 
         return $this->helper->getDefaultCity() ?? 'Hanoi';
     }
@@ -32,14 +31,19 @@ class Weather extends Template
     public function getWeatherData()
     {
         $city = $this->getCity();
-        $apiKey = $this->$helper->getApiKey();
+        $apiKey = $this->helper->getApiKey();
 
         $url = "https://api.openweathermap.org/data/2.5/weather?q={$city}&appid={$apiKey}&units=metric";
 
         try {
             $response = file_get_contents($url);
+
+            if ($response === false) {
+                return null;
+            }
+
             return json_decode($response, true);
-        } catch (\Exception $e) {
+        } catch (\Exception $e) { // ✅ thêm dấu \
             return null;
         }
     }
