@@ -1,0 +1,24 @@
+<div class="business-news-section">
+    <h2 class="title">Bản tin Kinh doanh - VnExpress</h2>
+    <div class="news-list">
+        <?php foreach ($block->getNewsList() as $item): ?>
+            <div class="news-item">
+                <a href="<?= $block->escapeUrl($item['link']) ?>" target="_blank" class="news-title">
+                    <?= $block->escapeHtml($item['title']) ?>
+                </a>
+                <span class="news-date"><?= $item['pubDate'] ?></span>
+                <p class="news-desc"><?= $block->escapeHtml($item['description']) ?></p>
+            </div>
+        <?php endforeach; ?>
+    </div>
+    <a href="https://vnexpress.net/kinh-doanh" target="_blank" class="view-more">Xem thêm trên VnExpress →</a>
+</div>
+
+<style>
+.business-news-section { margin: 20px 0; }
+.news-item { margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #eee; }
+.news-title { font-weight: bold; color: #0066cc; display: block; margin-bottom: 5px; }
+.news-date { font-size: 13px; color: #888; }
+.news-desc { color: #555; }
+.view-more { color: #0066cc; font-weight: bold; }
+</style>
