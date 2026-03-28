@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org"  xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+
+<!-- Khai báo file CSS vào Layout (helloworld_index_index.xml):
+Thêm thẻ <head> vào trước thẻ <body>: -->
+    <head>
+        <css src="TeknTek_HelloWorld::css/hello.css"/>
+    </head>
+
+    <body>
+        <referenceContainer name="content.top">
+            <block class="TeknTek\HelloWorld\Block\ProductList" 
+                name="check.thu.thoi" 
+                template="TeknTek_HelloWorld::list.phtml" />
+        </referenceContainer>
+
+    </body>
+</page>

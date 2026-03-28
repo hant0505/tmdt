@@ -16,6 +16,7 @@ class Index extends Action
     public function execute()
     {
         // Trả về Page object để Magento tự load Layout XML
+        // Nó sẽ tự tìm file layout helloworld_index_index.xml
         return $this->resultFactory->create(\Magento\Framework\Controller\ResultFactory::TYPE_PAGE);
     }
 
