@@ -1,0 +1,35 @@
+<?php
+/** @var \Magento\Framework\View\Element\Template $block */
+?>
+<section class="tekntek-cart container" aria-label="Shopping cart section">
+    <nav class="tekntek-cart__breadcrumbs" aria-label="Breadcrumb">
+        <a href="<?= $block->escapeUrl($block->getUrl('')) ?>"><?= $block->escapeHtml(__('Home')) ?></a>
+        <span>/</span>
+        <span><?= $block->escapeHtml(__('Shopping cart')) ?></span>
+    </nav>
+
+    <h1 class="tekntek-cart__title"><?= $block->escapeHtml(__('Shopping cart')) ?></h1>
+
+    <div class="tekntek-cart__layout">
+        <article class="tekntek-cart__items" aria-label="Items">
+            <div class="tekntek-item">
+                <div class="tekntek-item__image" aria-hidden="true"></div>
+                <div class="tekntek-item__meta">
+                    <p class="tekntek-item__name">HP Laptop with Intel Core i7</p>
+                    <p class="tekntek-item__desc">Intel Core i7 | 16GB RAM | 1TB SSD | 14 inch display</p>
+                    <div class="tekntek-item__price">
+                        <span class="old">EUR 1,299,-</span>
+                        <span class="new">EUR 1,104,-</span>
+                    </div>
+                </div>
+            </div>
+        </article>
+
+        <aside class="tekntek-cart__summary" aria-label="Order summary">
+            <div class="row"><span>Subtotal</span><strong>EUR 1,104,-</strong></div>
+            <div class="row"><span>Shipping</span><strong>Free</strong></div>
+            <div class="row"><span>Total</span><strong>EUR 1,104,-</strong></div>
+            <a class="tekntek-cart__cta" href="#">Continue to order</a>
+        </aside>
+    </div>
+</section>

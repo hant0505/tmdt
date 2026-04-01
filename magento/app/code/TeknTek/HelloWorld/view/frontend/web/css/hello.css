@@ -1,6 +1,6 @@
 /* Đổi màu tiêu đề h2 thành đỏ rực để dễ nhận biết */
 .hello-title {
-    color: red !important;
+    color: rgb(65, 35, 35) !important;
     text-transform: uppercase;
-    border-bottom: 2px solid red;
+    border-bottom: 2px solid rgb(90, 62, 62);
 }

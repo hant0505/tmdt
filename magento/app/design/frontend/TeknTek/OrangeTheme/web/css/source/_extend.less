@@ -1,0 +1,186 @@
+.page-wrapper {
+    background: linear-gradient(180deg, #e7e7e7 0, #f7f7f7 240px, #ffffff 500px);
+}
+
+.tekntek-header {
+    width: min(1240px, calc(100vw - 32px));
+    margin: 24px auto 0;
+}
+
+.tekntek-footer {
+    margin-top: 48px;
+}
+
+/* Hide default Luma sections that would duplicate the custom layout blocks. */
+.page-header .panel.wrapper,
+.page-header .header.content,
+.nav-sections {
+    display: none;
+}
+
+.header.content .tekntek-logo img {
+    width: auto;
+    height: 52px;
+    max-width: 100%;
+}
+
+.footer.content .switcher-store,
+.footer.content .footer.links,
+.footer.content .bugs {
+    display: none;
+}
+
+.footer.content {
+    display: none;
+}
+
+.tekntek-header-wrap {
+    margin: 24px auto 0;
+    width: min(1240px, calc(100vw - 32px));
+}
+
+.tekntek-header {
+    border-radius: 10px;
+    border: 1px solid #e4e4e4;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 14px 16px 10px;
+}
+
+.tekntek-header__inner {
+    display: grid;
+    grid-template-columns: 240px 1fr auto;
+    align-items: center;
+    gap: 16px;
+}
+
+.tekntek-brand {
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+    color: #272727;
+}
+
+.tekntek-brand__logo {
+    width: auto;
+    max-width: 100%;
+    height: 52px;
+    display: block;
+}
+
+.tekntek-brand__text {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+}
+
+.tekntek-search {
+    display: grid;
+    grid-template-columns: 140px 1fr;
+}
+
+.tekntek-search__catalog {
+    height: 42px;
+    border: 0;
+    border-radius: 8px 0 0 8px;
+    background: #ececec;
+    color: #4b4b4b;
+}
+
+.tekntek-search__field {
+    height: 42px;
+    border-radius: 0 8px 8px 0;
+    background: #f5f5f5;
+    display: flex;
+    align-items: center;
+    padding: 0 14px;
+}
+
+.tekntek-search__placeholder {
+    color: #8e8e8e;
+}
+
+.tekntek-header__actions {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.tekntek-header__actions a {
+    color: #343434;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.tekntek-header__categories {
+    margin-top: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 18px;
+}
+
+.tekntek-header__categories a {
+    color: #606060;
+    text-decoration: none;
+    font-size: 13px;
+}
+
+.tekntek-footer-wrap {
+    margin-top: 48px;
+}
+
+.tekntek-footer {
+    background: #f5f5f5;
+    border-top: 1px solid #dfdfdf;
+    padding: 36px 0;
+}
+
+.tekntek-footer__grid {
+    width: min(1240px, calc(100vw - 32px));
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1.3fr 1fr 1fr 1fr;
+    gap: 20px;
+}
+
+.tekntek-footer h3 {
+    margin: 0 0 8px;
+    font-size: 15px;
+    color: #262626;
+}
+
+.tekntek-footer p,
+.tekntek-footer a {
+    margin: 0 0 5px;
+    color: #5b5b5b;
+    font-size: 13px;
+    text-decoration: none;
+}
+
+@media (max-width: 960px) {
+    .tekntek-header__inner {
+        grid-template-columns: 1fr;
+    }
+
+    .tekntek-brand__logo {
+        height: 46px;
+    }
+
+    .tekntek-footer__grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 640px) {
+    .tekntek-search {
+        grid-template-columns: 110px 1fr;
+    }
+
+    .tekntek-footer__grid {
+        grid-template-columns: 1fr;
+    }
+}

@@ -1,0 +1,119 @@
+.tekntek-cart.container {
+    width: min(1240px, calc(100vw - 32px));
+    margin: 40px auto;
+}
+
+.tekntek-cart__breadcrumbs {
+    color: #8a8a8a;
+    font-size: 14px;
+    margin-bottom: 14px;
+}
+
+.tekntek-cart__breadcrumbs a {
+    color: #4b4b4b;
+    text-decoration: none;
+}
+
+.tekntek-cart__title {
+    margin: 0 0 22px;
+    font-size: 40px;
+    font-weight: 600;
+    color: #252525;
+}
+
+.tekntek-cart__layout {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 28px;
+}
+
+.tekntek-cart__items,
+.tekntek-cart__summary {
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    background: #fff;
+}
+
+.tekntek-cart__items {
+    padding: 20px;
+}
+
+.tekntek-item {
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    gap: 20px;
+}
+
+.tekntek-item__image {
+    height: 140px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #f6f6f6, #e8e8e8);
+}
+
+.tekntek-item__name {
+    margin: 0 0 8px;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.tekntek-item__desc {
+    margin: 0 0 12px;
+    color: #5d5d5d;
+}
+
+.tekntek-item__price {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.tekntek-item__price .old {
+    text-decoration: line-through;
+    color: #9b9b9b;
+}
+
+.tekntek-item__price .new {
+    color: #cb3909;
+    font-weight: 700;
+}
+
+.tekntek-cart__summary {
+    padding: 20px;
+    display: grid;
+    gap: 12px;
+    align-content: start;
+}
+
+.tekntek-cart__summary .row {
+    display: flex;
+    justify-content: space-between;
+    color: #363636;
+}
+
+.tekntek-cart__cta {
+    margin-top: 10px;
+    height: 44px;
+    border-radius: 8px;
+    background: #3b649e;
+    color: #fff;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+@media (max-width: 860px) {
+    .tekntek-cart__layout {
+        grid-template-columns: 1fr;
+    }
+
+    .tekntek-cart__title {
+        font-size: 32px;
+    }
+}
+
+@media (max-width: 640px) {
+    .tekntek-item {
+        grid-template-columns: 1fr;
+    }
+}

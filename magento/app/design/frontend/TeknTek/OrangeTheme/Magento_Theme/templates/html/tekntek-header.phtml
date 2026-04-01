@@ -1,0 +1,39 @@
+<?php
+/** @var \Magento\Framework\View\Element\Template $block */
+?>
+<header class="tekntek-header" role="banner">
+    <div class="tekntek-header__inner">
+        <a class="tekntek-brand" href="<?= $block->escapeUrl($block->getUrl('')) ?>" aria-label="TeknTek home">
+            <img
+                class="tekntek-brand__logo"
+                src="<?= $block->escapeUrl($block->getViewFileUrl('css/images/tekntek-logo.png')) ?>"
+                alt="TeknTek"
+                loading="eager"
+                
+            />
+            <span class="tekntek-brand__text">TeknTek</span>
+        </a>
+
+        <div class="tekntek-search" role="search">
+            <button class="tekntek-search__catalog" type="button">All products</button>
+            <label class="tekntek-search__field">
+                <span class="tekntek-search__placeholder">I am searching for...</span>
+            </label>
+        </div>
+
+        <nav class="tekntek-header__actions" aria-label="Header actions">
+            <a href="<?= $block->escapeUrl($block->getUrl('wishlist')) ?>">Wishlist</a>
+            <a href="<?= $block->escapeUrl($block->getUrl('customer/account')) ?>">Account</a>
+            <a href="<?= $block->escapeUrl($block->getUrl('checkout/cart')) ?>">Cart</a>
+        </nav>
+    </div>
+
+    <nav class="tekntek-header__categories" aria-label="Product categories">
+        <a href="#">Computer</a>
+        <a href="#">Smart phone</a>
+        <a href="#">TV</a>
+        <a href="#">Kitchen</a>
+        <a href="#">Gaming</a>
+        <a href="#">Accessories</a>
+    </nav>
+</header>
