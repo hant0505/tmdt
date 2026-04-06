@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    
+    <!-- Bảng chính: Yêu cầu trả hàng -->
+    <table name="vendor_rma" resource="default" engine="innodb" comment="Vendor RMA Requests">
+        <column xsi:type="int" name="rma_id" padding="10" unsigned="true" nullable="false" identity="true" comment="RMA ID"/>
+        <column xsi:type="int" name="order_id" padding="10" unsigned="true" nullable="false" comment="Order ID"/>
+        <column xsi:type="varchar" name="rma_number" nullable="false" length="32" comment="RMA Number"/>
+        <column xsi:type="int" name="customer_id" padding="10" unsigned="true" nullable="true" comment="Customer ID"/>
+        <column xsi:type="varchar" name="customer_email" nullable="false" length="255" comment="Customer Email"/>
+        <column xsi:type="varchar" name="status" nullable="false" length="32" default="pending" comment="RMA Status"/>
+        <column xsi:type="text" name="reason" nullable="true" comment="Return Reason"/>
+        <column xsi:type="varchar" name="resolution" nullable="true" length="32" comment="Resolution (refund, exchange, etc.)"/>
+        <column xsi:type="text" name="customer_notes" nullable="true" comment="Customer Notes"/>
+        
+        <!-- Created & Updated At - Cách viết đúng cho Magento 2.4 -->
+        <column xsi:type="timestamp" name="created_at" nullable="false" default="CURRENT_TIMESTAMP" on_update="false" comment="Created At"/>
+        <column xsi:type="timestamp" name="updated_at" nullable="false" default="CURRENT_TIMESTAMP" on_update="true" comment="Updated At"/>
+
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="rma_id"/>
+        </constraint>
+        
+        <!-- Index thông thường -->
+        <index referenceId="VENDOR_RMA_ORDER_ID" indexType="btree">
+            <column name="order_id"/>
+        </index>
+        <index referenceId="VENDOR_RMA_CUSTOMER_ID" indexType="btree">
+            <column name="customer_id"/>
+        </index>
+        
+        <!-- Unique Index cho rma_number -->
+        <constraint xsi:type="unique" referenceId="VENDOR_RMA_RMA_NUMBER">
+            <column name="rma_number"/>
+        </constraint>
+    </table>
+
+    <!-- Bảng chi tiết sản phẩm -->
+    <table name="vendor_rma_item" resource="default" engine="innodb" comment="Vendor RMA Items">
+        <column xsi:type="int" name="item_id" padding="10" unsigned="true" nullable="false" identity="true" comment="Item ID"/>
+        <column xsi:type="int" name="rma_id" padding="10" unsigned="true" nullable="false" comment="RMA ID"/>
+        <column xsi:type="int" name="order_item_id" padding="10" unsigned="true" nullable="false" comment="Order Item ID"/>
+        <column xsi:type="varchar" name="sku" nullable="false" length="64" comment="SKU"/>
+        <column xsi:type="varchar" name="name" nullable="false" length="255" comment="Product Name"/>
+        <column xsi:type="decimal" name="qty_requested" scale="4" precision="12" nullable="false" default="0" comment="Qty Requested"/>
+        <column xsi:type="decimal" name="qty_received" scale="4" precision="12" nullable="false" default="0" comment="Qty Received"/>
+        <column xsi:type="varchar" name="condition" nullable="true" length="32" comment="Item Condition"/>
+        <column xsi:type="text" name="notes" nullable="true" comment="Notes"/>
+
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="item_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="VENDOR_RMA_ITEM_RMA_ID"
+                    table="vendor_rma" column="rma_id"
+                    referenceTable="vendor_rma" referenceColumn="rma_id"
+                    onDelete="CASCADE"/>
+    </table>
+</schema>
