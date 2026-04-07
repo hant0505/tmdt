@@ -27,15 +27,23 @@ class ReturnButton extends Template
         return $this->getRequest()->getParam('order_id');
     }
 
-    // Viết hàm check xem Order này có RMA chưa
-    public function hasExistingRma()
+    public function getExistingRma()
     {
         $orderId = $this->getOrderId();
-        if (!$orderId) return false;
+        if (!$orderId) {
+            return null;
+        }
 
         $collection = $this->rmaCollectionFactory->create();
         $collection->addFieldToFilter('order_id', $orderId);
+        // Lấy cái RMA mới nhất của đơn hàng này
+        $collection->setOrder('created_at', 'DESC');
         
-        return $collection->getSize() > 0;
+        // Trả về object RMA nếu có, ngược lại trả về false/null
+        if ($collection->getSize() > 0) {
+            return $collection->getFirstItem();
+        }
+        
+        return null;
     }
 }
