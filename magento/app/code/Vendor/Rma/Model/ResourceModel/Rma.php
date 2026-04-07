@@ -7,6 +7,6 @@ class Rma extends AbstractDb
 {
     protected function _construct()
     {
-        $this->_init('vendor_rma', 'rma_id');
+        $this->_init('vendor_rma_request', 'entity_id');
     }
 }

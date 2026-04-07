@@ -1,0 +1,41 @@
+<?php
+/** @var \Vendor\Rma\Block\RmaList $block */
+$rmaCollection = $block->getRmaCollection();
+?>
+<div class="rma-list-container">
+    <?php if ($rmaCollection && $rmaCollection->getSize()): ?>
+        <div class="table-wrapper">
+            <table class="data table table-rma-items" id="my-rma-table">
+                <caption class="table-caption"><?= $escaper->escapeHtml(__('My Return Requests')) ?></caption>
+                <thead>
+                    <tr>
+                        <th scope="col" class="col id"><?= $escaper->escapeHtml(__('RMA #')) ?></th>
+                        <th scope="col" class="col order"><?= $escaper->escapeHtml(__('Order ID')) ?></th>
+                        <th scope="col" class="col date"><?= $escaper->escapeHtml(__('Date')) ?></th>
+                        <th scope="col" class="col status"><?= $escaper->escapeHtml(__('Status')) ?></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($rmaCollection as $rma): ?>
+                        <tr>
+                            <td data-th="<?= $escaper->escapeHtmlAttr(__('RMA #')) ?>" class="col id">
+                                <?= $escaper->escapeHtml($rma->getIncrementId()) ?>
+                            </td>
+                            <td data-th="<?= $escaper->escapeHtmlAttr(__('Order ID')) ?>" class="col order">
+                                <?= $escaper->escapeHtml($rma->getOrderId()) ?>
+                            </td>
+                            <td data-th="<?= $escaper->escapeHtmlAttr(__('Date')) ?>" class="col date">
+                                <?= $escaper->escapeHtml(date('Y-m-d', strtotime($rma->getCreatedAt()))) ?>
+                            </td>
+                            <td data-th="<?= $escaper->escapeHtmlAttr(__('Status')) ?>" class="col status">
+                                <?= $escaper->escapeHtml(ucfirst($rma->getStatus())) ?>
+                            </td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+    <?php else: ?>
+        <div class="message info empty"><span><?= $escaper->escapeHtml(__('You have submitted no return requests.')) ?></span></div>
+    <?php endif; ?>
+</div>
