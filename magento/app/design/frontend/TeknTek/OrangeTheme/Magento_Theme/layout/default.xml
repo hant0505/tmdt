@@ -1,0 +1,22 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceContainer name="header.container">
+            <block class="Magento\Framework\View\Element\Template"
+                   name="tekntek.header"
+                   template="Magento_Theme::html/tekntek-header.phtml"
+                   before="-">
+                <block class="Magento\Theme\Block\Html\Topmenu" name="catalog.topnav" template="Magento_Theme::html/topmenu.phtml" ttl="3600"/>
+            </block>
+        </referenceContainer>
+
+        <move element="minicart" destination="tekntek.header" as="minicart"/>
+
+        <referenceContainer name="footer-container">
+            <block class="Magento\Framework\View\Element\Template"
+                   name="tekntek.footer"
+                   template="Magento_Theme::html/tekntek-footer.phtml"
+                   after="-"/>
+        </referenceContainer>
+    </body>
+</page>
