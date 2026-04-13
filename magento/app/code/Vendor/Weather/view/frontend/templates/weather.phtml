@@ -1,0 +1,12 @@
+<h2>Weather Module</h2>
+
+<form method="get">
+    <input type="text" name="city" placeholder="Enter city">
+    <button type="submit">Search</button>
+</form>
+
+<h3>City: <?= $block->getCity(); ?></h3>
+
+<p>Temperature: <?= $block->getTemperature(); ?> °C</p>
+<p>Description: <?= $block->getDescription(); ?></p>
+<p>Humidity: <?= $block->getHumidity(); ?> %</p>
