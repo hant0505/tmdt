@@ -15,7 +15,12 @@
         </a>
 
         <div class="tekntek-search" role="search">
-            <button class="tekntek-search__catalog" type="button">All products</button>
+            <div class="tekntek-search__catalog-wrapper">
+                <button class="tekntek-search__catalog-button" type="button">All products</button>
+                <div class="tekntek-search__catalog-dropdown">
+                    <?= $block->getChildHtml('catalog.topnav') ?>
+                </div>
+            </div>
             <label class="tekntek-search__field">
                 <span class="tekntek-search__placeholder">I am searching for...</span>
             </label>
@@ -24,7 +29,7 @@
         <nav class="tekntek-header__actions" aria-label="Header actions">
             <a href="<?= $block->escapeUrl($block->getUrl('wishlist')) ?>">Wishlist</a>
             <a href="<?= $block->escapeUrl($block->getUrl('customer/account')) ?>">Account</a>
-            <a href="<?= $block->escapeUrl($block->getUrl('checkout/cart')) ?>">Cart</a>
+            <?= $block->getChildHtml('minicart') ?>
         </nav>
     </div>
 

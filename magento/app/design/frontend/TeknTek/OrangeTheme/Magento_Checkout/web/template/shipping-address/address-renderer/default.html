@@ -1,0 +1,43 @@
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<div class="shipping-address-item tekntek-shipping-address-item" css="'selected-item': isSelected(), 'not-selected-item': !isSelected()">
+    <button visible="address().isEditable()"
+            type="button"
+            class="action edit-address-link"
+            click="editAddress"
+            title="Edit address">
+        <span translate="'Edit'"></span>
+    </button>
+
+    <div class="tekntek-shipping-address-item__content">
+        <text args="address().prefix"></text> <text args="address().firstname"></text> <text args="address().middlename"></text>
+        <text args="address().lastname"></text> <text args="address().suffix"></text><br>
+        <if args="address().company">
+            <text args="address().company"></text><br>
+        </if>
+        <text args="_.values(_.compact(address().street)).join(', ')" ></text><br>
+        <text args="address().city"></text><br>
+        <text args="address().postcode"></text><br>
+        <text args="getCountryName(address().countryId)"></text><br>
+        <if args="address().telephone">
+            <span>
+                <translate args="'Phone number:'"></translate>
+                <a attr="'href': 'tel:' + address().telephone" text="address().telephone"></a>
+            </span>
+            <br>
+        </if>
+        <if args="address().vatId">
+            <translate args="'VAT'"></translate>: <text args="address().vatId"></text><br>
+        </if>
+    </div>
+
+    <!-- ko if: (!isSelected()) -->
+    <button type="button" click="selectAddress" class="action action-select-shipping-item">
+        <span translate="'Ship Here'"></span>
+    </button>
+    <!-- /ko -->
+</div>
