@@ -371,6 +371,7 @@ return [
 =======
         'Vendor_BusinessNews' => 1,
         'Vendor_Currency' => 1,
+        'Vendor_Rma' => 1,
         'Vendor_Weather' => 1,
         'Vnpayment_VNPAY' => 1
 >>>>>>> origin/dev

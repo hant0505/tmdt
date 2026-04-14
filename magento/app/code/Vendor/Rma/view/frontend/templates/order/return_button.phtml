@@ -1,0 +1,26 @@
+<?php
+/** @var \Vendor\Rma\Block\Order\ReturnButton $block */
+$rma = $block->getExistingRma();
+?>
+<?php if ($block->getOrderId()): ?>
+    <?php if ($rma && $rma->getId()): ?>
+        <?php
+            // Lấy trạng thái và setup màu sắc
+            $status = $rma->getStatus();
+            $statusLabel = ucfirst($status);
+            $color = '#e22626'; // Đỏ (cho rejected hoặc lỗi)
+            if ($status == 'pending') {
+                $color = '#ff9900'; // Cam
+            } elseif ($status == 'approved') {
+                $color = '#008000'; // Xanh lá
+            }
+        ?>
+        <div class="message" style="display:inline-block; margin-left: 10px; border-color: <?= $color ?>; color: <?= $color ?>; background: transparent; padding: 5px 15px; border: 1px solid <?= $color ?>;">
+            <strong><?= $escaper->escapeHtml(__('Return Status: %1', $statusLabel)) ?></strong>
+        </div>
+    <?php else: ?>
+        <a href="<?= $block->escapeUrl($block->getReturnUrl()) ?>" class="action primary">
+            <span><?= $escaper->escapeHtml(__('Request Return')) ?></span>
+        </a>
+    <?php endif; ?>
+<?php endif; ?>

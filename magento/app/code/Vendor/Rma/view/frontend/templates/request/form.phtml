@@ -1,0 +1,39 @@
+<?php
+/** @var \Magento\Framework\View\Element\Template $block */
+$orderId = $block->getRequest()->getParam('order_id');
+?>
+<div class="rma-form-container">
+    <form class="form" action="<?= $block->escapeUrl($block->getUrl('rma/request/save')) ?>" method="post" id="rma-request-form">
+        <fieldset class="fieldset">
+            <legend class="legend"><span><?= $escaper->escapeHtml(__('Return Information')) ?></span></legend><br>
+            
+            <input type="hidden" name="order_id" value="<?= $escaper->escapeHtmlAttr($orderId) ?>" />
+            
+            <div class="field reason required">
+                <label class="label" for="reason"><span><?= $escaper->escapeHtml(__('Reason for Return')) ?></span></label>
+                <div class="control">
+                    <select name="reason" id="reason" class="select required-entry">
+                        <option value="defective"><?= $escaper->escapeHtml(__('Item is defective or broken')) ?></option>
+                        <option value="wrong_item"><?= $escaper->escapeHtml(__('Received wrong item')) ?></option>
+                        <option value="not_satisfied"><?= $escaper->escapeHtml(__('Not satisfied with the product')) ?></option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="field comment">
+                <label class="label" for="customer_comment"><span><?= $escaper->escapeHtml(__('Additional Comments')) ?></span></label>
+                <div class="control">
+                    <textarea name="customer_comment" id="customer_comment" cols="5" rows="3" class="textarea"></textarea>
+                </div>
+            </div>
+        </fieldset>
+
+        <div class="actions-toolbar">
+            <div class="primary">
+                <button type="submit" class="action submit primary" title="<?= $escaper->escapeHtmlAttr(__('Submit Request')) ?>">
+                    <span><?= $escaper->escapeHtml(__('Submit Request')) ?></span>
+                </button>
+            </div>
+        </div>
+    </form>
+</div>
