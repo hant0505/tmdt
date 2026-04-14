@@ -1,0 +1,129 @@
+<?php
+/**
+ * Custom Payment Method Selection - TeknTek Design
+ * Only shows on Payment step
+ */
+?>
+<div class="tekntek-checkout-payment-selection" style="display: none;" data-payment-form>
+    <div class="tekntek-payment-selection-wrapper">
+    <div class="tekntek-payment-header">
+        <h3 class="tekntek-payment-title">Choose Your Payment Method</h3>
+        <p class="tekntek-payment-subtitle">Select the payment method that works best for you</p>
+    </div>
+
+    <div class="tekntek-payment-options-wrapper">
+        <!-- Bank Transfer -->
+        <label class="tekntek-payment-option-card">
+            <input type="radio" name="selected_payment_method" value="bank_transfer" class="payment-radio" checked>
+            <div class="payment-option-content">
+                <span class="payment-option-title">Bank Transfer</span>
+                <span class="payment-option-desc">Transfer money to our bank account</span>
+            </div>
+        </label>
+
+        <!-- Cash On Delivery -->
+        <label class="tekntek-payment-option-card">
+            <input type="radio" name="selected_payment_method" value="cashondelivery" class="payment-radio">
+            <div class="payment-option-content">
+                <span class="payment-option-title">Cash On Delivery (COD)</span>
+                <span class="payment-option-desc">Pay when you receive your order</span>
+            </div>
+        </label>
+    </div>
+
+    <!-- Bank Transfer Details Section -->
+    <div id="bank-transfer-details" class="payment-details-section" style="display: block;">
+        <h4 class="details-title">Bank Transfer Information</h4>
+        <div class="details-content">
+            <div class="form-group">
+                <label for="bank_select">Select Your Bank</label>
+                <select id="bank_select" name="bank_select" class="form-control">
+                    <option value="">-- Choose a bank --</option>
+                    <option value="vietcombank">Vietcombank (VCB)</option>
+                    <option value="techcombank">Techcombank (TCB)</option>
+                    <option value="agribank">Agribank</option>
+                    <option value="bidv">BIDV</option>
+                    <option value="sacombank">Sacombank</option>
+                    <option value="mbbank">MB Bank</option>
+                    <option value="vpbank">VPBank</option>
+                    <option value="eximbk">Exim Bank</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label for="account_number">Account Number</label>
+                <input type="text" id="account_number" name="account_number" class="form-control" placeholder="e.g., 123456789">
+            </div>
+
+            <div class="form-group">
+                <label for="account_holder">Account Holder Name</label>
+                <input type="text" id="account_holder" name="account_holder" class="form-control" placeholder="Your full name">
+            </div>
+
+            <div class="transfer-info-box">
+                <p class="info-label">Please transfer to:</p>
+                <p class="info-amount" id="transfer-amount">Amount: <strong>--</strong></p>
+                <p class="info-text">Reference: Your Order ID will be provided</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- COD Details Section -->
+    <div id="cod-details" class="payment-details-section" style="display: none;">
+        <div class="cod-info-box">
+            <p>You will pay in cash when your order is delivered.</p>
+            <p>Please have the exact change ready.</p>
+        </div>
+    </div>
+</div>
+
+<script>
+require(['jquery', 'uiComponent'], function($) {
+    // Show form only on Payment step
+    var formElement = $('[data-payment-form]');
+    
+    // Listen to checkout step changes
+    if (window.checkoutConfig && window.checkoutConfig.quoteData) {
+        // Check if payment step is active
+        $(document).on('checkout:step-show', function(event, step) {
+            if (step === 'payment') {
+                formElement.slideDown(300);
+            } else {
+                formElement.slideUp(300);
+            }
+        });
+    }
+    
+    // Alternative: Check current step periodically
+    var checkStep = setInterval(function() {
+        var paymentStep = $('.checkout-index-index [data-step-id="payment"]').length > 0 || 
+                         $('._show[data-bind*="payment"]').length > 0 ||
+                         $('#opc-payment').is(':visible') ||
+                         $('.opc-block-payment').is(':visible');
+        
+        if (paymentStep) {
+            formElement.show();
+        } else {
+            formElement.hide();
+        }
+    }, 500);
+    
+    // Toggle between payment method details
+    $(document).on('change', '.payment-radio', function() {
+        var method = $(this).val();
+        if (method === 'bank_transfer') {
+            $('#bank-transfer-details').slideDown(300);
+            $('#cod-details').slideUp(300);
+        } else if (method === 'cashondelivery') {
+            $('#bank-transfer-details').slideUp(300);
+            $('#cod-details').slideDown(300);
+        }
+    });
+
+    // Initialize with Bank Transfer checked
+    $('#bank-transfer-details').show();
+    $('#cod-details').hide();
+});
+</script>
+    </div>
+</div>

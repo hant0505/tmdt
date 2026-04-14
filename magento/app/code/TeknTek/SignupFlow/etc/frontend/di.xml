@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Magento\Customer\Controller\Account\LoginPost">
+        <plugin name="tekntek_signupflow_login_nonexistent_account"
+                type="TeknTek\SignupFlow\Plugin\Customer\LoginPostAccountCheckPlugin"/>
+    </type>
+
+    <type name="Magento\Customer\Controller\Account\ResetPasswordPost">
+        <plugin name="tekntek_signupflow_reset_password_policy"
+            type="TeknTek\SignupFlow\Plugin\Customer\ResetPasswordPolicyPlugin"
+            sortOrder="5"/>
+        <plugin name="tekntek_signupflow_reset_password_redirect"
+                type="TeknTek\SignupFlow\Plugin\Customer\ResetPasswordRedirectPlugin"/>
+    </type>
+
+    <type name="Magento\Customer\Controller\Account\ForgotPasswordPost">
+        <plugin name="tekntek_signupflow_forgot_password_redirect"
+                type="TeknTek\SignupFlow\Plugin\Customer\ForgotPasswordRedirectPlugin"/>
+    </type>
+</config>

@@ -1,0 +1,381 @@
+<?php
+/** @var \Magento\Framework\View\Element\Template $block */
+
+$om = \Magento\Framework\App\ObjectManager::getInstance();
+$registry = $om->get(\Magento\Framework\Registry::class);
+$currentCategory = $registry->registry('current_category');
+$queryText = trim((string) $block->getRequest()->getParam('q'));
+$listBlock = $block->getLayout()->getBlock('category.products.list');
+if (!$listBlock) {
+    $listBlock = $block->getLayout()->getBlock('search_result_list');
+}
+
+if (!$listBlock) {
+    return;
+}
+
+$collection = $listBlock->getLoadedProductCollection();
+if (!$collection) {
+    return;
+}
+
+$productCount = (int) $collection->getSize();
+$brandCounts = [];
+
+foreach ($collection as $item) {
+    $brand = '';
+
+    $manufacturer = $item->getAttributeText('manufacturer');
+    if (is_array($manufacturer)) {
+        $manufacturer = implode(', ', $manufacturer);
+    }
+    $manufacturer = trim((string) $manufacturer);
+    if ($manufacturer !== '') {
+        $brand = $manufacturer;
+    }
+
+    if ($brand === '') {
+        $brand = trim((string) $item->getData('brand'));
+    }
+
+    if ($brand === '') {
+        $name = trim((string) $item->getName());
+        $firstWord = preg_split('/\s+/', $name);
+        $brand = isset($firstWord[0]) ? (string) $firstWord[0] : '';
+    }
+
+    $brand = trim((string) preg_replace('/[^A-Za-z0-9\-\+\. ]+/', '', $brand));
+    if ($brand === '') {
+        continue;
+    }
+
+    if (!isset($brandCounts[$brand])) {
+        $brandCounts[$brand] = 0;
+    }
+    $brandCounts[$brand] += 1;
+}
+
+arsort($brandCounts, SORT_NATURAL | SORT_FLAG_CASE);
+$brands = array_slice(array_keys($brandCounts), 0, 8);
+$categoryTitle = $currentCategory ? (string) $currentCategory->getName() : '';
+$queryTitle = $queryText !== '' ? ucwords(trim($queryText)) : 'Products';
+$headTitle = $categoryTitle !== '' ? ('Explore All ' . $categoryTitle) : ('Explore All ' . $queryTitle);
+
+$brandPalette = [
+    ['bg' => '#e0f2fe', 'fg' => '#075985', 'bd' => '#bae6fd'],
+    ['bg' => '#ecfccb', 'fg' => '#3f6212', 'bd' => '#d9f99d'],
+    ['bg' => '#fee2e2', 'fg' => '#991b1b', 'bd' => '#fecaca'],
+    ['bg' => '#ede9fe', 'fg' => '#5b21b6', 'bd' => '#ddd6fe'],
+    ['bg' => '#fef3c7', 'fg' => '#92400e', 'bd' => '#fde68a'],
+    ['bg' => '#dcfce7', 'fg' => '#166534', 'bd' => '#bbf7d0'],
+    ['bg' => '#fce7f3', 'fg' => '#9d174d', 'bd' => '#fbcfe8'],
+    ['bg' => '#e0e7ff', 'fg' => '#1e3a8a', 'bd' => '#c7d2fe']
+];
+
+$brandColor = static function (string $brand) use ($brandPalette): array {
+    $hash = abs((int) crc32(strtolower($brand)));
+    $index = $hash % count($brandPalette);
+    return $brandPalette[$index];
+};
+
+$storeCount = 1;
+try {
+    $storeManager = $om->get(\Magento\Store\Model\StoreManagerInterface::class);
+    $storeCount = count($storeManager->getStores());
+} catch (\Throwable $e) {
+    $storeCount = 1;
+}
+
+$priceHelper = $om->get(\Magento\Framework\Pricing\Helper\Data::class);
+$primaryBrand = $brands[0] ?? '';
+$brandHeadline = $primaryBrand !== '' ? $primaryBrand : ($categoryTitle !== '' ? $categoryTitle : $queryTitle);
+$sampleProductUrl = $block->getUrl('catalog/product/view', ['id' => 1]);
+$sampleProductImage = $block->getBaseUrl() . 'media/laptop.png';
+$samplePrice = 1099;
+$showSampleCard = in_array($categoryText, ['laptop', 'laptops'], true);
+?>
+
+<style>
+.catalog-category-view .page-main,
+.catalogsearch-result-index .page-main {
+    background: #f4f6f8;
+}
+
+.catalog-category-view .columns,
+.catalogsearch-result-index .columns {
+    gap: 20px;
+}
+
+.catalog-category-view .sidebar-main,
+.catalogsearch-result-index .sidebar-main {
+    background: #fff;
+    border: 1px solid #dde3ea;
+    border-radius: 12px;
+    padding: 14px;
+}
+
+.catalogsearch-result-index .page-title-wrapper {
+    display: none;
+}
+
+.catalog-category-view .sidebar-main .filter-title,
+.catalog-category-view .sidebar-main .filter-subtitle,
+.catalogsearch-result-index .sidebar-main .filter-title,
+.catalogsearch-result-index .sidebar-main .filter-subtitle {
+    display: none;
+}
+
+.catalog-category-view .sidebar-main .filter-options-title,
+.catalogsearch-result-index .sidebar-main .filter-options-title {
+    font-weight: 700;
+    color: #111827;
+    font-size: 13px;
+}
+
+.catalog-category-view .sidebar-main .filter-options-item,
+.catalogsearch-result-index .sidebar-main .filter-options-item {
+    border-bottom: 1px solid #eef2f7;
+    padding-bottom: 8px;
+    margin-bottom: 8px;
+}
+
+.catalog-category-view .sidebar-main .filter-options-content,
+.catalogsearch-result-index .sidebar-main .filter-options-content {
+    font-size: 12px;
+    color: #4b5563;
+}
+
+.catalog-category-view .sidebar-main .filter-options-content a,
+.catalogsearch-result-index .sidebar-main .filter-options-content a {
+    color: #4b5563;
+    text-decoration: none;
+}
+
+.catalog-category-view .sidebar-main .filter-options-content a:hover,
+.catalog-category-view .sidebar-main .filter-options-content a:focus,
+.catalogsearch-result-index .sidebar-main .filter-options-content a:hover,
+.catalogsearch-result-index .sidebar-main .filter-options-content a:focus {
+    color: #111827;
+}
+
+.catalog-category-view .sidebar-main .filter-current,
+.catalogsearch-result-index .sidebar-main .filter-current {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 8px;
+    margin-bottom: 10px;
+}
+
+.catalog-category-view .products-grid .product-item,
+.catalogsearch-result-index .products-grid .product-item {
+    background: #fff;
+    border: 1px solid #dbe1e8;
+    border-radius: 8px;
+    padding: 8px;
+}
+
+.catalog-category-view .products-grid .product-item:hover,
+.catalogsearch-result-index .products-grid .product-item:hover {
+    border-color: #c7d2e0;
+}
+
+.catalog-category-view .products-grid .product-item .product-item-info,
+.catalogsearch-result-index .products-grid .product-item .product-item-info {
+    position: relative !important;
+    width: 100% !important;
+    margin: 0 !important;
+    background: #fff;
+}
+
+.catalog-category-view .products-grid .product-item:hover .product-item-info,
+.catalog-category-view .products-grid .product-item .product-item-info:hover,
+.catalogsearch-result-index .products-grid .product-item:hover .product-item-info,
+.catalogsearch-result-index .products-grid .product-item .product-item-info:hover {
+    margin: 0 !important;
+    box-shadow: none !important;
+    border: 0 !important;
+}
+
+.catalog-category-view .products-grid .product-item .product-item-inner,
+.catalogsearch-result-index .products-grid .product-item .product-item-inner {
+    position: static !important;
+    display: block !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    border: 0 !important;
+    padding: 0 !important;
+}
+
+.ttk-category-head {
+    background: #fff;
+    border: 1px solid #dde3ea;
+    border-radius: 10px;
+    margin-bottom: 14px;
+    padding: 12px 14px;
+}
+
+.ttk-category-head-title {
+    margin: 0;
+    font-size: 20px;
+    color: #111827;
+    font-weight: 700;
+}
+
+.ttk-category-head-meta {
+    margin-top: 4px;
+    font-size: 12px;
+    color: #6b7280;
+}
+
+.ttk-brand-ribbon {
+    margin-top: 12px;
+    padding-top: 10px;
+}
+
+.ttk-brand-ribbon-label {
+    margin: 0 0 8px;
+    font-size: 14px;
+    color: #111827;
+    font-weight: 700;
+}
+
+.ttk-brand-ribbon-logos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.ttk-brand-logo {
+    font-size: 28px;
+    font-weight: 800;
+    color: #111827;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    margin: 0;
+}
+
+.ttk-brand-meta {
+    margin-top: 4px;
+    font-size: 12px;
+    color: #6b7280;
+}
+
+.ttk-empty-grid {
+    margin-top: 18px;
+}
+
+.ttk-empty-grid .ttk-demo-card {
+    width: min(280px, 100%);
+    background: #fff;
+    border: 1px solid #e7e7ef;
+    border-radius: 12px;
+    padding: 10px 10px 12px;
+    overflow: hidden;
+    display: block;
+    transition: transform 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
+}
+
+.ttk-empty-grid .ttk-demo-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 22px rgba(15, 23, 42, 0.08);
+    border-color: #d7dbe6;
+}
+
+.ttk-empty-grid .ttk-demo-card__image {
+    width: 100%;
+    height: 154px;
+    border-radius: 10px;
+    border: 1px solid #eef1f6;
+    background: linear-gradient(180deg, #ffffff 0%, #f4f6fb 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.ttk-empty-grid .ttk-demo-card__image img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.ttk-empty-grid .ttk-demo-card__name {
+    font-size: 13px;
+    margin: 10px 0 0;
+    line-height: 1.35;
+    font-weight: 400;
+    color: #0f172a;
+    text-decoration: none;
+    display: block;
+}
+
+.ttk-empty-grid .ttk-demo-card__price {
+    color: #dc2626;
+    font-weight: 800;
+    font-size: 14px;
+    margin-top: 8px;
+}
+
+.ttk-empty-grid .ttk-demo-card__rating {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 4px;
+    font-size: 12px;
+    color: #7c8493;
+}
+
+.ttk-empty-grid .ttk-demo-card__rating .rating {
+    color: #9aa3b2;
+    letter-spacing: 1px;
+}
+
+.ttk-empty-grid .ttk-empty-grid__title {
+    margin: 0 0 12px;
+    font-size: 15px;
+    color: #6b7280;
+}
+
+@media (max-width: 920px) {
+    .catalog-category-view .sidebar-main {
+        margin-bottom: 12px;
+    }
+}
+</style>
+
+<div class="ttk-category-head">
+    <h1 class="ttk-category-head-title"><?= $block->escapeHtml($headTitle) ?></h1>
+    <div class="ttk-category-head-meta"><?= $block->escapeHtml((string) $productCount) ?> products • <?= $block->escapeHtml((string) $storeCount) ?> stores</div>
+
+    <div class="ttk-brand-ribbon" aria-label="Brand showcase">
+        <p class="ttk-brand-ribbon-label">Featured brand</p>
+        <p class="ttk-brand-logo"><?= $block->escapeHtml($brandHeadline) ?></p>
+        <div class="ttk-brand-meta"><?= $block->escapeHtml((string) $productCount) ?> products available</div>
+    </div>
+</div>
+
+<?php if ($productCount === 0 && $showSampleCard): ?>
+    <div class="ttk-empty-grid" id="ttk-empty-grid">
+        <div class="ttk-empty-grid__title">Sample product card</div>
+        <div class="ttk-demo-card">
+            <a class="ttk-demo-card__image" href="<?= $block->escapeUrl($sampleProductUrl) ?>" aria-label="HP Laptop with Intel Core i7">
+                <img src="<?= $block->escapeUrl($sampleProductImage) ?>" alt="HP Laptop with Intel Core i7" />
+            </a>
+            <a class="ttk-demo-card__name" href="<?= $block->escapeUrl($sampleProductUrl) ?>">HP Laptop with Intel Core i7</a>
+            <div class="ttk-demo-card__price"><?= $block->escapeHtml($priceHelper->currency($samplePrice, true, false)) ?></div>
+            <div class="ttk-demo-card__rating"><span class="rating">★★★★★</span> <span>(0)</span></div>
+        </div>
+    </div>
+<?php endif; ?>
+
+<?php if ($productCount === 0 && !$showSampleCard): ?>
+    <script>
+    (function () {
+        var notice = document.querySelector('.message.notice');
+        if (notice) {
+            notice.style.display = 'none';
+        }
+    })();
+    </script>
+<?php endif; ?>

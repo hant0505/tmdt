@@ -1,0 +1,60 @@
+services:
+
+  php:
+    build: .
+    container_name: magento_php
+    volumes:
+      - ./magento:/var/www/html
+    working_dir: /var/www/html
+
+  nginx:
+    image: nginx:1.24
+    container_name: magento_nginx
+    ports:
+      - "8080:80"
+    volumes:
+      - ./magento:/var/www/html
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    links:
+      - php
+    depends_on:
+      - php
+
+  mysql:
+    image: mysql:8
+    container_name: magento_mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: magento
+      MYSQL_USER: magento
+      MYSQL_PASSWORD: magento123
+    ports:
+      - "3307:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  redis:
+    image: redis:7
+    container_name: magento_redis
+
+  opensearch:
+    image: opensearchproject/opensearch:2.19.1
+    container_name: magento_os
+    environment:
+      - discovery.type=single-node
+      - plugins.security.disabled=true
+      - OPENSEARCH_INITIAL_ADMIN_PASSWORD=Magento123!@# # <--- THÊM DÒNG NÀY
+      - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"
+    ulimits:
+      memlock:
+        soft: -1
+        hard: -1
+      nofile:
+        soft: 65536
+        hard: 65536
+    ports:
+      - "9200:9200"
+      - "9600:9600"
+
+volumes:
+  mysql_data:

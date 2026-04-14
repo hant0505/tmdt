@@ -1,0 +1,46 @@
+<?php
+/** @var \Vendor\Currency\Block\Rates $block */
+$ratesData = $block->getRatesData();
+?>
+
+<div class="vietcombank-rates">
+    <h2>Tỷ giá ngoại tệ Vietcombank</h2>
+
+    <?php if (isset($ratesData['error'])): ?>
+        <p style="color: red;"><?= $ratesData['error'] ?></p>
+    <?php else: ?>
+        <p>
+            <strong>Cập nhật:</strong> <?= htmlspecialchars($ratesData['datetime'] ?? '') ?> 
+            | <strong>Nguồn:</strong> <?= htmlspecialchars($ratesData['source'] ?? '') ?>
+        </p>
+
+        <table class="data-table" style="width:100%; border-collapse: collapse;">
+            <thead>
+                <tr>
+                    <th style="text-align: left; padding: 8px; border-bottom: 2px solid #ddd;">Tiền tệ</th>
+                    <th style="text-align: right; padding: 8px; border-bottom: 2px solid #ddd;">Mua vào</th>
+                    <th style="text-align: right; padding: 8px; border-bottom: 2px solid #ddd;">Chuyển khoản</th>
+                    <th style="text-align: right; padding: 8px; border-bottom: 2px solid #ddd;">Bán ra</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($ratesData['rates'] as $rate): ?>
+                <tr>
+                    <td style="padding: 8px; border-bottom: 1px solid #ddd;">
+                        <strong><?= htmlspecialchars($rate['code']) ?></strong> - <?= htmlspecialchars($rate['name']) ?>
+                    </td>
+                    <td style="text-align: right; padding: 8px; border-bottom: 1px solid #ddd;">
+                        <?= $this->formatCurrencyValue($rate['buy']) ?>
+                    </td>
+                    <td style="text-align: right; padding: 8px; border-bottom: 1px solid #ddd;">
+                        <?= $this->formatCurrencyValue($rate['transfer']) ?>
+                    </td>
+                    <td style="text-align: right; padding: 8px; border-bottom: 1px solid #ddd;">
+                        <?= $this->formatCurrencyValue($rate['sell']) ?>
+                    </td>
+                </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    <?php endif; ?>
+</div>

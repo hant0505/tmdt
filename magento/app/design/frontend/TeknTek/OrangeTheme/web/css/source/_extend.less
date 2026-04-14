@@ -1,0 +1,844 @@
+.page-wrapper {
+    background: linear-gradient(180deg, #e7e7e7 0, #f7f7f7 240px, #ffffff 500px);
+}
+
+.tekntek-header {
+    width: min(1240px, calc(100vw - 32px));
+    margin: 24px auto 0;
+}
+
+.tekntek-footer {
+    margin-top: 48px;
+}
+
+/* Hide default Luma sections that would duplicate the custom layout blocks. */
+.page-header .panel.wrapper,
+.page-header .header.content,
+.nav-sections {
+    display: none;
+}
+
+.header.content .tekntek-logo img {
+    width: auto;
+    height: 52px;
+    max-width: 100%;
+}
+
+.footer.content .switcher-store,
+.footer.content .footer.links,
+.footer.content .bugs {
+    display: none;
+}
+
+.footer.content {
+    display: none;
+}
+
+.tekntek-header-wrap {
+    margin: 24px auto 0;
+    width: min(1240px, calc(100vw - 32px));
+}
+
+.tekntek-header {
+    border-radius: 10px;
+    border: 1px solid #e4e4e4;
+    background: rgba(255, 255, 255, 0.9);
+    padding: 14px 16px 10px;
+}
+
+.tekntek-header__inner {
+    display: grid;
+    grid-template-columns: 240px 1fr auto;
+    align-items: center;
+    gap: 16px;
+}
+
+.tekntek-brand {
+    display: inline-flex;
+    align-items: center;
+    text-decoration: none;
+    color: #272727;
+}
+
+.tekntek-brand__logo {
+    width: auto;
+    max-width: 100%;
+    height: 52px;
+    display: block;
+}
+
+.tekntek-brand__text {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+}
+
+.tekntek-search {
+    position: relative;
+    display: grid;
+    grid-template-columns: 170px 1fr;
+}
+
+.tekntek-search__catalog-wrapper {
+    position: relative;
+}
+
+.tekntek-search__catalog-button {
+    width: 100%;
+    height: 42px;
+    border: 0;
+    border-radius: 8px 0 0 8px;
+    background: #ececec;
+    color: #4b4b4b;
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.tekntek-search__catalog-dropdown {
+    display: none;
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    width: 320px;
+    max-height: 420px;
+    overflow-y: auto;
+    background: #ffffff;
+    border: 1px solid #e4e4e4;
+    border-radius: 10px;
+    box-shadow: 0 10px 28px rgba(0, 0, 0, 0.12);
+    z-index: 30;
+}
+
+.tekntek-search__catalog-wrapper:hover .tekntek-search__catalog-dropdown,
+.tekntek-search__catalog-wrapper:focus-within .tekntek-search__catalog-dropdown {
+    display: block;
+}
+
+.tekntek-search__catalog-dropdown .navigation {
+    background: transparent;
+    border-radius: 0;
+}
+
+.tekntek-search__catalog-dropdown .navigation > ul {
+    display: block;
+    position: static;
+    width: auto;
+    border: 0;
+    background: transparent;
+    border-radius: 0;
+    list-style: none;
+    padding: 8px 0;
+    margin: 0;
+}
+
+.tekntek-search__catalog-dropdown .navigation .level0 {
+    margin: 0;
+}
+
+.tekntek-search__catalog-dropdown .navigation .level0 > .level-top {
+    height: auto;
+    padding: 10px 16px;
+    background: transparent;
+    color: #3b3b3b;
+    display: block;
+    text-decoration: none;
+    font-size: 15px;
+    line-height: 1.4;
+}
+
+.tekntek-search__catalog-dropdown .navigation .level0 > .level-top:hover {
+    background: #f5f5f5;
+}
+
+.tekntek-search__catalog-dropdown .navigation .submenu {
+    display: none;
+}
+
+.tekntek-search__field {
+    height: 42px;
+    border-radius: 0 8px 8px 0;
+    background: #f5f5f5;
+    display: flex;
+    align-items: center;
+    padding: 0 14px;
+}
+
+.tekntek-search__placeholder {
+    color: #8e8e8e;
+}
+
+.tekntek-header__actions {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+}
+
+.tekntek-header__actions a {
+    color: #343434;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.tekntek-header__actions .tekntek-minicart-wrapper {
+    margin-left: 0;
+}
+
+.tekntek-minicart-wrapper {
+    position: relative;
+    font-family: Roboto, sans-serif;
+}
+
+.tekntek-minicart-wrapper .action.showcart {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    color: #343434;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.tekntek-minicart-wrapper .action.showcart .counter.qty {
+    min-width: 16px;
+    height: 16px;
+    padding: 0 4px;
+    border-radius: 999px;
+    background: #fa460f;
+    color: #ffffff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    font-weight: 600;
+    line-height: 1;
+}
+
+.tekntek-minicart-wrapper .action.showcart .counter.qty.empty {
+    display: none;
+}
+
+.tekntek-minicart-wrapper .block-minicart {
+    width: 446px;
+    max-width: min(446px, calc(100vw - 24px));
+    padding: 16px;
+    border: 1px solid #cbcbcb;
+    border-radius: 8px;
+    background: #fdfdfd;
+    box-shadow: 0 16px 34px rgba(0, 0, 0, 0.14);
+    right: 0;
+    left: auto;
+    top: calc(100% + 10px);
+}
+
+.tekntek-minicart-content {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.tekntek-minicart-items-wrapper {
+    max-height: 264px;
+    overflow-y: auto;
+}
+
+.tekntek-minicart-items {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.tekntek-minicart-item__card {
+    border: 1px solid #cbcbcb;
+    border-radius: 8px;
+    background: #fdfdfd;
+    display: grid;
+    grid-template-columns: 103px 1fr;
+}
+
+.tekntek-minicart-item__image {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 82px;
+    overflow: hidden;
+}
+
+.tekntek-minicart-item__image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.tekntek-minicart-item__details {
+    padding: 8px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    min-width: 0;
+}
+
+.tekntek-minicart-item__top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.tekntek-minicart-item__name,
+.tekntek-minicart-item__name a,
+.tekntek-minicart-item__name span {
+    margin: 0;
+    color: #4b4b4b;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.2;
+    text-decoration: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 230px;
+}
+
+.tekntek-minicart-item__price .price-container,
+.tekntek-minicart-item__price .price {
+    color: #424242;
+    font-size: 12px;
+    font-weight: 500;
+    white-space: nowrap;
+}
+
+.tekntek-minicart-item__bottom {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    color: #717171;
+}
+
+.tekntek-minicart-item__meta {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-size: 12px;
+    line-height: 1;
+}
+
+.tekntek-minicart-item__meta .qty {
+    font-size: 14px;
+}
+
+.tekntek-minicart-item__bottom .shipping {
+    font-size: 10px;
+    white-space: nowrap;
+}
+
+.tekntek-minicart-totals {
+    margin-left: auto;
+    width: 250px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.tekntek-minicart-totals__row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    color: #424242;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.tekntek-minicart-totals__row .free {
+    color: #fa460f;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.tekntek-minicart-totals__row.total .value,
+.tekntek-minicart-totals__row.total .price {
+    color: #424242;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.tekntek-minicart-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+}
+
+.tekntek-minicart-actions .action {
+    min-height: 48px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 1;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.tekntek-minicart-actions .action.review-items {
+    border: 1px solid #3b649e;
+    color: #3b649e;
+    background: #ffffff;
+}
+
+.tekntek-minicart-actions .action.checkout {
+    border: 1px solid #3b649e;
+    color: #ffffff;
+    background: #3b649e;
+}
+
+.tekntek-minicart-empty {
+    margin: 0;
+    color: #4b4b4b;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.tekntek-header__categories {
+    margin-top: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 18px;
+}
+
+.tekntek-header__categories .navigation {
+    width: 100%;
+}
+
+.tekntek-header__categories .navigation > ul {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 18px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.tekntek-header__categories .navigation .level0 {
+    margin: 0;
+}
+
+.tekntek-header__categories .navigation .level0 > .level-top,
+.tekntek-header__categories a {
+    color: #606060;
+    text-decoration: none;
+    font-size: 13px;
+}
+
+.tekntek-footer-wrap {
+    margin-top: 48px;
+}
+
+.tekntek-footer {
+    background: #f5f5f5;
+    border-top: 1px solid #dfdfdf;
+    padding: 36px 0;
+}
+
+.tekntek-footer__grid {
+    width: min(1240px, calc(100vw - 32px));
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1.3fr 1fr 1fr 1fr;
+    gap: 20px;
+}
+
+.tekntek-footer h3 {
+    margin: 0 0 8px;
+    font-size: 15px;
+    color: #262626;
+}
+
+.tekntek-footer p,
+.tekntek-footer a {
+    margin: 0 0 5px;
+    color: #5b5b5b;
+    font-size: 13px;
+    text-decoration: none;
+}
+
+
+
+@media (max-width: 960px) {
+    .tekntek-header__inner {
+        grid-template-columns: 1fr;
+    }
+
+    .tekntek-header__actions {
+        justify-content: flex-start;
+        flex-wrap: wrap;
+    }
+
+    .tekntek-minicart-wrapper .block-minicart {
+        right: auto;
+        left: 0;
+    }
+
+    .tekntek-brand__logo {
+        height: 46px;
+    }
+
+    .tekntek-footer__grid {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media (max-width: 640px) {
+    .tekntek-search {
+        grid-template-columns: 110px 1fr;
+    }
+
+    .tekntek-minicart-wrapper .block-minicart {
+        width: calc(100vw - 24px);
+        max-width: calc(100vw - 24px);
+        padding: 12px;
+    }
+
+    .tekntek-minicart-item__card {
+        grid-template-columns: 80px 1fr;
+    }
+
+    .tekntek-minicart-item__name,
+    .tekntek-minicart-item__name a,
+    .tekntek-minicart-item__name span {
+        max-width: 160px;
+    }
+
+    .tekntek-minicart-totals {
+        width: 100%;
+    }
+
+    .tekntek-minicart-actions {
+        justify-content: stretch;
+    }
+
+    .tekntek-minicart-actions .action {
+        flex: 1;
+    }
+
+    .tekntek-footer__grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* Desktop login page matching the supplied Figma reference */
+@media (min-width: 1024px) {
+    body.customer-account-login {
+        background: #11035d;
+    }
+
+    .customer-account-login .page-wrapper {
+        background: #11035d;
+    }
+
+    .customer-account-login .page-main {
+        padding: 22px 0 30px;
+    }
+
+    .customer-account-login .page-main .columns {
+        width: auto;
+        min-height: 0;
+        margin: 0;
+        padding: 0;
+        border: 0;
+        border-radius: 0;
+        overflow: visible;
+        background: transparent;
+    }
+
+    .customer-account-login .page-title-wrapper {
+        display: none;
+    }
+
+    .customer-account-login .column.main {
+        padding: 0;
+    }
+
+    .customer-account-login .login-container {
+        max-width: none;
+        margin: 0;
+        padding: 0;
+        border: 0;
+        border-radius: 0;
+        background: transparent;
+        box-shadow: none;
+    }
+
+    .tekntek-auth {
+        width: min(1340px, calc(100vw - 36px));
+        margin: 0 auto;
+    }
+
+    .tekntek-auth__shell {
+        border-radius: 52px;
+        background: #11035d;
+        padding: 22px;
+    }
+
+    .tekntek-auth__stage {
+        position: relative;
+        display: block;
+        min-height: 740px;
+        background: #ffffff url('../images/auth-login-figma-bg.png') 100% 50% / cover no-repeat;
+        border-radius: 28px;
+        overflow: hidden;
+    }
+
+    .tekntek-auth__stage::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(90deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.92) 28%, rgba(255, 255, 255, 0.58) 44%, rgba(255, 255, 255, 0) 62%);
+        pointer-events: none;
+    }
+
+    .tekntek-auth__panel--form {
+        position: absolute;
+        z-index: 1;
+        left: 120px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 388px;
+        max-width: calc(100% - 44px);
+        background: rgba(255, 255, 255, 0.96);
+        margin: 0;
+        border-radius: 24px;
+        box-shadow: 0 18px 48px rgba(8, 10, 31, 0.18);
+        padding: 46px 28px 28px 36px;
+    }
+
+    .tekntek-auth__brand {
+        display: inline-flex;
+        align-items: center;
+        margin-bottom: 16px;
+        text-decoration: none;
+    }
+
+    .tekntek-auth__brand-logo {
+        width: 136px;
+        height: auto;
+        display: block;
+    }
+
+    .tekntek-auth .block-title {
+        margin: 0 0 10px;
+        padding: 0;
+    }
+
+    .tekntek-auth .block-title strong {
+        display: block;
+        color: #2a2a2a;
+        font-size: 25px;
+        line-height: 1.2;
+        font-weight: 500;
+    }
+
+    .tekntek-auth__subtitle {
+        margin: 0 0 14px;
+        color: #757575;
+        font-size: 12px;
+        line-height: 1.45;
+        max-width: 240px;
+    }
+
+    .tekntek-auth .fieldset.login {
+        margin: 0;
+        padding: 0;
+    }
+
+    .tekntek-auth .fieldset > .field {
+        margin: 0 0 10px;
+    }
+
+    .tekntek-auth .fieldset .label {
+        display: block;
+        margin: 0 0 5px;
+        color: #4a4a4a;
+        font-size: 12px;
+        line-height: 1.25;
+        font-weight: 600;
+    }
+
+    .tekntek-auth .field .control input {
+        width: 100%;
+        height: 28px;
+        border-radius: 6px;
+        border: 1px solid #d0d0d0;
+        background: #ffffff;
+        box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.04);
+        padding: 0 9px;
+        font-size: 12px;
+        color: #222;
+    }
+
+    .tekntek-auth .field .control input::placeholder {
+        color: #9c9c9c;
+        opacity: 1;
+    }
+
+    .tekntek-auth .field.choice {
+        margin: 2px 0 10px;
+    }
+
+    .tekntek-auth .field.choice .field-tooltip,
+    .tekntek-auth .field.choice .field-tooltip-toggle {
+        display: none;
+    }
+
+    .tekntek-auth .actions-toolbar {
+        margin: 0;
+    }
+
+    .tekntek-auth .actions-toolbar .primary,
+    .tekntek-auth .actions-toolbar .secondary {
+        float: none;
+        display: block;
+        width: 100%;
+    }
+
+    .tekntek-auth .action.login.primary {
+        width: 100%;
+        min-height: 28px;
+        border: 0;
+        border-radius: 5px;
+        background: #3d6fcb;
+        color: #ffffff;
+        font-size: 11px;
+        font-weight: 400;
+        line-height: 1;
+        letter-spacing: 0;
+        box-shadow: none;
+        text-transform: none;
+    }
+
+    .tekntek-auth .action.login.primary:hover {
+        background: #315dad;
+    }
+
+    .tekntek-auth .secondary {
+        margin-top: 4px;
+    }
+
+    .tekntek-auth .action.remind {
+        color: #4969af;
+        font-size: 9px;
+        line-height: 1.2;
+        text-decoration: none;
+    }
+
+    .tekntek-login__separator {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin: 8px 0 8px;
+        color: #8c8c8c;
+        font-size: 10px;
+        line-height: 1;
+        text-transform: uppercase;
+    }
+
+    .tekntek-login__separator::before,
+    .tekntek-login__separator::after {
+        content: "";
+        height: 1px;
+        flex: 1;
+        background: #bdbdbd;
+    }
+
+    .tekntek-login__google {
+        width: 100%;
+        min-height: 26px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        border: 1px solid #b6c2da;
+        border-radius: 3px;
+        background: #ffffff;
+        color: #254b91;
+        font-size: 10px;
+        line-height: 1;
+        padding: 0 10px;
+    }
+
+    .tekntek-login__google-mark {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 12px;
+        height: 12px;
+        font-size: 10px;
+        font-weight: 700;
+        color: #4285f4;
+    }
+}
+
+@media (max-width: 1023px) {
+    .tekntek-auth__panel--form {
+        position: relative;
+        left: auto;
+        top: auto;
+        transform: none;
+        margin: 0;
+        border-radius: 0;
+        box-shadow: none;
+        width: auto;
+        flex: none;
+    }
+}
+
+@media (max-width: 1023px) {
+    body.customer-account-login {
+        background: #f2f2f2;
+    }
+
+    .customer-account-login .page-main {
+        padding: 0 0 20px;
+    }
+
+    .customer-account-login .page-main .columns {
+        width: 100%;
+        min-height: 0;
+        border: 0;
+        border-radius: 0;
+        padding: 0;
+        background: #f2f2f2;
+    }
+
+    .customer-account-login .login-container {
+        margin: 16px auto;
+        width: min(560px, calc(100vw - 24px));
+        max-width: none;
+        padding: 18px 14px 18px;
+        border-radius: 16px;
+    }
+
+    .customer-account-login .tekntek-auth__brand {
+        margin: 0 0 14px;
+    }
+
+    .customer-account-login .tekntek-auth__brand-logo {
+        height: 26px;
+    }
+
+    .customer-account-login .field .control input {
+        height: 36px;
+    }
+}
