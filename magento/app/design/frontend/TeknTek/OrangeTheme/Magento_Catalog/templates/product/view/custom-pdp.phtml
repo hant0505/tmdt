@@ -1,0 +1,993 @@
+<?php
+/** @var \Magento\Framework\View\Element\Template $block */
+
+$om = \Magento\Framework\App\ObjectManager::getInstance();
+$registry = $om->get(\Magento\Framework\Registry::class);
+/** @var \Magento\Catalog\Model\Product $product */
+$product = $registry->registry('current_product');
+
+if (!$product) {
+    return;
+}
+
+$imageHelper = $om->get(\Magento\Catalog\Helper\Image::class);
+$outputHelper = $om->get(\Magento\Catalog\Helper\Output::class);
+$priceHelper = $om->get(\Magento\Framework\Pricing\Helper\Data::class);
+$formKey = $om->get(\Magento\Framework\Data\Form\FormKey::class)->getFormKey();
+$urlEncoder = $om->get(\Magento\Framework\Url\EncoderInterface::class);
+
+$name = (string) $product->getName();
+$shortDesc = trim((string) $product->getShortDescription());
+$description = trim((string) $product->getDescription());
+$descriptionSource = $description !== '' ? $description : $shortDesc;
+$descriptionHtml = trim($descriptionSource) !== ''
+    ? (string) $outputHelper->productAttribute($product, $descriptionSource, 'description')
+    : '<p>No description available.</p>';
+$regular = (float) $product->getPrice();
+$final = (float) $product->getFinalPrice();
+$buyNowUrl = $block->getUrl('checkout/cart/add', [
+    'product' => (int) $product->getId(),
+    'qty' => 1,
+    'uenc' => $urlEncoder->encode($block->getUrl('checkout'))
+]);
+$addToCartUrl = $block->getUrl('checkout/cart/add', ['product' => (int) $product->getId()]);
+$wishlistUrl = $block->getUrl('wishlist/index/add', ['product' => (int) $product->getId()]);
+$compareIndexUrl = $block->getUrl('catalog/product_compare/index');
+$compareAddBaseUrl = $block->getUrl('catalog/product_compare/add');
+$compareClearUrl = $block->getUrl('catalog/product_compare/clear');
+$httpContext = $om->get(\Magento\Framework\App\Http\Context::class);
+$isLoggedIn = (bool) $httpContext->getValue(\Magento\Customer\Model\Context::CONTEXT_AUTH);
+$currentUrl = $block->getUrl('*/*/*', ['_current' => true, '_use_rewrite' => true]);
+$loginUrl = $block->getUrl('customer/account/login', ['referer' => base64_encode($currentUrl)]);
+
+$ratingCount = 84;
+$ratingValue = 4;
+
+$specMap = [
+    'Display' => ['display', 'display_size', 'screen_size', 'screen_diagonal', 'resolution', 'display_resolution'],
+    'Processor' => ['processor', 'cpu', 'processor_type', 'chipset'],
+    'Internal memory (RAM)' => ['ram', 'memory', 'internal_memory', 'ram_type'],
+    'Hard drive capacity' => ['hard_drive_size', 'hard_drive_capacity', 'storage_capacity', 'storage', 'ssd_capacity'],
+    'Video card' => ['graphics_card', 'video_card', 'graphics_processor', 'graphics_coprocessor'],
+    'Operating system' => ['operating_system', 'os'],
+    'Weight' => ['weight_item', 'weight'],
+    'Battery life' => ['battery_life', 'maximum_battery_battery_life']
+];
+
+$findFirstValue = static function (\Magento\Catalog\Model\Product $source, array $codes): string {
+    foreach ($codes as $code) {
+        $raw = $source->getData($code);
+        if (is_array($raw)) {
+            $raw = implode(', ', array_map('strval', $raw));
+        } elseif (is_bool($raw)) {
+            $raw = $raw ? 'Yes' : 'No';
+        } elseif (!is_scalar($raw) && $raw !== null) {
+            $raw = '';
+        }
+        $value = trim((string) $raw);
+        if ($value !== '') {
+            return $value;
+        }
+    }
+    return '';
+};
+
+$specRows = [];
+foreach ($specMap as $label => $codes) {
+    $value = $findFirstValue($product, $codes);
+    if ($value !== '') {
+        $specRows[$label] = $value;
+    }
+}
+
+if (empty($specRows)) {
+    $specRows = [
+        'Display' => '-',
+        'Processor' => '-',
+        'Internal memory (RAM)' => '-',
+        'Hard drive capacity' => '-',
+        'Video card' => '-',
+        'Operating system' => '-',
+        'Weight' => '-',
+        'Battery life' => '-'
+    ];
+}
+
+$featureBullets = [
+    'Intel Core i7 processor for smooth multitasking and high responsiveness.',
+    '16 GB RAM and fast NVMe SSD for startup and app loading speed.',
+    'Lightweight design suitable for work, study, and travel.',
+    'Long battery life and quiet cooling for daily productivity.',
+    'Full HD IPS display with solid color and viewing angles.'
+];
+
+$related = $product->getRelatedProductCollection();
+$related->addAttributeToSelect(['name', 'small_image', 'price', 'final_price', 'short_description']);
+$related->addAttributeToFilter('status', \Magento\Catalog\Model\Product\Attribute\Source\Status::STATUS_ENABLED);
+$related->setPageSize(4);
+$related->setCurPage(1);
+$related->load();
+
+$upsell = $product->getUpSellProductCollection();
+$upsell->addAttributeToSelect(['name', 'small_image', 'price', 'final_price', 'short_description']);
+$upsell->addAttributeToFilter('status', \Magento\Catalog\Model\Product\Attribute\Source\Status::STATUS_ENABLED);
+$upsell->setPageSize(4);
+$upsell->setCurPage(1);
+$upsell->load();
+
+$galleryBlock = $block->getLayout()
+    ->createBlock(\Magento\Catalog\Block\Product\View\Gallery::class)
+    ->setTemplate('Magento_Catalog::product/view/gallery.phtml')
+    ->setProduct($product)
+    ->setData('imageHelper', $imageHelper);
+$galleryHtml = $galleryBlock->toHtml();
+
+$compareItems = [];
+$compareItems[] = $product;
+foreach ($related as $item) {
+    if (count($compareItems) >= 3) {
+        break;
+    }
+    $compareItems[] = $item;
+}
+foreach ($upsell as $item) {
+    if (count($compareItems) >= 3) {
+        break;
+    }
+    $exists = false;
+    foreach ($compareItems as $cmp) {
+        if ((int) $cmp->getId() === (int) $item->getId()) {
+            $exists = true;
+            break;
+        }
+    }
+    if (!$exists) {
+        $compareItems[] = $item;
+    }
+}
+
+if (count($compareItems) < 3) {
+    $productCollectionFactory = $om->get(\Magento\Catalog\Model\ResourceModel\Product\CollectionFactory::class);
+    $fallbackCollection = $productCollectionFactory->create();
+    $fallbackCollection->addAttributeToSelect(['name', 'small_image', 'price', 'final_price']);
+    $fallbackCollection->addAttributeToFilter('status', \Magento\Catalog\Model\Product\Attribute\Source\Status::STATUS_ENABLED);
+    $fallbackCollection->addAttributeToFilter('entity_id', ['neq' => (int) $product->getId()]);
+    $fallbackCollection->setPageSize(8);
+    $fallbackCollection->setCurPage(1);
+    $fallbackCollection->load();
+
+    foreach ($fallbackCollection as $item) {
+        if (count($compareItems) >= 3) {
+            break;
+        }
+        $exists = false;
+        foreach ($compareItems as $cmp) {
+            if ((int) $cmp->getId() === (int) $item->getId()) {
+                $exists = true;
+                break;
+            }
+        }
+        if (!$exists) {
+            $compareItems[] = $item;
+        }
+    }
+}
+
+$toCardData = function ($item, $tag = '') use ($imageHelper) {
+    $img = (string) $imageHelper->init($item, 'product_small_image')->getUrl();
+    $rPrice = (float) $item->getPrice();
+    $fPrice = (float) $item->getFinalPrice();
+    $conf = trim(strip_tags((string) $item->getShortDescription()));
+
+    return [
+        'id' => (int) $item->getId(),
+        'name' => (string) $item->getName(),
+        'url' => (string) $item->getProductUrl(),
+        'image' => $img,
+        'config' => $conf !== '' ? $conf : 'Balanced performance for daily use',
+        'price' => $fPrice > 0 ? $fPrice : $rPrice,
+        'tag' => $tag
+    ];
+};
+
+$similarData = [];
+$similarIds = [];
+foreach ($related as $item) {
+    $itemId = (int) $item->getId();
+    if ($itemId <= 0 || isset($similarIds[$itemId])) {
+        continue;
+    }
+    $similarIds[$itemId] = true;
+    $similarData[] = $toCardData($item);
+}
+
+if (count($similarData) < 4) {
+    $productCollectionFactory = $om->get(\Magento\Catalog\Model\ResourceModel\Product\CollectionFactory::class);
+    $similarCollection = $productCollectionFactory->create();
+    $similarCollection->addAttributeToSelect(['name', 'small_image', 'price', 'final_price', 'short_description', 'visibility']);
+    $similarCollection->addAttributeToFilter('status', \Magento\Catalog\Model\Product\Attribute\Source\Status::STATUS_ENABLED);
+    $similarCollection->addAttributeToFilter('entity_id', ['neq' => (int) $product->getId()]);
+    $similarCollection->addAttributeToFilter(
+        'visibility',
+        ['in' => [
+            \Magento\Catalog\Model\Product\Visibility::VISIBILITY_IN_CATALOG,
+            \Magento\Catalog\Model\Product\Visibility::VISIBILITY_IN_SEARCH,
+            \Magento\Catalog\Model\Product\Visibility::VISIBILITY_BOTH
+        ]]
+    );
+    $similarCollection->setPageSize(12);
+    $similarCollection->setCurPage(1);
+    $similarCollection->load();
+
+    foreach ($similarCollection as $item) {
+        if (count($similarData) >= 4) {
+            break;
+        }
+        $itemId = (int) $item->getId();
+        if ($itemId <= 0 || isset($similarIds[$itemId])) {
+            continue;
+        }
+        $similarIds[$itemId] = true;
+        $similarData[] = $toCardData($item);
+    }
+}
+
+if (empty($similarData)) {
+    $similarData = [
+        ['id' => 9001, 'name' => 'Everyday Laptop 14"', 'url' => '#', 'image' => (string) $imageHelper->init($product, 'product_small_image')->getUrl(), 'config' => 'Intel i5, 8GB RAM, 512GB SSD', 'price' => 499, 'tag' => ''],
+        ['id' => 9002, 'name' => 'Creator Laptop 15.6"', 'url' => '#', 'image' => (string) $imageHelper->init($product, 'product_small_image')->getUrl(), 'config' => 'Intel i7, 16GB RAM, 1TB SSD', 'price' => 799, 'tag' => ''],
+        ['id' => 9003, 'name' => 'Student Laptop 13.3"', 'url' => '#', 'image' => (string) $imageHelper->init($product, 'product_small_image')->getUrl(), 'config' => 'Intel i3, 8GB RAM, 256GB SSD', 'price' => 399, 'tag' => ''],
+        ['id' => 9004, 'name' => 'Business Laptop 16"', 'url' => '#', 'image' => (string) $imageHelper->init($product, 'product_small_image')->getUrl(), 'config' => 'Intel i7, 32GB RAM, 1TB SSD', 'price' => 999, 'tag' => '']
+    ];
+}
+
+if (count($similarData) > 4) {
+    $similarData = array_slice($similarData, 0, 4);
+}
+
+$accessoryData = [];
+foreach ($upsell as $item) {
+    $accessoryData[] = $toCardData($item, '15%');
+}
+
+if (empty($accessoryData)) {
+    $placeholder = $block->getViewFileUrl('Magento_Catalog::images/product/placeholder/small_image.jpg');
+    $accessoryData = [
+        ['id' => 9101, 'name' => 'Wireless Mouse', 'url' => '#', 'image' => $placeholder, 'config' => '2.4G, silent click', 'price' => 19.99, 'tag' => '15%'],
+        ['id' => 9102, 'name' => 'Laptop Sleeve 15.6"', 'url' => '#', 'image' => $placeholder, 'config' => 'Water-resistant, padded', 'price' => 24.99, 'tag' => '15%'],
+        ['id' => 9103, 'name' => 'USB-C Hub 7-in-1', 'url' => '#', 'image' => $placeholder, 'config' => 'HDMI + USB 3.0 + PD', 'price' => 29.99, 'tag' => '15%'],
+        ['id' => 9104, 'name' => 'Cooling Pad', 'url' => '#', 'image' => $placeholder, 'config' => 'Dual fan, adjustable angle', 'price' => 34.99, 'tag' => '15%']
+    ];
+}
+
+$reviewData = [
+    [
+        'stars' => 5,
+        'date' => '12/04/2026',
+        'user' => 'Nguyen A',
+        'title' => 'Amazing performance for work and study',
+        'content' => 'Runs smooth with many browser tabs and office apps. Battery is good and fan noise is low.',
+        'pros' => ['Fast startup', 'Good keyboard'],
+        'cons' => ['Speaker could be louder'],
+        'up' => 12,
+        'down' => 1
+    ],
+    [
+        'stars' => 4,
+        'date' => '11/04/2026',
+        'user' => 'Tran B',
+        'title' => 'Great value with solid build quality',
+        'content' => 'Display is clear and bright. Compact charger and easy to carry all day.',
+        'pros' => ['Lightweight', 'Nice screen'],
+        'cons' => ['More ports would be better'],
+        'up' => 8,
+        'down' => 0
+    ],
+    [
+        'stars' => 5,
+        'date' => '10/04/2026',
+        'user' => 'Le C',
+        'title' => 'Battery life is exactly what I needed',
+        'content' => 'I can use it through a full workday without charging. Thermals are stable.',
+        'pros' => ['Long battery', 'Cool temperature'],
+        'cons' => ['Webcam quality average'],
+        'up' => 6,
+        'down' => 0
+    ],
+    [
+        'stars' => 3,
+        'date' => '09/04/2026',
+        'user' => 'Pham D',
+        'title' => 'Good for basics, not for heavy editing',
+        'content' => 'For office work it is fine, but video exporting is slower than expected.',
+        'pros' => ['Decent battery', 'Good value'],
+        'cons' => ['Average performance under heavy load'],
+        'up' => 4,
+        'down' => 2
+    ],
+    [
+        'stars' => 4,
+        'date' => '08/04/2026',
+        'user' => 'Hoang E',
+        'title' => 'Comfortable keyboard and stable wifi',
+        'content' => 'Typing feels comfortable and connection is stable for meetings.',
+        'pros' => ['Comfortable keyboard'],
+        'cons' => ['Trackpad is just okay'],
+        'up' => 5,
+        'down' => 0
+    ]
+];
+
+$compareSeed = [];
+$mainCompareItem = [
+    'id' => (int) $product->getId(),
+    'name' => $name,
+    'image' => (string) $imageHelper->init($product, 'product_small_image')->getUrl(),
+    'price' => $final > 0 ? $final : $regular,
+    'url' => (string) $product->getProductUrl(),
+    'category_ids' => array_values(array_map('intval', (array) $product->getCategoryIds()))
+];
+?>
+
+<style>
+.tekntek-pdp-wrap { width: min(1240px, calc(100vw - 32px)); margin: 20px auto 110px; color: #121212; }
+.tekntek-hero { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+.tekntek-buy h1 { margin: 0; font-size: 34px; line-height: 1.2; font-weight: 800; }
+.tekntek-rating { margin-top: 10px; display: inline-flex; align-items: center; gap: 10px; font-size: 14px; }
+.tekntek-rating-stars { color: #111; letter-spacing: 1px; }
+.tekntek-option { margin-top: 16px; }
+.tekntek-option label { font-size: 13px; color: #666; display: block; margin-bottom: 8px; }
+.tekntek-colors { display: flex; gap: 8px; }
+.tekntek-color { width: 20px; height: 20px; border-radius: 50%; border: 1px solid #d1d5db; display: inline-block; }
+.tekntek-price { margin-top: 18px; display: flex; align-items: baseline; gap: 10px; }
+.tekntek-price-old { color: #9ca3af; text-decoration: line-through; font-size: 14px; }
+.tekntek-price-new { color: #dc2626; font-size: 34px; font-weight: 800; }
+.tekntek-cta { margin-top: 16px; display: flex; gap: 10px; align-items: center; }
+.tekntek-btn { height: 42px; padding: 0 18px; border-radius: 8px; border: 1px solid transparent; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
+.tekntek-btn-buy { background: #1f5fbf; color: #fff; }
+.tekntek-btn-cart { background: #fff; color: #1f5fbf; border-color: #1f5fbf; }
+.tekntek-btn-compare { background: #fff; color: #111827; border-color: #d1d5db; }
+.tekntek-btn-heart { width: 42px; padding: 0; background: #fff; color: #1f5fbf; border: 1px solid #c7d2fe; }
+.tekntek-compare-error { color: #dc2626; font-size: 12px; min-height: 16px; margin-top: 6px; display: block; }
+.tekntek-promises { margin-top: 14px; padding: 0; list-style: none; color: #374151; }
+.tekntek-promises li { margin: 7px 0; font-size: 13px; }
+.tekntek-promises li:before { content: "\2713"; color: #10b981; margin-right: 8px; }
+.tekntek-section { margin-top: 28px; background: #fff; border: 1px solid #eceff3; border-radius: 12px; padding: 16px; }
+.tekntek-sec-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+.tekntek-sec-head h2 { margin: 0; font-size: 16px; }
+.tekntek-sec-link { color: #1f5fbf; font-size: 12px; text-decoration: none; }
+.tekntek-info-specs { display: grid; grid-template-columns: 3fr 2fr; gap: 20px; }
+.tekntek-features { margin: 0; padding-left: 18px; line-height: 1.7; font-size: 13px; }
+.tekntek-spec-box { background: #f8f8f8; border-radius: 10px; padding: 10px 14px; }
+.tekntek-spec-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.tekntek-spec-table td { padding: 9px 0; border-bottom: 1px solid #e5e7eb; vertical-align: top; }
+.tekntek-spec-table td:first-child { width: 38%; font-weight: 700; color: #1f2937; }
+.tekntek-spec-table tr:last-child td { border-bottom: 0; }
+.tekntek-description { font-size: 13px; line-height: 1.7; color: #374151; }
+.tekntek-description.is-collapsed { max-height: 82px; overflow: hidden; }
+.tekntek-reviews { display: grid; grid-template-columns: 35% 65%; gap: 16px; }
+.tekntek-rev-card { border: 1px solid #e5e7eb; border-radius: 10px; padding: 12px; }
+.tekntek-bars { display: grid; gap: 10px; margin: 12px 0 14px; }
+.tekntek-overall-stars { font-size: 26px; letter-spacing: 2px; margin: 6px 0 8px; text-align: center; }
+.tekntek-bar-row { display: grid; grid-template-columns: 52px 1fr 42px; gap: 8px; align-items: center; font-size: 12px; color: #374151; }
+.tekntek-bar { height: 6px; background: #e5e7eb; border-radius: 999px; overflow: hidden; }
+.tekntek-bar > span { display: block; height: 100%; background: #10b981; }
+.tekntek-review-note { margin: 14px 0 10px; font-size: 13px; line-height: 1.6; color: #374151; }
+.tekntek-review-form { margin-top: 12px; padding-top: 12px; border-top: 1px solid #e5e7eb; display: none; }
+.tekntek-review-form.is-open { display: block; }
+.tekntek-review-form label { display: block; font-size: 12px; color: #4b5563; margin-bottom: 5px; }
+.tekntek-review-form input, .tekntek-review-form textarea, .tekntek-review-form select { width: 100%; border: 1px solid #d1d5db; border-radius: 6px; padding: 7px 8px; font-size: 12px; }
+.tekntek-review-form textarea { min-height: 72px; resize: vertical; }
+.tekntek-review-form-row { margin-bottom: 10px; }
+.tekntek-review-form-actions { display: flex; gap: 8px; }
+.tekntek-review-item { border: 1px solid #e5e7eb; border-radius: 10px; padding: 12px; margin-bottom: 10px; font-size: 12px; }
+.tekntek-review-meta { color: #6b7280; margin: 4px 0 8px; }
+.tekntek-review-vote { text-align: right; color: #1f5fbf; font-size: 12px; }
+.tekntek-review-more-wrap { text-align: center; margin-top: 6px; }
+.tekntek-btn-view-more { height: 34px; padding: 0 14px; border: 1px solid #1f5fbf; border-radius: 6px; background: #fff; color: #1f5fbf; font-size: 12px; cursor: pointer; }
+.tekntek-grid { margin-top: 10px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
+.tekntek-prod-card { border: 1px solid #e5e7eb; border-radius: 10px; padding: 10px; background: #fff; position: relative; }
+.tekntek-prod-card img { width: 100%; height: 120px; object-fit: contain; display: block; }
+.tekntek-prod-name { font-size: 12px; line-height: 1.4; min-height: 34px; margin: 8px 0 4px; }
+.tekntek-prod-conf { font-size: 11px; color: #6b7280; min-height: 30px; }
+.tekntek-prod-price { margin-top: 6px; font-size: 13px; font-weight: 700; color: #111827; }
+.tekntek-tag { position: absolute; top: 8px; right: 8px; background: #ef4444; color: #fff; border-radius: 4px; font-size: 10px; padding: 2px 5px; }
+.tekntek-compare-bar { display: none; position: fixed; left: 0; right: 0; bottom: 0; background: #fff; border-top: 1px solid #e5e7eb; box-shadow: 0 -8px 20px rgba(0, 0, 0, 0.06); z-index: 80; }
+.tekntek-compare-inner { width: min(1240px, calc(100vw - 32px)); margin: 0 auto; min-height: 72px; display: flex; gap: 12px; align-items: center; justify-content: space-between; }
+.tekntek-compare-items { display: flex; gap: 10px; align-items: center; }
+.tekntek-compare-item { display: flex; gap: 8px; align-items: center; border: 1px solid #e5e7eb; border-radius: 8px; padding: 6px 8px; background: #fafafa; min-width: 180px; }
+.tekntek-compare-item img { width: 34px; height: 34px; object-fit: contain; }
+.tekntek-compare-item-main { display: flex; gap: 8px; align-items: center; min-width: 0; flex: 1; }
+.tekntek-compare-title { font-size: 11px; line-height: 1.2; }
+.tekntek-compare-price { font-size: 11px; color: #6b7280; }
+.tekntek-compare-remove { width: 22px; height: 22px; border: 1px solid #d1d5db; background: #fff; color: #6b7280; border-radius: 50%; cursor: pointer; line-height: 1; font-size: 14px; display: inline-flex; align-items: center; justify-content: center; }
+.tekntek-vote-btn { border: 0; background: transparent; color: #1f5fbf; cursor: pointer; font-size: 12px; }
+#tekntek-compare-link,
+#tekntek-compare-link:visited,
+#tekntek-compare-link:hover,
+#tekntek-compare-link:focus,
+#tekntek-compare-link:active {
+    color: #fff !important;
+    text-decoration: none;
+    font-weight: 700;
+}
+@media (max-width: 980px) {
+  .tekntek-hero, .tekntek-info-specs, .tekntek-reviews { grid-template-columns: 1fr; }
+  .tekntek-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .tekntek-compare-item { min-width: 140px; }
+}
+</style>
+
+<div class="tekntek-pdp-wrap">
+    <section class="tekntek-hero">
+        <div class="tekntek-media">
+            <?= /* @noEscape */ $galleryHtml ?>
+        </div>
+
+        <div class="tekntek-buy">
+            <h1><?= $escaper->escapeHtml($name) ?></h1>
+            <div class="tekntek-rating">
+                <span class="tekntek-rating-stars"><?= str_repeat('★', $ratingValue) . str_repeat('☆', 5 - $ratingValue) ?></span>
+                <span>(<?= (int) $ratingCount ?>)</span>
+            </div>
+
+            <div class="tekntek-option">
+                <label>Kleur</label>
+                <div class="tekntek-colors">
+                    <span class="tekntek-color" style="background:#cfd3d8"></span>
+                    <span class="tekntek-color" style="background:#1f2937"></span>
+                    <span class="tekntek-color" style="background:#111827"></span>
+                    <span class="tekntek-color" style="background:#f8fafc"></span>
+                </div>
+            </div>
+
+            <div class="tekntek-price">
+                <span class="tekntek-price-old"><?= $regular > $final ? $escaper->escapeHtml($priceHelper->currency($regular, true, false)) : '' ?></span>
+                <span class="tekntek-price-new"><?= $escaper->escapeHtml($priceHelper->currency($final, true, false)) ?></span>
+            </div>
+
+            <div class="tekntek-cta">
+                <a class="tekntek-btn tekntek-btn-buy" href="<?= $escaper->escapeUrl($buyNowUrl) ?>">Buy now</a>
+                <form action="<?= $escaper->escapeUrl($addToCartUrl) ?>" method="post">
+                    <input type="hidden" name="form_key" value="<?= $escaper->escapeHtmlAttr($formKey) ?>" />
+                    <input type="hidden" name="product" value="<?= (int) $product->getId() ?>" />
+                    <input type="hidden" name="qty" value="1" />
+                    <button class="tekntek-btn tekntek-btn-cart" type="submit">Add to Cart</button>
+                </form>
+                <button type="button" class="tekntek-btn tekntek-btn-compare" id="tekntek-add-main-compare">Compare</button>
+                <a class="tekntek-btn tekntek-btn-heart" href="<?= $escaper->escapeUrl($wishlistUrl) ?>" aria-label="Wishlist">♡</a>
+            </div>
+            <span class="tekntek-compare-error" id="tekntek-compare-error"></span>
+
+            <ul class="tekntek-promises">
+                <li>Fast delivery and transparent shipping updates.</li>
+                <li>Easy return policy within 30 days.</li>
+                <li>Official warranty and dedicated support.</li>
+            </ul>
+        </div>
+    </section>
+
+    <section class="tekntek-section">
+        <div class="tekntek-sec-head">
+            <h2>Product Information &amp; Specifications</h2>
+            <a class="tekntek-sec-link" href="#">Show less</a>
+        </div>
+        <div class="tekntek-info-specs">
+            <ul class="tekntek-features">
+                <?php foreach ($featureBullets as $bullet): ?>
+                    <li><?= $escaper->escapeHtml($bullet) ?></li>
+                <?php endforeach; ?>
+            </ul>
+            <div class="tekntek-spec-box">
+                <table class="tekntek-spec-table">
+                    <tbody>
+                        <?php foreach ($specRows as $label => $value): ?>
+                            <tr>
+                                <td><?= $escaper->escapeHtml($label) ?></td>
+                                <td><?= $escaper->escapeHtml($value) ?></td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <section class="tekntek-section">
+        <div class="tekntek-sec-head">
+            <h2>Description</h2>
+            <a class="tekntek-sec-link" data-role="desc-toggle" href="#">Show more</a>
+        </div>
+        <div class="tekntek-description is-collapsed" data-role="desc-text">
+            <?= /* @noEscape */ $descriptionHtml ?>
+        </div>
+    </section>
+
+    <section class="tekntek-section">
+        <div class="tekntek-sec-head"><h2>User ratings and reviews</h2><a class="tekntek-sec-link" href="#">Read all</a></div>
+        <div class="tekntek-reviews">
+            <div class="tekntek-rev-card" id="tekntek-review-summary"></div>
+            <div>
+                <div id="tekntek-review-list"></div>
+                <div class="tekntek-review-more-wrap">
+                    <button type="button" class="tekntek-btn-view-more" id="tekntek-view-more">View more</button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="tekntek-section">
+        <div class="tekntek-sec-head"><h2>Similar picks for you</h2><a class="tekntek-sec-link" href="#">View all</a></div>
+        <div class="tekntek-grid" id="tekntek-similar-grid"></div>
+    </section>
+
+    <section class="tekntek-section">
+        <div class="tekntek-sec-head"><h2>Add these accessories to your order</h2><a class="tekntek-sec-link" href="#">View all</a></div>
+        <div class="tekntek-grid" id="tekntek-accessory-grid"></div>
+    </section>
+</div>
+
+<script type="application/json" id="tekntek-mock-json"><?= /* @noEscape */ json_encode([
+    'similar' => $similarData,
+    'accessories' => $accessoryData,
+    'reviews' => $reviewData,
+    'compareSeed' => $compareSeed,
+    'mainProduct' => $mainCompareItem,
+    'compareAddBaseUrl' => $compareAddBaseUrl,
+    'compareClearUrl' => $compareClearUrl,
+    'auth' => [
+        'isLoggedIn' => $isLoggedIn,
+        'loginUrl' => $loginUrl
+    ]
+], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?></script>
+
+<div class="tekntek-compare-bar" id="tekntek-compare-bar">
+    <div class="tekntek-compare-inner">
+        <div class="tekntek-compare-items" id="tekntek-compare-items"></div>
+        <a class="tekntek-btn tekntek-btn-buy" id="tekntek-compare-link" href="<?= $escaper->escapeUrl($compareIndexUrl) ?>">Compare items (0)</a>
+    </div>
+</div>
+
+<script>
+(function () {
+    var link = document.querySelector('[data-role="desc-toggle"]');
+    var text = document.querySelector('[data-role="desc-text"]');
+    if (!link || !text) {
+        return;
+    }
+    link.addEventListener('click', function (event) {
+        event.preventDefault();
+        var collapsed = text.classList.toggle('is-collapsed');
+        link.textContent = collapsed ? 'Show more' : 'Show less';
+    });
+
+    var dataNode = document.getElementById('tekntek-mock-json');
+    var similarGrid = document.getElementById('tekntek-similar-grid');
+    var accessoryGrid = document.getElementById('tekntek-accessory-grid');
+    var reviewSummary = document.getElementById('tekntek-review-summary');
+    var reviewList = document.getElementById('tekntek-review-list');
+    var viewMoreBtn = document.getElementById('tekntek-view-more');
+    var compareBar = document.getElementById('tekntek-compare-bar');
+    var compareItemsWrap = document.getElementById('tekntek-compare-items');
+    var compareLink = document.getElementById('tekntek-compare-link');
+    var addMainCompareBtn = document.getElementById('tekntek-add-main-compare');
+    var compareError = document.getElementById('tekntek-compare-error');
+
+    if (!dataNode || !similarGrid || !accessoryGrid || !reviewSummary || !reviewList || !compareBar || !compareItemsWrap || !compareLink || !viewMoreBtn || !addMainCompareBtn || !compareError) {
+        return;
+    }
+
+    var payload = JSON.parse(dataNode.textContent || '{}');
+    var compareStoreKey = 'tekntek_compare_v1';
+    var reviews = Array.isArray(payload.reviews) ? payload.reviews : [];
+    var similar = Array.isArray(payload.similar) ? payload.similar : [];
+    var accessories = Array.isArray(payload.accessories) ? payload.accessories : [];
+    var mainProduct = payload.mainProduct || null;
+    var compareAddBaseUrl = payload.compareAddBaseUrl || '/catalog/product_compare/add/';
+    var compareClearUrl = payload.compareClearUrl || '/catalog/product_compare/clear/';
+    var auth = payload.auth || {};
+    var isLoggedIn = !!auth.isLoggedIn;
+    var loginUrl = auth.loginUrl || '/customer/account/login';
+    var compareState = [];
+    var visibleReviews = 2;
+    var reviewStep = 2;
+
+    function price(value) {
+        var num = Number(value || 0);
+        return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(num);
+    }
+
+    function stars(n) {
+        var rating = Math.max(0, Math.min(5, Number(n || 0)));
+        return '★★★★★'.slice(0, rating) + '☆☆☆☆☆'.slice(0, 5 - rating);
+    }
+
+    function esc(value) {
+        return String(value || '').replace(/[&<>"']/g, function (ch) {
+            return ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' })[ch];
+        });
+    }
+
+    function setCompareError(message) {
+        compareError.textContent = message || '';
+    }
+
+    function buildCompareAddUrl(productId) {
+        var base = String(compareAddBaseUrl || '/catalog/product_compare/add/');
+        if (base.slice(-1) !== '/') {
+            base += '/';
+        }
+        return base + 'product/' + Number(productId) + '/';
+    }
+
+    function getFormKey() {
+        var node = document.querySelector('input[name="form_key"]');
+        if (node && node.value) {
+            return node.value;
+        }
+        if (window.FORM_KEY) {
+            return window.FORM_KEY;
+        }
+        return '';
+    }
+
+    function postForm(url, data) {
+        return fetch(url, {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+            },
+            body: new URLSearchParams(data).toString()
+        }).catch(function () {
+            return null;
+        });
+    }
+
+    function syncMagentoCompare() {
+        var formKey = getFormKey();
+        var uenc = window.btoa(window.location.href);
+        return Promise.all(compareState.map(function (item) {
+            return postForm(buildCompareAddUrl(item.id), {
+                form_key: formKey,
+                product: Number(item.id),
+                uenc: uenc
+            });
+        }));
+    }
+
+    function loadCompareState() {
+        try {
+            var raw = window.localStorage.getItem(compareStoreKey);
+            if (!raw) {
+                return Array.isArray(payload.compareSeed) ? payload.compareSeed.slice(0, 3) : [];
+            }
+            var parsed = JSON.parse(raw);
+            if (!Array.isArray(parsed)) {
+                return [];
+            }
+            var normalized = parsed.filter(function (item) {
+                return item && Number(item.id) > 0;
+            }).slice(0, 3).map(function (item) {
+                var categoryIds = Array.isArray(item.category_ids) ? item.category_ids : [];
+                categoryIds = categoryIds.map(function (id) {
+                    return Number(id);
+                }).filter(function (id) {
+                    return id > 0;
+                });
+
+                if ((!categoryIds.length) && mainProduct && Number(item.id) === Number(mainProduct.id) && Array.isArray(mainProduct.category_ids)) {
+                    categoryIds = mainProduct.category_ids.map(function (id) {
+                        return Number(id);
+                    }).filter(function (id) {
+                        return id > 0;
+                    });
+                }
+
+                item.category_ids = categoryIds;
+                return item;
+            });
+
+            return normalized;
+        } catch (e) {
+            return [];
+        }
+    }
+
+    function normalizeCategoryIds(item) {
+        var list = Array.isArray(item && item.category_ids) ? item.category_ids : [];
+        return list.map(function (id) {
+            return Number(id);
+        }).filter(function (id) {
+            return id > 0;
+        });
+    }
+
+    function intersectCategories(left, right) {
+        var leftSet = new Set(left);
+        return right.filter(function (id) {
+            return leftSet.has(id);
+        });
+    }
+
+    function getCommonCategoryIds(state) {
+        if (!Array.isArray(state) || !state.length) {
+            return [];
+        }
+        var common = normalizeCategoryIds(state[0]);
+        for (var i = 1; i < state.length; i += 1) {
+            common = intersectCategories(common, normalizeCategoryIds(state[i]));
+            if (!common.length) {
+                break;
+            }
+        }
+        return common;
+    }
+
+    function saveCompareState() {
+        try {
+            window.localStorage.setItem(compareStoreKey, JSON.stringify(compareState));
+        } catch (e) {
+            // Ignore storage quota/privacy mode errors.
+        }
+    }
+
+    function removeFromCompare(id) {
+        compareState = compareState.filter(function (item) {
+            return Number(item.id) !== Number(id);
+        });
+        setCompareError('');
+        saveCompareState();
+        renderCompare();
+    }
+
+    function renderCompare() {
+        compareBar.style.display = compareState.length > 0 ? 'block' : 'none';
+        compareItemsWrap.innerHTML = compareState.map(function (item) {
+            return '<div class="tekntek-compare-item">' +
+                '<div class="tekntek-compare-item-main">' +
+                    '<img src="' + item.image + '" alt="' + item.name + '">' +
+                    '<div><div class="tekntek-compare-title">' + item.name + '</div><div class="tekntek-compare-price">' + price(item.price) + '</div></div>' +
+                '</div>' +
+                '<button type="button" class="tekntek-compare-remove" data-role="remove-compare" data-id="' + item.id + '" aria-label="Remove">×</button>' +
+            '</div>';
+        }).join('');
+        compareLink.textContent = 'Compare items (' + compareState.length + ')';
+        compareItemsWrap.querySelectorAll('[data-role="remove-compare"]').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                removeFromCompare(Number(btn.getAttribute('data-id')));
+            });
+        });
+    }
+
+    function addToCompare(item) {
+        item.category_ids = normalizeCategoryIds(item);
+        var exists = compareState.some(function (x) { return Number(x.id) === Number(item.id); });
+        if (exists) {
+            setCompareError('This product is already in compare list.');
+            return;
+        }
+        if (compareState.length >= 3) {
+            setCompareError('You can compare up to 3 products only.');
+            return;
+        }
+
+        if (!item.category_ids.length) {
+            setCompareError('Cannot add to compare: product category is missing.');
+            return;
+        }
+
+        if (compareState.length > 0) {
+            var commonCategories = getCommonCategoryIds(compareState);
+            if (!commonCategories.length) {
+                commonCategories = normalizeCategoryIds(compareState[0]);
+            }
+            var nextCommon = intersectCategories(commonCategories, item.category_ids);
+            if (!nextCommon.length) {
+                setCompareError('Only products in the same category can be compared.');
+                return;
+            }
+        }
+
+        compareState.push(item);
+        setCompareError('');
+        saveCompareState();
+        renderCompare();
+
+        // Keep Magento compare list in sync immediately, not only at redirect time.
+        var formKey = getFormKey();
+        var uenc = window.btoa(window.location.href);
+        postForm(buildCompareAddUrl(item.id), {
+            form_key: formKey,
+            product: Number(item.id),
+            uenc: uenc
+        });
+    }
+
+    function cardTemplate(item, withTag) {
+        var tag = withTag && item.tag ? '<span class="tekntek-tag">' + item.tag + '</span>' : '';
+        return '<article class="tekntek-prod-card">' +
+            tag +
+            '<a href="' + item.url + '"><img src="' + item.image + '" alt="' + item.name + '"></a>' +
+            '<div class="tekntek-prod-name">' + item.name + '</div>' +
+            '<div class="tekntek-prod-conf">' + item.config + '</div>' +
+            '<div class="tekntek-prod-price">' + price(item.price) + '</div>' +
+        '</article>';
+    }
+
+    function renderCards() {
+        similarGrid.innerHTML = similar.map(function (item) { return cardTemplate(item, false); }).join('');
+        accessoryGrid.innerHTML = accessories.map(function (item) { return cardTemplate(item, true); }).join('');
+    }
+
+    function renderReviewSummary() {
+        var counts = [5, 4, 3, 2, 1].map(function (star) {
+            return reviews.filter(function (r) { return Number(r.stars) === star; }).length;
+        });
+        var total = reviews.length || 1;
+        reviewSummary.innerHTML = '<strong>Customer reviews</strong>' +
+            '<div class="tekntek-overall-stars">★★★★★</div>' +
+            '<div class="tekntek-bars">' + counts.map(function (count, idx) {
+                var width = Math.round((count / total) * 100);
+                var starLabel = 5 - idx;
+                return '<div class="tekntek-bar-row"><span>' + starLabel + ' star</span><div class="tekntek-bar"><span style="width:' + width + '%"></span></div><span>' + width + '%</span></div>';
+            }).join('') + '</div>' +
+            '<p class="tekntek-review-note">Share your feedback and create a better shopping experience for everyone. Thank you for taking the time to share your opinion.</p>' +
+            '<button class="tekntek-btn tekntek-btn-buy" id="tekntek-add-review" style="width:100%">Write a review</button>' +
+            '<form id="tekntek-review-form" class="tekntek-review-form" novalidate>' +
+                '<div class="tekntek-review-form-row"><label for="tekntek-review-stars">Rating</label><select id="tekntek-review-stars"><option value="5">5 stars</option><option value="4">4 stars</option><option value="3">3 stars</option><option value="2">2 stars</option><option value="1">1 star</option></select></div>' +
+                '<div class="tekntek-review-form-row"><label for="tekntek-review-title">Title</label><input id="tekntek-review-title" type="text" maxlength="120" placeholder="Review title"></div>' +
+                '<div class="tekntek-review-form-row"><label for="tekntek-review-content">Comment</label><textarea id="tekntek-review-content" maxlength="800" placeholder="Share your experience"></textarea></div>' +
+                '<div class="tekntek-review-form-actions"><button type="submit" class="tekntek-btn tekntek-btn-buy">Submit review</button><button type="button" id="tekntek-review-cancel" class="tekntek-btn tekntek-btn-cart">Cancel</button></div>' +
+            '</form>';
+    }
+
+    function renderReviews() {
+        var current = reviews.slice(0, visibleReviews);
+        reviewList.innerHTML = current.map(function (review, idx) {
+            return '<article class="tekntek-review-item">' +
+                '<div class="tekntek-rating-stars">' + stars(review.stars) + '</div>' +
+                '<div class="tekntek-review-meta">' + esc(review.date) + ' • ' + esc(review.user) + '</div>' +
+                '<strong>' + esc(review.title) + '</strong>' +
+                '<p>' + esc(review.content) + '</p>' +
+                '<p>+ ' + (review.pros || []).map(esc).join('<br>+ ') + '<br>- ' + (review.cons || []).map(esc).join('<br>- ') + '</p>' +
+                '<div class="tekntek-review-vote">' +
+                    '<button class="tekntek-vote-btn" data-role="vote" data-type="up" data-index="' + idx + '">Helpful (' + Number(review.up || 0) + ')</button> ' +
+                    '<button class="tekntek-vote-btn" data-role="vote" data-type="down" data-index="' + idx + '">Not helpful (' + Number(review.down || 0) + ')</button>' +
+                '</div>' +
+            '</article>';
+        }).join('');
+
+        viewMoreBtn.style.display = reviews.length > visibleReviews ? 'inline-flex' : 'none';
+
+        reviewList.querySelectorAll('[data-role="vote"]').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                if (!isLoggedIn) {
+                    window.location.href = loginUrl;
+                    return;
+                }
+                var index = Number(btn.getAttribute('data-index'));
+                var type = btn.getAttribute('data-type');
+                if (!reviews[index]) {
+                    return;
+                }
+                if (type === 'up') {
+                    reviews[index].up += 1;
+                } else {
+                    reviews[index].down += 1;
+                }
+                renderReviews();
+                renderReviewSummary();
+                bindAddReview();
+            });
+        });
+    }
+
+    function bindAddReview() {
+        var btn = document.getElementById('tekntek-add-review');
+        var form = document.getElementById('tekntek-review-form');
+        var cancel = document.getElementById('tekntek-review-cancel');
+        if (!btn) {
+            return;
+        }
+        btn.addEventListener('click', function () {
+            if (!isLoggedIn) {
+                window.location.href = loginUrl;
+                return;
+            }
+            if (!form) {
+                return;
+            }
+            form.classList.add('is-open');
+        });
+
+        if (!form) {
+            return;
+        }
+
+        form.addEventListener('submit', function (event) {
+            event.preventDefault();
+            var starNode = document.getElementById('tekntek-review-stars');
+            var titleNode = document.getElementById('tekntek-review-title');
+            var contentNode = document.getElementById('tekntek-review-content');
+            var starsValue = Number(starNode && starNode.value ? starNode.value : 5);
+            var titleValue = titleNode ? titleNode.value.trim() : '';
+            var contentValue = contentNode ? contentNode.value.trim() : '';
+
+            if (contentValue === '') {
+                return;
+            }
+
+            reviews.unshift({
+                stars: Math.max(1, Math.min(5, starsValue)),
+                date: new Date().toLocaleDateString('en-GB'),
+                user: 'You',
+                title: titleValue !== '' ? titleValue : 'New review',
+                content: contentValue,
+                pros: ['Posted by logged-in customer'],
+                cons: ['No cons yet'],
+                up: 0,
+                down: 0
+            });
+            visibleReviews = Math.max(visibleReviews, 2);
+            if (titleNode) {
+                titleNode.value = '';
+            }
+            if (contentNode) {
+                contentNode.value = '';
+            }
+            renderReviews();
+            renderReviewSummary();
+            bindAddReview();
+        });
+
+        if (cancel) {
+            cancel.addEventListener('click', function () {
+                form.classList.remove('is-open');
+            });
+        }
+    }
+
+    function bindViewMore() {
+        viewMoreBtn.addEventListener('click', function () {
+            visibleReviews += reviewStep;
+            renderReviews();
+        });
+    }
+
+    renderCards();
+    renderReviewSummary();
+    renderReviews();
+    compareState = loadCompareState();
+    bindAddReview();
+    bindViewMore();
+    addMainCompareBtn.addEventListener('click', function () {
+        if (!mainProduct || !mainProduct.id) {
+            return;
+        }
+        addToCompare({
+            id: mainProduct.id,
+            name: mainProduct.name,
+            image: mainProduct.image,
+            price: mainProduct.price,
+            category_ids: mainProduct.category_ids
+        });
+    });
+    compareLink.addEventListener('click', function (event) {
+        event.preventDefault();
+        if (!compareState.length) {
+            window.location.href = compareLink.href;
+            return;
+        }
+        var ids = compareState.map(function (item) { return Number(item.id); }).filter(function (id) { return id > 0; });
+        var nextUrl = new URL(compareLink.href, window.location.origin);
+        nextUrl.searchParams.set('ids', ids.join(','));
+        setCompareError('Syncing compare list...');
+        syncMagentoCompare().then(function () {
+            setCompareError('');
+            window.location.href = nextUrl.toString();
+        });
+    });
+    renderCompare();
+})();
+</script>

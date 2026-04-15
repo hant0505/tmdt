@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="tekntek.hello.category.list" remove="true"/>
+        <referenceBlock name="category.description" remove="true"/>
+        <referenceBlock name="category.cms" remove="true"/>
+        <referenceBlock name="wishlist_sidebar" remove="true"/>
+
+        <referenceContainer name="sidebar.main">
+            <block class="Magento\Framework\View\Element\Template" name="tekntek.category.sidebar.facets" template="Magento_Catalog::category/tekntek-sidebar-facets.phtml" before="catalog.leftnav"/>
+        </referenceContainer>
+        <referenceContainer name="content">
+            <block class="Magento\Framework\View\Element\Template" name="tekntek.category.brand.ribbon" template="Magento_Catalog::category/tekntek-brand-ribbon.phtml" before="category.products"/>
+        </referenceContainer>
+    </body>
+</page>

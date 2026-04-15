@@ -1,0 +1,567 @@
+<?php
+/** @var \Magento\Framework\View\Element\Template $block */
+/** @var \Magento\Framework\Escaper $escaper */
+
+$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+$signupSession = $objectManager->get(\TeknTek\SignupFlow\Model\SignupSession::class);
+
+$initialStep = 'email';
+if ($signupSession->hasVerifiedEmail()) {
+    $initialStep = 'profile';
+} elseif ($signupSession->hasPendingCode() && !$signupSession->isExpired()) {
+    $initialStep = 'verify';
+}
+
+$prefilledEmail = $signupSession->getEmail();
+$expiresAt = $signupSession->getExpiresAt();
+$signupInit = [
+    'TeknTek_SignupFlow/js/signup-flow' => [
+        'sendUrl' => $block->getUrl('tekntek_signup/code/send'),
+        'verifyUrl' => $block->getUrl('tekntek_signup/code/verify'),
+        'createUrl' => $block->getUrl('tekntek_signup/account/create'),
+        'successUrl' => $block->getUrl(''),
+        'expiresSeconds' => 300,
+    ],
+];
+?>
+<style>
+@media (min-width: 1024px) {
+    body.customer-account-create,
+    .customer-account-create .page-wrapper {
+        background: #11035d !important;
+    }
+
+    .customer-account-create .page-main {
+        padding: 22px 0 30px !important;
+    }
+
+    .customer-account-create .page-title-wrapper,
+    .customer-account-create .page-main > .page-title-wrapper,
+    .customer-account-create h1.page-title,
+    .customer-account-create .page-title {
+        display: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+}
+</style>
+<div class="tekntek-auth tekntek-auth--register"
+     data-role="tekntek-signup-root"
+     data-initial-step="<?= $escaper->escapeHtmlAttr($initialStep) ?>"
+    data-initial-email="<?= $escaper->escapeHtmlAttr($prefilledEmail) ?>"
+    data-initial-expires-at="<?= $escaper->escapeHtmlAttr((string)$expiresAt) ?>"
+    data-mage-init='<?= $escaper->escapeHtmlAttr((string)json_encode($signupInit, JSON_UNESCAPED_SLASHES)) ?>'>
+    <div class="tekntek-auth__shell">
+        <div class="tekntek-auth__stage tekntek-auth__stage--register">
+            <section class="tekntek-auth__panel tekntek-auth__panel--form tekntek-auth__panel--register" aria-labelledby="tekntek-register-heading">
+                <a class="tekntek-auth__brand" href="<?= $block->escapeUrl($block->getUrl('')) ?>" aria-label="TeknTek home">
+                    <img
+                        class="tekntek-auth__brand-logo"
+                        src="<?= $block->escapeUrl($block->getViewFileUrl('css/images/tekntek-logo.png')) ?>"
+                        alt="TeknTek"
+                        loading="eager"
+                    />
+                </a>
+
+                <div class="tekntek-register__progress" aria-label="Registration progress">
+                    <div class="tekntek-register__step-indicator<?= $initialStep === 'email' ? ' is-active' : '' ?><?= $initialStep !== 'email' ? ' is-complete' : '' ?>" data-role="progress-step" data-step-index="0">
+                        <span>1</span>
+                        <strong><?= $escaper->escapeHtml(__('Sign up')) ?></strong>
+                    </div>
+                    <div class="tekntek-register__progress-line"></div>
+                    <div class="tekntek-register__step-indicator<?= $initialStep === 'verify' ? ' is-active' : '' ?><?= $initialStep === 'profile' ? ' is-complete' : '' ?>" data-role="progress-step" data-step-index="1">
+                        <span>2</span>
+                        <strong><?= $escaper->escapeHtml(__('Verify email')) ?></strong>
+                    </div>
+                    <div class="tekntek-register__progress-line"></div>
+                    <div class="tekntek-register__step-indicator<?= $initialStep === 'profile' ? ' is-active' : '' ?>" data-role="progress-step" data-step-index="2">
+                        <span>3</span>
+                        <strong><?= $escaper->escapeHtml(__('Add info')) ?></strong>
+                    </div>
+                </div>
+
+                <div class="tekntek-register__message" data-role="message" hidden></div>
+
+                <div class="tekntek-register__stage<?= $initialStep === 'email' ? ' is-active' : '' ?>" data-step="email"<?= $initialStep !== 'email' ? ' hidden' : '' ?>>
+                    <div class="block-title">
+                        <strong id="tekntek-register-heading" role="heading" aria-level="2"><?= $escaper->escapeHtml(__('Create an account')) ?></strong>
+                    </div>
+
+                    <p class="tekntek-auth__subtitle">
+                        <?= $escaper->escapeHtml(__('Enter your email address. We will send a 6-digit code to verify your account.')) ?>
+                    </p>
+
+                    <form class="tekntek-register__form" data-role="email-form" action="<?= $escaper->escapeUrl($block->getUrl('tekntek_signup/code/send')) ?>" method="post">
+                        <?= $block->getBlockHtml('formkey') ?>
+                        <label class="tekntek-register__field">
+                            <span><?= $escaper->escapeHtml(__('Email')) ?></span>
+                            <input type="email" name="email" data-role="email-input" placeholder="<?= $escaper->escapeHtmlAttr(__('Email')) ?>" autocomplete="email" value="<?= $escaper->escapeHtmlAttr($prefilledEmail) ?>" required>
+                        </label>
+
+                        <button type="submit" class="tekntek-register__button" data-role="email-submit">
+                            <span><?= $escaper->escapeHtml(__('Continue')) ?></span>
+                        </button>
+                    </form>
+
+                    <div class="tekntek-register__login-link">
+                        <p><?= $escaper->escapeHtml(__('Have you already created an account?')) ?></p>
+                        <a class="tekntek-register__text-link" href="<?= $escaper->escapeUrl($block->getUrl('customer/account/login')) ?>">
+                            <?= $escaper->escapeHtml(__('Login')) ?>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="tekntek-register__stage<?= $initialStep === 'verify' ? ' is-active' : '' ?>" data-step="verify"<?= $initialStep !== 'verify' ? ' hidden' : '' ?>>
+                    <div class="block-title">
+                        <strong role="heading" aria-level="2"><?= $escaper->escapeHtml(__('Verify email')) ?></strong>
+                    </div>
+
+                    <p class="tekntek-auth__subtitle" data-role="verify-copy">
+                        <?= $escaper->escapeHtml(__('Check your inbox. Enter the 6-digit verification code we sent to your email. The code expires after 5 minutes.')) ?>
+                    </p>
+
+                    <form class="tekntek-register__form" data-role="verify-form" action="<?= $escaper->escapeUrl($block->getUrl('tekntek_signup/code/verify')) ?>" method="post">
+                        <?= $block->getBlockHtml('formkey') ?>
+                        <input type="hidden" name="email" data-role="verified-email-hidden" value="<?= $escaper->escapeHtmlAttr($prefilledEmail) ?>">
+                        <input type="hidden" name="code" data-role="code-hidden" value="">
+
+                        <div class="tekntek-register__otp" data-role="otp-group" aria-label="<?= $escaper->escapeHtmlAttr(__('Verification code')) ?>">
+                            <?php for ($index = 0; $index < 6; $index++): ?>
+                                <input
+                                    type="text"
+                                    inputmode="numeric"
+                                    pattern="[0-9]*"
+                                    maxlength="1"
+                                    autocomplete="one-time-code"
+                                    data-role="code-digit"
+                                    aria-label="<?= $escaper->escapeHtmlAttr(__('Digit %1', $index + 1)) ?>"
+                                >
+                            <?php endfor; ?>
+                        </div>
+
+                        <div class="tekntek-register__resend-row">
+                            <button type="button" class="tekntek-register__resend" data-role="resend-code" disabled>
+                                <?= $escaper->escapeHtml(__('Send code again')) ?>
+                            </button>
+                            <span class="tekntek-register__timer" data-role="countdown">05:00</span>
+                        </div>
+
+                        <button type="submit" class="tekntek-register__button">
+                            <span><?= $escaper->escapeHtml(__('Continue')) ?></span>
+                        </button>
+                    </form>
+                </div>
+
+                <div class="tekntek-register__stage<?= $initialStep === 'profile' ? ' is-active' : '' ?>" data-step="profile"<?= $initialStep !== 'profile' ? ' hidden' : '' ?>>
+                    <div class="block-title">
+                        <strong role="heading" aria-level="2"><?= $escaper->escapeHtml(__('Add info')) ?></strong>
+                    </div>
+
+                    <p class="tekntek-auth__subtitle">
+                        <?= $escaper->escapeHtml(__('Fill in your personal information to finish creating your account.')) ?>
+                    </p>
+
+                    <form class="tekntek-register__form" data-role="profile-form" action="<?= $escaper->escapeUrl($block->getUrl('tekntek_signup/account/create')) ?>" method="post" autocomplete="off">
+                        <?= $block->getBlockHtml('formkey') ?>
+                        <input type="hidden" name="email" data-role="final-email-hidden" value="<?= $escaper->escapeHtmlAttr($prefilledEmail) ?>">
+
+                        <div class="tekntek-register__titles" role="radiogroup" aria-label="<?= $escaper->escapeHtmlAttr(__('Title')) ?>">
+                            <label><input type="radio" name="prefix" value="Mr."> <span><?= $escaper->escapeHtml(__('Mr.')) ?></span></label>
+                            <label><input type="radio" name="prefix" value="Mrs."> <span><?= $escaper->escapeHtml(__('Mrs.')) ?></span></label>
+                            <label><input type="radio" name="prefix" value=""> <span><?= $escaper->escapeHtml(__('Prefer not to say')) ?></span></label>
+                        </div>
+
+                        <label class="tekntek-register__field">
+                            <input type="text" name="firstname" placeholder="<?= $escaper->escapeHtmlAttr(__('First name')) ?>" autocomplete="given-name" required>
+                        </label>
+
+                        <label class="tekntek-register__field">
+                            <input type="text" name="lastname" placeholder="<?= $escaper->escapeHtmlAttr(__('Surname')) ?>" autocomplete="family-name" required>
+                        </label>
+
+                        <p class="tekntek-register__hint"><?= $escaper->escapeHtml(__('This is the best way to reach me.')) ?></p>
+
+                        <label class="tekntek-register__field">
+                            <input type="tel" name="telephone" placeholder="<?= $escaper->escapeHtmlAttr(__('Phone number')) ?>" autocomplete="tel">
+                        </label>
+
+                        <label class="tekntek-register__field">
+                            <input type="password" name="password" placeholder="<?= $escaper->escapeHtmlAttr(__('Password')) ?>" autocomplete="new-password" required>
+                        </label>
+
+                        <p class="tekntek-register__hint"><?= $escaper->escapeHtml(__('Password must be at least 8 characters, start with an uppercase letter, and contain at least one number.')) ?></p>
+
+                        <label class="tekntek-register__field">
+                            <input type="password" name="password_confirmation" placeholder="<?= $escaper->escapeHtmlAttr(__('Repeat password')) ?>" autocomplete="new-password" required>
+                        </label>
+
+                        <button type="submit" class="tekntek-register__button">
+                            <span><?= $escaper->escapeHtml(__('Continue')) ?></span>
+                        </button>
+                    </form>
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var root = document.querySelector('[data-role="tekntek-signup-root"]');
+    if (!root) {
+        return;
+    }
+
+    window.setTimeout(function () {
+        if (root.getAttribute('data-signup-flow-bound') === '1') {
+            return;
+        }
+
+        var digits = Array.prototype.slice.call(root.querySelectorAll('[data-role="code-digit"]'));
+        var countdown = root.querySelector('[data-role="countdown"]');
+        var resend = root.querySelector('[data-role="resend-code"]');
+        var verifyForm = root.querySelector('[data-role="verify-form"]');
+        var emailForm = root.querySelector('[data-role="email-form"]');
+        var profileForm = root.querySelector('[data-role="profile-form"]');
+        var hiddenCode = root.querySelector('[data-role="code-hidden"]');
+        var hiddenEmail = root.querySelector('[data-role="verified-email-hidden"]');
+        var finalEmail = root.querySelector('[data-role="final-email-hidden"]');
+        var emailInput = root.querySelector('[data-role="email-input"]');
+        var messageBox = root.querySelector('[data-role="message"]');
+        var steps = Array.prototype.slice.call(root.querySelectorAll('[data-step]'));
+        var progressSteps = Array.prototype.slice.call(root.querySelectorAll('[data-role="progress-step"]'));
+        var initialStep = root.getAttribute('data-initial-step') || 'email';
+        var expiresAt = parseInt(root.getAttribute('data-initial-expires-at') || '0', 10) || 0;
+
+        function showMessage(text, type) {
+            if (!messageBox) {
+                return;
+            }
+
+            if (!text) {
+                messageBox.setAttribute('hidden', 'hidden');
+                messageBox.classList.remove('is-error');
+                messageBox.classList.remove('is-success');
+                messageBox.textContent = '';
+                return;
+            }
+
+            messageBox.removeAttribute('hidden');
+            messageBox.classList.remove('is-error');
+            messageBox.classList.remove('is-success');
+            messageBox.classList.add(type === 'error' ? 'is-error' : 'is-success');
+            messageBox.textContent = text;
+        }
+
+        function setStep(step) {
+            var activeIndex = step === 'email' ? 0 : (step === 'verify' ? 1 : 2);
+
+            steps.forEach(function (item) {
+                var isActive = item.getAttribute('data-step') === step;
+                item.hidden = !isActive;
+                item.classList.toggle('is-active', isActive);
+            });
+
+            progressSteps.forEach(function (item) {
+                var index = parseInt(item.getAttribute('data-step-index') || '0', 10);
+                item.classList.toggle('is-active', index === activeIndex);
+                item.classList.toggle('is-complete', index < activeIndex);
+            });
+        }
+
+        function syncCode() {
+            if (!hiddenCode) {
+                return;
+            }
+            hiddenCode.value = digits.map(function (input) {
+                return (input.value || '').replace(/\D+/g, '');
+            }).join('');
+        }
+
+        function pad2(num) {
+            return num < 10 ? '0' + num : String(num);
+        }
+
+        function renderTimer() {
+            if (!countdown || !resend) {
+                return;
+            }
+
+            var timerId = null;
+
+            function tick() {
+                var now = Math.floor(Date.now() / 1000);
+                var remaining = Math.max(0, expiresAt - now);
+                countdown.textContent = pad2(Math.floor(remaining / 60)) + ':' + pad2(remaining % 60);
+                resend.disabled = remaining > 0;
+
+                if (remaining <= 0 && timerId) {
+                    window.clearInterval(timerId);
+                }
+            }
+
+            tick();
+            if (expiresAt > 0) {
+                timerId = window.setInterval(tick, 1000);
+            }
+        }
+
+        digits.forEach(function (input, idx) {
+            input.addEventListener('input', function () {
+                var value = (input.value || '').replace(/\D+/g, '');
+                if ((input.value || '') !== value) {
+                    showMessage('Verification code only accepts numbers.', 'error');
+                } else {
+                    showMessage('', 'success');
+                }
+
+                if (value.length > 1) {
+                    value.split('').forEach(function (digit, offset) {
+                        if (digits[idx + offset]) {
+                            digits[idx + offset].value = digit;
+                        }
+                    });
+                    var targetIndex = Math.min(idx + value.length, digits.length - 1);
+                    digits[targetIndex].focus();
+                    digits[targetIndex].select();
+                    syncCode();
+                    return;
+                }
+
+                input.value = value.slice(0, 1);
+                if (input.value && digits[idx + 1]) {
+                    digits[idx + 1].focus();
+                    digits[idx + 1].select();
+                }
+                syncCode();
+            });
+
+            input.addEventListener('keydown', function (event) {
+                if (event.key === 'Backspace' && !input.value && digits[idx - 1]) {
+                    digits[idx - 1].focus();
+                    digits[idx - 1].select();
+                }
+            });
+        });
+
+        if (verifyForm && hiddenCode) {
+            verifyForm.addEventListener('submit', function (event) {
+                event.preventDefault();
+                syncCode();
+                if ((hiddenCode.value || '').length !== 6) {
+                    showMessage('Please enter the 6-digit code.', 'error');
+                    return;
+                }
+
+                var formKey = (root.querySelector('input[name="form_key"]') || {}).value || '';
+                var body = new URLSearchParams();
+                body.append('form_key', formKey);
+                body.append('code', hiddenCode.value || '');
+
+                fetch('<?= $escaper->escapeJs($block->getUrl('tekntek_signup/code/verify')) ?>', {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+                    },
+                    body: body.toString()
+                }).then(function (resp) {
+                    return resp.text();
+                }).then(function (text) {
+                    var data = {};
+                    try {
+                        data = text ? JSON.parse(text) : {};
+                    } catch (e) {
+                        data = {};
+                    }
+
+                    if (!data.success) {
+                        showMessage((data && data.message) || 'The code is invalid or has expired.', 'error');
+                        return;
+                    }
+
+                    if (hiddenEmail && data.email) {
+                        hiddenEmail.value = data.email;
+                    }
+                    if (finalEmail && data.email) {
+                        finalEmail.value = data.email;
+                    }
+
+                    showMessage(data.message || 'Email verified successfully.', 'success');
+                    setStep('profile');
+                }).catch(function () {
+                    showMessage('Unable to verify the code right now. Please try again.', 'error');
+                });
+            });
+        }
+
+        if (emailForm && emailInput) {
+            emailForm.addEventListener('submit', function (event) {
+                event.preventDefault();
+
+                var email = (emailInput.value || '').trim();
+                var emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+                if (!emailPattern.test(email)) {
+                    showMessage('Please enter a valid email address.', 'error');
+                    return;
+                }
+
+                var formKey = (root.querySelector('input[name="form_key"]') || {}).value || '';
+                var body = new URLSearchParams();
+                body.append('form_key', formKey);
+                body.append('email', email);
+
+                fetch('<?= $escaper->escapeJs($block->getUrl('tekntek_signup/code/send')) ?>', {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+                    },
+                    body: body.toString()
+                }).then(function (resp) {
+                    return resp.text();
+                }).then(function (text) {
+                    var data = {};
+                    try {
+                        data = text ? JSON.parse(text) : {};
+                    } catch (e) {
+                        data = {};
+                    }
+
+                    if (!data.success) {
+                        showMessage((data && data.message) || 'Unable to send verification code.', 'error');
+                        return;
+                    }
+
+                    if (data.email) {
+                        setEmailValue(data.email);
+                    }
+
+                    if (data.expires_at) {
+                        expiresAt = parseInt(data.expires_at, 10) || 0;
+                        renderTimer();
+                    }
+
+                    showMessage(data.message || 'We sent a 6-digit verification code.', 'success');
+                    setStep('verify');
+                    if (digits[0]) {
+                        digits[0].focus();
+                    }
+                }).catch(function () {
+                    showMessage('Unable to send verification code.', 'error');
+                });
+            });
+        }
+
+        if (profileForm) {
+            profileForm.addEventListener('submit', function (event) {
+                event.preventDefault();
+                
+                var passwordInput = profileForm.querySelector('input[name="password"]');
+                var confirmInput = profileForm.querySelector('input[name="password_confirmation"]');
+                var password = passwordInput ? (passwordInput.value || '') : '';
+                var passwordConfirmation = confirmInput ? (confirmInput.value || '') : '';
+
+                if (password.length < 8) {
+                    showMessage('Password must be at least 8 characters, start with an uppercase letter, and contain at least one number.', 'error');
+                    return;
+                }
+
+                if (!/^[A-Z]/.test(password) || !/\d/.test(password)) {
+                    showMessage('Password must be at least 8 characters, start with an uppercase letter, and contain at least one number.', 'error');
+                    return;
+                }
+
+                var firstnameInput = profileForm.querySelector('input[name="firstname"]');
+                var lastnameInput = profileForm.querySelector('input[name="lastname"]');
+                    var firstname = firstnameInput ? (firstnameInput.value || '').trim() : '';
+                    var lastname = lastnameInput ? (lastnameInput.value || '').trim() : '';
+
+                    if (firstname.length === 0 || lastname.length === 0) {
+                    showMessage('Please fill in your name details.', 'error');
+                    return;
+                }
+
+                    // Use FormData which properly serializes all form fields including hidden ones
+                    var formData = new FormData(profileForm);
+
+                fetch('<?= $escaper->escapeJs($block->getUrl('tekntek_signup/account/create')) ?>', {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                        body: formData
+                }).then(function (resp) {
+                    return resp.text();
+                }).then(function (text) {
+                    var data = {};
+                    try {
+                        data = text ? JSON.parse(text) : {};
+                    } catch (e) {
+                        data = {};
+                    }
+
+                    if (!data.success) {
+                        showMessage((data && data.message) || 'Unable to create your account right now. Please try again.', 'error');
+                        return;
+                    }
+
+                    showMessage(data.message || 'Account created successfully.', 'success');
+                    window.location.href = data.redirect_url || '<?= $escaper->escapeJs($block->getUrl('')) ?>';
+                }).catch(function (error) {
+                    console.error('Profile form submission error:', error);
+                    showMessage('Unable to create your account right now. Please try again.', 'error');
+                });
+            });
+        }
+
+        if (resend) {
+            resend.addEventListener('click', function () {
+                if (resend.disabled) {
+                    return;
+                }
+
+                var formKey = (root.querySelector('input[name="form_key"]') || {}).value || '';
+                var email = hiddenEmail ? hiddenEmail.value : '';
+
+                if (!formKey || !email) {
+                    return;
+                }
+
+                var body = new URLSearchParams();
+                body.append('form_key', formKey);
+                body.append('email', email);
+
+                fetch('<?= $escaper->escapeJs($block->getUrl('tekntek_signup/code/send')) ?>', {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
+                    },
+                    body: body.toString()
+                }).then(function (resp) {
+                    return resp.json();
+                }).then(function (data) {
+                    if (data && data.success && data.expires_at) {
+                        expiresAt = parseInt(data.expires_at, 10) || 0;
+                        renderTimer();
+                        showMessage(data.message || 'Verification code sent again.', 'success');
+                    } else {
+                        showMessage((data && data.message) || 'Unable to resend the code.', 'error');
+                    }
+                }).catch(function () {
+                    showMessage('Unable to resend the code.', 'error');
+                });
+            });
+        }
+
+        if (initialStep === 'verify') {
+            renderTimer();
+            if (digits[0]) {
+                digits[0].focus();
+            }
+        }
+    }, 300);
+});
+</script>

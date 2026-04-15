@@ -1,0 +1,910 @@
+<?php
+/** @var \Magento\Framework\View\Element\Template $block */
+
+$listBlock = $block->getLayout()->getBlock('category.products.list');
+if (!$listBlock) {
+    $listBlock = $block->getLayout()->getBlock('search_result_list');
+}
+
+$collection = $listBlock ? $listBlock->getLoadedProductCollection() : null;
+
+$om = \Magento\Framework\App\ObjectManager::getInstance();
+if (!$collection) {
+    try {
+        $layerResolver = $om->get(\Magento\Catalog\Model\Layer\Resolver::class);
+        $collection = $layerResolver->get()->getProductCollection();
+    } catch (\Throwable $e) {
+        $collection = null;
+    }
+}
+
+if (!$collection) {
+    return;
+}
+
+$registry = $om->get(\Magento\Framework\Registry::class);
+$currentCategory = $registry->registry('current_category');
+$queryText = strtolower(trim((string) $block->getRequest()->getParam('q')));
+$categoryText = strtolower(trim((string) ($currentCategory ? $currentCategory->getName() : '')));
+$contextText = trim($categoryText . ' ' . $queryText);
+
+$allFacetGroups = [
+    'classification' => ['label' => 'Classification', 'order' => ['Gaming', 'Office', 'Creator', 'Student']],
+    'screen_size' => ['label' => 'Screen size', 'order' => ['11 inch', '13 inch', '14 inch', '15 inch', '16 inch+']],
+    'touchscreen' => ['label' => 'Touchscreen', 'order' => ['Yes', 'No']],
+    'ram_bucket' => ['label' => 'RAM', 'order' => ['4GB', '8GB', '16GB', '32GB+']],
+    'ram_type' => ['label' => 'Type of RAM memory', 'order' => ['DDR3', 'DDR4', 'DDR5', 'LPDDR4', 'LPDDR5']],
+    'storage_bucket' => ['label' => 'Storage', 'order' => ['64GB', '128GB', '256GB', '512GB', '1TB+']],
+    'connectivity' => ['label' => 'Connectivity', 'order' => ['5G', '4G', 'Wi-Fi', 'Bluetooth', 'Wired']],
+    'battery_bucket' => ['label' => 'Battery life', 'order' => ['Up to 6h', '6-10h', '10h+']],
+    'interface' => ['label' => 'Interface', 'order' => ['USB-C', 'USB-A', 'Wireless', 'Bluetooth', 'HDMI', 'DisplayPort']],
+    'noise_cancel' => ['label' => 'Noise cancellation', 'order' => ['Yes', 'No']],
+    'microphone' => ['label' => 'Microphone', 'order' => ['Yes', 'No']],
+    'megapixel_bucket' => ['label' => 'Resolution', 'order' => ['12MP', '24MP', '48MP', '64MP+']],
+    'lens_type' => ['label' => 'Lens type', 'order' => ['Wide', 'Telephoto', 'Macro', 'Zoom']],
+    'stabilization' => ['label' => 'Stabilization', 'order' => ['OIS', 'EIS', 'None']],
+    'panel_type' => ['label' => 'Panel type', 'order' => ['IPS', 'OLED', 'VA', 'TN']],
+    'refresh_rate' => ['label' => 'Refresh rate', 'order' => ['60Hz', '90Hz', '120Hz', '144Hz+']],
+    'brand' => ['label' => 'Brand', 'order' => []]
+];
+
+$resolveProfile = static function (string $text): string {
+    if (preg_match('/headphone|earphone|speaker|audio/', $text)) {
+        return 'audio';
+    }
+    if (preg_match('/smartphone|phone|mobile|tablet|watch/', $text)) {
+        return 'mobile';
+    }
+    if (preg_match('/camera/', $text)) {
+        return 'camera';
+    }
+    if (preg_match('/monitor|display/', $text)) {
+        return 'monitor';
+    }
+    if (preg_match('/mouse|mice|keyboard|hard drive|ssd|hdd|accessor/', $text)) {
+        return 'peripheral';
+    }
+    if (preg_match('/laptop|notebook|computer/', $text)) {
+        return 'laptop';
+    }
+    return 'generic';
+};
+
+$profile = $resolveProfile($contextText);
+$profileGroupMap = [
+    'laptop' => ['classification', 'screen_size', 'touchscreen', 'ram_bucket', 'ram_type', 'storage_bucket', 'battery_bucket', 'brand'],
+    'mobile' => ['screen_size', 'ram_bucket', 'storage_bucket', 'connectivity', 'battery_bucket', 'touchscreen', 'brand'],
+    'audio' => ['connectivity', 'noise_cancel', 'microphone', 'battery_bucket', 'brand'],
+    'camera' => ['megapixel_bucket', 'lens_type', 'stabilization', 'connectivity', 'brand'],
+    'monitor' => ['screen_size', 'panel_type', 'refresh_rate', 'interface', 'brand'],
+    'peripheral' => ['interface', 'connectivity', 'brand'],
+    'generic' => ['classification', 'screen_size', 'storage_bucket', 'connectivity', 'brand']
+];
+
+$activeGroupKeys = $profileGroupMap[$profile] ?? $profileGroupMap['generic'];
+$facetGroups = [];
+foreach ($activeGroupKeys as $groupKey) {
+    if (isset($allFacetGroups[$groupKey])) {
+        $facetGroups[$groupKey] = $allFacetGroups[$groupKey];
+    }
+}
+
+$facetCounts = [];
+foreach (array_keys($facetGroups) as $groupKey) {
+    $facetCounts[$groupKey] = [];
+}
+
+$productsMeta = [];
+
+$extractScreenSize = static function (string $text): string {
+    if (preg_match('/\b11(\.\d+)?\s?(inch|\"|in)\b/i', $text)) {
+        return '11 inch';
+    }
+    if (preg_match('/\b13(\.\d+)?\s?(inch|\"|in)\b/i', $text)) {
+        return '13 inch';
+    }
+    if (preg_match('/\b14(\.\d+)?\s?(inch|\"|in)\b/i', $text)) {
+        return '14 inch';
+    }
+    if (preg_match('/\b15(\.\d+)?\s?(inch|\"|in)\b/i', $text)) {
+        return '15 inch';
+    }
+    if (preg_match('/\b(16|17|18)(\.\d+)?\s?(inch|\"|in)\b/i', $text)) {
+        return '16 inch+';
+    }
+    return '';
+};
+
+$extractRamBucket = static function (string $text): string {
+    if (preg_match('/\b(3[2-9]|[4-9][0-9])\s?gb\b/i', $text)) {
+        return '32GB+';
+    }
+    if (preg_match('/\b16\s?gb\b/i', $text)) {
+        return '16GB';
+    }
+    if (preg_match('/\b8\s?gb\b/i', $text)) {
+        return '8GB';
+    }
+    if (preg_match('/\b4\s?gb\b/i', $text)) {
+        return '4GB';
+    }
+    return '';
+};
+
+$extractRamType = static function (string $text): string {
+    if (stripos($text, 'lpddr5') !== false) {
+        return 'LPDDR5';
+    }
+    if (stripos($text, 'lpddr4') !== false) {
+        return 'LPDDR4';
+    }
+    if (stripos($text, 'ddr5') !== false) {
+        return 'DDR5';
+    }
+    if (stripos($text, 'ddr4') !== false) {
+        return 'DDR4';
+    }
+    if (stripos($text, 'ddr3') !== false) {
+        return 'DDR3';
+    }
+    return '';
+};
+
+$extractStorageBucket = static function (string $text): string {
+    if (preg_match('/\b(1|2)\s?tb\b/i', $text)) {
+        return '1TB+';
+    }
+    if (preg_match('/\b512\s?gb\b/i', $text)) {
+        return '512GB';
+    }
+    if (preg_match('/\b256\s?gb\b/i', $text)) {
+        return '256GB';
+    }
+    if (preg_match('/\b128\s?gb\b/i', $text)) {
+        return '128GB';
+    }
+    if (preg_match('/\b64\s?gb\b/i', $text)) {
+        return '64GB';
+    }
+    return '';
+};
+
+$extractBatteryBucket = static function (string $text): string {
+    if (preg_match('/\b(1[0-9]|2[0-9])\s?(h|hr|hrs|hour|hours)\b/i', $text)) {
+        return '10h+';
+    }
+    if (preg_match('/\b([6-9])\s?(h|hr|hrs|hour|hours)\b/i', $text)) {
+        return '6-10h';
+    }
+    if (preg_match('/\b([1-5])\s?(h|hr|hrs|hour|hours)\b/i', $text)) {
+        return 'Up to 6h';
+    }
+    return '';
+};
+
+$extractConnectivity = static function (string $text): string {
+    if (preg_match('/\b5g\b/i', $text)) {
+        return '5G';
+    }
+    if (preg_match('/\b4g\b|\blte\b/i', $text)) {
+        return '4G';
+    }
+    if (preg_match('/\bwi[ -]?fi\b|\bwlan\b/i', $text)) {
+        return 'Wi-Fi';
+    }
+    if (preg_match('/\bbluetooth\b|\bbt\b/i', $text)) {
+        return 'Bluetooth';
+    }
+    if (preg_match('/\bwired\b|\busb\b|\beth\b|ethernet/i', $text)) {
+        return 'Wired';
+    }
+    return '';
+};
+
+$extractInterface = static function (string $text): string {
+    if (preg_match('/usb[ -]?c|type[ -]?c/i', $text)) {
+        return 'USB-C';
+    }
+    if (preg_match('/usb[ -]?a|usb\s+2\.0|usb\s+3\.0/i', $text)) {
+        return 'USB-A';
+    }
+    if (preg_match('/displayport/i', $text)) {
+        return 'DisplayPort';
+    }
+    if (preg_match('/hdmi/i', $text)) {
+        return 'HDMI';
+    }
+    if (preg_match('/wireless/i', $text)) {
+        return 'Wireless';
+    }
+    if (preg_match('/bluetooth/i', $text)) {
+        return 'Bluetooth';
+    }
+    return '';
+};
+
+$extractMegapixelBucket = static function (string $text): string {
+    if (preg_match('/\b(64|108|200)\s?mp\b/i', $text)) {
+        return '64MP+';
+    }
+    if (preg_match('/\b48\s?mp\b/i', $text)) {
+        return '48MP';
+    }
+    if (preg_match('/\b24\s?mp\b/i', $text)) {
+        return '24MP';
+    }
+    if (preg_match('/\b12\s?mp\b/i', $text)) {
+        return '12MP';
+    }
+    return '';
+};
+
+$extractLensType = static function (string $text): string {
+    if (preg_match('/telephoto|zoom/i', $text)) {
+        return 'Telephoto';
+    }
+    if (preg_match('/macro/i', $text)) {
+        return 'Macro';
+    }
+    if (preg_match('/wide|ultra[ -]?wide/i', $text)) {
+        return 'Wide';
+    }
+    if (preg_match('/zoom/i', $text)) {
+        return 'Zoom';
+    }
+    return '';
+};
+
+$extractPanelType = static function (string $text): string {
+    if (preg_match('/oled|amoled/i', $text)) {
+        return 'OLED';
+    }
+    if (preg_match('/ips/i', $text)) {
+        return 'IPS';
+    }
+    if (preg_match('/\bva\b/i', $text)) {
+        return 'VA';
+    }
+    if (preg_match('/\btn\b/i', $text)) {
+        return 'TN';
+    }
+    return '';
+};
+
+$extractRefreshRate = static function (string $text): string {
+    if (preg_match('/\b(144|165|240)\s?hz\b/i', $text)) {
+        return '144Hz+';
+    }
+    if (preg_match('/\b120\s?hz\b/i', $text)) {
+        return '120Hz';
+    }
+    if (preg_match('/\b90\s?hz\b/i', $text)) {
+        return '90Hz';
+    }
+    if (preg_match('/\b60\s?hz\b/i', $text)) {
+        return '60Hz';
+    }
+    return '';
+};
+
+$collectCount = static function (array &$groupCounts, string $value): void {
+    if ($value === '') {
+        return;
+    }
+    if (!isset($groupCounts[$value])) {
+        $groupCounts[$value] = 0;
+    }
+    $groupCounts[$value] += 1;
+};
+
+$normalizeBrand = static function (string $brand): string {
+    $clean = trim((string) preg_replace('/\s+/', ' ', $brand));
+    if ($clean === '') {
+        return '';
+    }
+
+    $lower = strtolower($clean);
+    $special = [
+        'lg' => 'LG',
+        'aoc' => 'AOC',
+        'hp' => 'HP',
+        'dell' => 'Dell',
+        'acer' => 'Acer',
+        'asus' => 'ASUS',
+        'msi' => 'MSI',
+        'samsung' => 'Samsung',
+        'philips' => 'Philips',
+        'viewsonic' => 'ViewSonic'
+    ];
+
+    if (isset($special[$lower])) {
+        return $special[$lower];
+    }
+
+    if (strlen($clean) <= 3) {
+        return strtoupper($clean);
+    }
+
+    return ucwords($lower);
+};
+
+foreach ($collection as $item) {
+    $name = trim((string) $item->getName());
+    $shortDesc = trim((string) $item->getShortDescription());
+    $description = trim((string) $item->getDescription());
+    $text = strtolower($name . ' ' . $shortDesc . ' ' . $description);
+
+    $manufacturer = $item->getAttributeText('manufacturer');
+    if (is_array($manufacturer)) {
+        $manufacturer = implode(', ', $manufacturer);
+    }
+    $brand = trim((string) $manufacturer);
+    if ($brand === '') {
+        $brand = trim((string) $item->getData('brand'));
+    }
+    if ($brand === '') {
+        $firstWord = preg_split('/\s+/', $name);
+        $brand = isset($firstWord[0]) ? (string) $firstWord[0] : '';
+    }
+    $brand = trim((string) preg_replace('/[^A-Za-z0-9\-\+\. ]+/', '', $brand));
+    $brand = $normalizeBrand($brand);
+
+    $classification = [];
+    if (preg_match('/gaming|game|rtx|gtx|fps/', $text)) {
+        $classification[] = 'Gaming';
+    }
+    if (preg_match('/office|business|work|productivity/', $text)) {
+        $classification[] = 'Office';
+    }
+    if (preg_match('/creator|editing|design|render/', $text)) {
+        $classification[] = 'Creator';
+    }
+    if (preg_match('/student|school|study/', $text)) {
+        $classification[] = 'Student';
+    }
+    if (empty($classification)) {
+        $classification[] = 'Office';
+    }
+
+    $screenSource = strtolower(
+        trim(
+            (string) $item->getData('screen_size') . ' ' .
+            (string) $item->getData('screen_diagonal') . ' ' .
+            (string) $item->getData('display_size') . ' ' .
+            $name . ' ' . $shortDesc
+        )
+    );
+    $screenSize = $extractScreenSize($screenSource);
+
+    $touchRaw = strtolower(
+        trim(
+            (string) $item->getData('touchscreen') . ' ' .
+            (string) $item->getData('touch_screen') . ' ' .
+            (string) $item->getData('display_features') . ' ' .
+            $text
+        )
+    );
+    $touchscreen = preg_match('/touch|touchscreen|multi-touch|multi touch/', $touchRaw) ? 'Yes' : 'No';
+
+    $ramSource = strtolower(
+        trim(
+            (string) $item->getData('ram') . ' ' .
+            (string) $item->getData('memory') . ' ' .
+            (string) $item->getData('internal_memory') . ' ' .
+            (string) $item->getData('ram_type') . ' ' .
+            $name . ' ' . $shortDesc
+        )
+    );
+    $ramBucket = $extractRamBucket($ramSource);
+    $ramType = $extractRamType($ramSource);
+    $storageBucket = $extractStorageBucket($text . ' ' . (string) $item->getData('storage') . ' ' . (string) $item->getData('hard_drive_size'));
+    $connectivity = $extractConnectivity($text . ' ' . (string) $item->getData('wireless_connectivity') . ' ' . (string) $item->getData('bluetooth'));
+    $batteryBucket = $extractBatteryBucket($text . ' ' . (string) $item->getData('battery_life') . ' ' . (string) $item->getData('maximum_battery_battery_life'));
+    $interface = $extractInterface($text . ' ' . (string) $item->getData('ports') . ' ' . (string) $item->getData('usb_connection_type'));
+    $noiseCancel = preg_match('/noise[ -]?cancel|anc/', $text) ? 'Yes' : 'No';
+    $microphone = preg_match('/microphone|\bmic\b/', $text) ? 'Yes' : 'No';
+    $megapixelBucket = $extractMegapixelBucket($text . ' ' . (string) $item->getData('resolution'));
+    $lensType = $extractLensType($text);
+    $stabilization = preg_match('/\bois\b/', $text) ? 'OIS' : (preg_match('/\beis\b|stabiliz/', $text) ? 'EIS' : 'None');
+    $panelType = $extractPanelType($screenSource . ' ' . $text);
+    $refreshRate = $extractRefreshRate($screenSource . ' ' . $text);
+
+    $meta = [
+        'classification' => $classification,
+        'screen_size' => $screenSize,
+        'touchscreen' => $touchscreen,
+        'ram_bucket' => $ramBucket,
+        'ram_type' => $ramType,
+        'storage_bucket' => $storageBucket,
+        'connectivity' => $connectivity,
+        'battery_bucket' => $batteryBucket,
+        'interface' => $interface,
+        'noise_cancel' => $noiseCancel,
+        'microphone' => $microphone,
+        'megapixel_bucket' => $megapixelBucket,
+        'lens_type' => $lensType,
+        'stabilization' => $stabilization,
+        'panel_type' => $panelType,
+        'refresh_rate' => $refreshRate,
+        'brand' => $brand
+    ];
+
+    foreach ($activeGroupKeys as $groupKey) {
+        if (!isset($meta[$groupKey]) || !isset($facetCounts[$groupKey])) {
+            continue;
+        }
+        if (is_array($meta[$groupKey])) {
+            foreach ($meta[$groupKey] as $v) {
+                $collectCount($facetCounts[$groupKey], (string) $v);
+            }
+            continue;
+        }
+        $collectCount($facetCounts[$groupKey], (string) $meta[$groupKey]);
+    }
+
+    $productsMeta[] = $meta;
+}
+
+if (isset($facetCounts['brand'])) {
+    arsort($facetCounts['brand'], SORT_NATURAL | SORT_FLAG_CASE);
+    $facetCounts['brand'] = array_slice($facetCounts['brand'], 0, 12, true);
+}
+
+$minPrice = 0;
+$maxPrice = 0;
+foreach ($collection as $item) {
+    $price = (float) $item->getFinalPrice();
+    if ($price <= 0) {
+        continue;
+    }
+    if ($minPrice === 0 || $price < $minPrice) {
+        $minPrice = $price;
+    }
+    if ($price > $maxPrice) {
+        $maxPrice = $price;
+    }
+}
+
+if ($maxPrice <= 0) {
+    $minPrice = 0;
+    $maxPrice = 2000;
+}
+
+$currentMin = $minPrice;
+$currentMax = $maxPrice;
+$priceParam = (string) $block->getRequest()->getParam('price');
+if ($priceParam !== '' && strpos($priceParam, '-') !== false) {
+    $parts = explode('-', $priceParam, 2);
+    $pMin = isset($parts[0]) ? (float) $parts[0] : $minPrice;
+    $pMax = isset($parts[1]) ? (float) $parts[1] : $maxPrice;
+    if ($pMin >= 0) {
+        $currentMin = $pMin;
+    }
+    if ($pMax > 0) {
+        $currentMax = $pMax;
+    }
+}
+
+$stockOnly = (string) $block->getRequest()->getParam('stock') === '1';
+?>
+
+<style>
+.ttk-facet-box {
+    border: 1px solid #dde3ea;
+    border-radius: 10px;
+    background: #fff;
+    padding: 10px;
+    margin-bottom: 12px;
+}
+
+.ttk-facet-title {
+    margin: 0 0 8px;
+    color: #111827;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.ttk-facet-price-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-bottom: 8px;
+}
+
+.ttk-facet-price-row input {
+    border: 1px solid #d3dae5;
+    border-radius: 6px;
+    height: 30px;
+    padding: 0 8px;
+    font-size: 12px;
+}
+
+.ttk-facet-range {
+    width: 100%;
+    margin: 2px 0;
+}
+
+.ttk-facet-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 10px;
+    font-size: 12px;
+    color: #374151;
+}
+
+.ttk-switch {
+    position: relative;
+    display: inline-block;
+    width: 42px;
+    height: 24px;
+}
+
+.ttk-switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.ttk-switch-slider {
+    position: absolute;
+    cursor: pointer;
+    inset: 0;
+    background-color: #d1d5db;
+    transition: .2s;
+    border-radius: 999px;
+}
+
+.ttk-switch-slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    top: 3px;
+    background-color: #fff;
+    transition: .2s;
+    border-radius: 50%;
+}
+
+.ttk-switch input:checked + .ttk-switch-slider {
+    background-color: #1e3a8a;
+}
+
+.ttk-switch input:checked + .ttk-switch-slider:before {
+    transform: translateX(18px);
+}
+
+.ttk-facet-actions {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.ttk-facet-btn {
+    height: 32px;
+    border-radius: 7px;
+    border: 1px solid #c8d1df;
+    padding: 0 10px;
+    font-size: 12px;
+    cursor: pointer;
+    background: #fff;
+    color: #1f2937;
+}
+
+.ttk-facet-btn--primary {
+    border-color: #1e3a8a;
+    background: #1e3a8a;
+    color: #fff;
+}
+
+.ttk-accordion {
+    margin-top: 12px;
+    border-top: 1px solid #e9edf3;
+    padding-top: 8px;
+}
+
+.ttk-accordion-item {
+    border-bottom: 1px solid #eef2f7;
+    padding: 8px 0;
+}
+
+.ttk-accordion-summary {
+    list-style: none;
+    cursor: pointer;
+    font-size: 12px;
+    color: #111827;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.ttk-accordion-summary::-webkit-details-marker {
+    display: none;
+}
+
+.ttk-accordion-arrow {
+    width: 7px;
+    height: 7px;
+    border-right: 2px solid #6b7280;
+    border-bottom: 2px solid #6b7280;
+    transform: rotate(45deg);
+    transition: transform 140ms ease;
+}
+
+.ttk-accordion-item[open] .ttk-accordion-arrow {
+    transform: rotate(225deg);
+}
+
+.ttk-option-list {
+    margin-top: 7px;
+    display: grid;
+    gap: 6px;
+}
+
+.ttk-option-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    font-size: 12px;
+    color: #4b5563;
+}
+
+.ttk-option-row label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+}
+
+.ttk-option-row input[type="checkbox"] {
+    accent-color: #1e3a8a;
+}
+
+.ttk-option-count {
+    color: #9ca3af;
+    font-size: 11px;
+}
+</style>
+
+<div class="ttk-facet-box" id="ttk-facet-box">
+    <h3 class="ttk-facet-title">Price</h3>
+    <div class="ttk-facet-price-row">
+        <input id="ttk-price-min-input" type="number" min="<?= (int) floor($minPrice) ?>" max="<?= (int) ceil($maxPrice) ?>" value="<?= (int) floor($currentMin) ?>" />
+        <input id="ttk-price-max-input" type="number" min="<?= (int) floor($minPrice) ?>" max="<?= (int) ceil($maxPrice) ?>" value="<?= (int) ceil($currentMax) ?>" />
+    </div>
+
+    <input id="ttk-price-min-range" class="ttk-facet-range" type="range" min="<?= (int) floor($minPrice) ?>" max="<?= (int) ceil($maxPrice) ?>" value="<?= (int) floor($currentMin) ?>" />
+    <input id="ttk-price-max-range" class="ttk-facet-range" type="range" min="<?= (int) floor($minPrice) ?>" max="<?= (int) ceil($maxPrice) ?>" value="<?= (int) ceil($currentMax) ?>" />
+
+    <label class="ttk-facet-toggle" for="ttk-stock-toggle">
+        <span>Only available items</span>
+        <span class="ttk-switch">
+            <input id="ttk-stock-toggle" type="checkbox" <?= $stockOnly ? 'checked' : '' ?> />
+            <span class="ttk-switch-slider"></span>
+        </span>
+    </label>
+
+    <div class="ttk-facet-actions">
+        <button type="button" class="ttk-facet-btn ttk-facet-btn--primary" id="ttk-facet-apply">Apply</button>
+        <button type="button" class="ttk-facet-btn" id="ttk-facet-clear">Clear</button>
+    </div>
+
+    <div class="ttk-accordion" id="ttk-facet-accordion">
+        <?php foreach ($facetGroups as $groupKey => $groupConfig): ?>
+            <?php
+            $counts = $facetCounts[$groupKey];
+            if (empty($counts)) {
+                continue;
+            }
+
+            $orderedValues = [];
+            if (!empty($groupConfig['order'])) {
+                foreach ($groupConfig['order'] as $valueName) {
+                    if (isset($counts[$valueName])) {
+                        $orderedValues[] = $valueName;
+                    }
+                }
+                if ($groupKey !== 'brand') {
+                    foreach (array_keys($counts) as $valueName) {
+                        if (!in_array($valueName, $orderedValues, true)) {
+                            $orderedValues[] = $valueName;
+                        }
+                    }
+                }
+            } else {
+                $orderedValues = array_keys($counts);
+            }
+            ?>
+            <details class="ttk-accordion-item" open>
+                <summary class="ttk-accordion-summary">
+                    <span><?= $block->escapeHtml($groupConfig['label']) ?></span>
+                    <span class="ttk-accordion-arrow" aria-hidden="true"></span>
+                </summary>
+                <div class="ttk-option-list">
+                    <?php foreach ($orderedValues as $valueName): ?>
+                        <div class="ttk-option-row">
+                            <label>
+                                <input type="checkbox" class="ttk-facet-check" data-group="<?= $block->escapeHtmlAttr($groupKey) ?>" data-value="<?= $block->escapeHtmlAttr($valueName) ?>" />
+                                <span><?= $block->escapeHtml($valueName) ?></span>
+                            </label>
+                            <span class="ttk-option-count">(<?= (int) $counts[$valueName] ?>)</span>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            </details>
+        <?php endforeach; ?>
+    </div>
+</div>
+
+<script type="application/json" id="ttk-facet-meta-json"><?= /* @noEscape */ json_encode($productsMeta, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?></script>
+
+<script>
+(function () {
+    var root = document.getElementById('ttk-facet-box');
+    if (!root) {
+        return;
+    }
+
+    var minInput = document.getElementById('ttk-price-min-input');
+    var maxInput = document.getElementById('ttk-price-max-input');
+    var minRange = document.getElementById('ttk-price-min-range');
+    var maxRange = document.getElementById('ttk-price-max-range');
+    var stockToggle = document.getElementById('ttk-stock-toggle');
+    var applyBtn = document.getElementById('ttk-facet-apply');
+    var clearBtn = document.getElementById('ttk-facet-clear');
+    var metaNode = document.getElementById('ttk-facet-meta-json');
+    var checks = Array.prototype.slice.call(document.querySelectorAll('.ttk-facet-check'));
+    var cards = Array.prototype.slice.call(document.querySelectorAll('.products-grid .product-item'));
+
+    var productMeta = [];
+    try {
+        productMeta = JSON.parse(metaNode ? metaNode.textContent : '[]');
+        if (!Array.isArray(productMeta)) {
+            productMeta = [];
+        }
+    } catch (e) {
+        productMeta = [];
+    }
+
+    if (!minInput || !maxInput || !minRange || !maxRange || !stockToggle || !applyBtn || !clearBtn) {
+        return;
+    }
+
+    function syncMinFromInput() {
+        minRange.value = minInput.value;
+    }
+
+    function syncMaxFromInput() {
+        maxRange.value = maxInput.value;
+    }
+
+    function syncMinFromRange() {
+        minInput.value = minRange.value;
+    }
+
+    function syncMaxFromRange() {
+        maxInput.value = maxRange.value;
+    }
+
+    minInput.addEventListener('input', syncMinFromInput);
+    maxInput.addEventListener('input', syncMaxFromInput);
+    minRange.addEventListener('input', syncMinFromRange);
+    maxRange.addEventListener('input', syncMaxFromRange);
+
+    applyBtn.addEventListener('click', function () {
+        var min = Number(minInput.value || 0);
+        var max = Number(maxInput.value || 0);
+        if (max > 0 && min > max) {
+            var temp = min;
+            min = max;
+            max = temp;
+        }
+
+        var url = new URL(window.location.href);
+        if (max > 0) {
+            url.searchParams.set('price', String(Math.floor(min)) + '-' + String(Math.ceil(max)));
+        } else {
+            url.searchParams.delete('price');
+        }
+
+        if (stockToggle.checked) {
+            url.searchParams.set('stock', '1');
+        } else {
+            url.searchParams.delete('stock');
+        }
+
+        window.location.href = url.toString();
+    });
+
+    clearBtn.addEventListener('click', function () {
+        var url = new URL(window.location.href);
+        url.searchParams.delete('price');
+        url.searchParams.delete('stock');
+        window.location.href = url.toString();
+    });
+
+    function collectSelectedFacets() {
+        var selected = {};
+        checks.forEach(function (input) {
+            if (!input.checked) {
+                return;
+            }
+            var group = input.getAttribute('data-group') || '';
+            var value = input.getAttribute('data-value') || '';
+            if (!group || !value) {
+                return;
+            }
+            if (!selected[group]) {
+                selected[group] = [];
+            }
+            selected[group].push(value);
+        });
+        return selected;
+    }
+
+    function matchesGroup(metaValue, selectedValues) {
+        if (!selectedValues || !selectedValues.length) {
+            return true;
+        }
+        if (Array.isArray(metaValue)) {
+            return metaValue.some(function (v) {
+                return selectedValues.indexOf(v) !== -1;
+            });
+        }
+        return selectedValues.indexOf(metaValue) !== -1;
+    }
+
+    function applyFacetVisibility() {
+        var selected = collectSelectedFacets();
+        cards.forEach(function (card, idx) {
+            var meta = productMeta[idx] || {};
+            var visible = true;
+
+            Object.keys(selected).forEach(function (groupKey) {
+                if (!visible) {
+                    return;
+                }
+                var selectedValues = selected[groupKey] || [];
+                if (!matchesGroup(meta[groupKey], selectedValues)) {
+                    visible = false;
+                }
+            });
+
+            if (stockToggle.checked && card.querySelector('.stock.unavailable')) {
+                visible = false;
+            }
+
+            card.style.display = visible ? '' : 'none';
+        });
+    }
+
+    checks.forEach(function (input) {
+        input.addEventListener('change', applyFacetVisibility);
+    });
+
+    // Remove duplicated native "Price" block from layered navigation.
+    (function hideNativePriceFilter() {
+        var titles = document.querySelectorAll('.filter-options-title');
+        titles.forEach(function (title) {
+            var text = (title.textContent || '').trim().toLowerCase();
+            if (text !== 'price') {
+                return;
+            }
+            var item = title.closest('.filter-options-item');
+            if (item) {
+                item.style.display = 'none';
+            }
+        });
+    })();
+
+    if (new URL(window.location.href).searchParams.get('stock') === '1') {
+        stockToggle.checked = true;
+    }
+
+    stockToggle.addEventListener('change', applyFacetVisibility);
+    applyFacetVisibility();
+})();
+</script>
