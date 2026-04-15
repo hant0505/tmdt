@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd"
+      layout="1column">
+    <body>
+        <!-- Hide the page title -->
+        <referenceBlock name="page.title" remove="true"/>
+        <referenceBlock name="cms_page" remove="true"/>
+        <referenceBlock name="catalog.topnav" remove="true"/>
+        <referenceBlock name="store.menu" remove="true"/>
+        <referenceContainer name="navigation.sections" remove="true"/>
+        
+        <referenceContainer name="content">
+            <!-- Homepage block for CMS page -->
+            <block class="Magento\Framework\View\Element\Template"
+                   name="tekntek.homepage"
+                   cacheable="false"
+                   template="Magento_Cms::page/homepage.phtml"/>
+        </referenceContainer>
+    </body>
+</page>
