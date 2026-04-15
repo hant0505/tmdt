@@ -1,0 +1,249 @@
+<?php
+/** @var \Magento\Customer\Block\Form\Login $block */
+if (!$block->getButtonLockManager()) {
+    $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+    $block->setButtonLockManager(
+        $objectManager->get(\Magento\Framework\View\Element\ButtonLockManager::class)
+    );
+}
+/** @var $escaper \Magento\Framework\Escaper */
+
+if (!isset($objectManager)) {
+    $objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+}
+
+$customerSession = $objectManager->get(\Magento\Customer\Model\Session::class);
+$customLoginError = trim((string)$customerSession->getData('tekntek_login_error'));
+if ($customLoginError !== '') {
+    $customerSession->unsData('tekntek_login_error');
+}
+?>
+<style>
+@media (min-width: 1024px) {
+    .customer-account-login .page-main .columns {
+        width: auto !important;
+        min-height: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: 0 !important;
+        border-radius: 0 !important;
+        overflow: visible !important;
+        background: transparent !important;
+    }
+
+    .customer-account-login .login-container {
+        max-width: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: 0 !important;
+        border-radius: 0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+    }
+
+    .customer-account-login .block-new-customer {
+        display: none !important;
+    }
+
+    .customer-account-login .block-customer-login {
+        margin: 0 !important;
+    }
+
+    .customer-account-login .tekntek-login__create-account {
+        width: 100% !important;
+        margin: 0 !important;
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+    }
+}
+
+.tekntek-login__message {
+    margin: 0 0 12px;
+    padding: 8px 10px;
+    border-radius: 6px;
+    font-size: 11px;
+    line-height: 1.45;
+}
+
+.tekntek-login__message.is-success {
+    background: #edf5ff;
+    color: #254b91;
+}
+
+.tekntek-login__message.is-error,
+.tekntek-login__message.is-notice,
+.tekntek-login__message.is-warning {
+    background: #ffecec;
+    color: #9d2d2d;
+}
+</style>
+<div class="tekntek-auth tekntek-auth--login">
+    <div class="tekntek-auth__shell">
+        <div class="tekntek-auth__stage">
+            <section class="tekntek-auth__panel tekntek-auth__panel--form" aria-labelledby="block-customer-login-heading">
+                <a class="tekntek-auth__brand" href="<?= $block->escapeUrl($block->getUrl('')) ?>" aria-label="TeknTek home">
+                    <img
+                        class="tekntek-auth__brand-logo"
+                        src="<?= $block->escapeUrl($block->getViewFileUrl('css/images/tekntek-logo.png')) ?>"
+                        alt="TeknTek"
+                        loading="eager"
+                    />
+                </a>
+
+                <div class="block-title">
+                    <strong id="block-customer-login-heading" role="heading" aria-level="2"><?= $escaper->escapeHtml(__('Login')) ?></strong>
+                </div>
+
+                <p class="tekntek-auth__subtitle"><?= $escaper->escapeHtml(__('If you have an account, sign in with your email address.')) ?></p>
+
+                <div class="tekntek-login__messages" data-role="login-messages"<?= $customLoginError === '' ? ' hidden' : '' ?>>
+                    <div class="tekntek-login__message is-error" data-role="login-message-text">
+                        <?= $escaper->escapeHtml($customLoginError) ?>
+                    </div>
+                </div>
+
+                <div class="block-content">
+                    <form class="form form-login"
+                          action="<?= $escaper->escapeUrl($block->getPostActionUrl()) ?>"
+                          method="post"
+                          id="login-form"
+                          autocomplete="off"
+                          novalidate="novalidate"
+                          data-mage-init='{"validation":{}}'>
+                        <?= $block->getBlockHtml('formkey') ?>
+                        <fieldset class="fieldset login" data-hasrequired="<?= $escaper->escapeHtml(__('* Required Fields')) ?>">
+                            <div class="field email required">
+                                <label class="label" for="email"><span><?= $escaper->escapeHtml(__('Email')) ?></span></label>
+                                <div class="control">
+                                    <input name="login[username]" value="<?= $escaper->escapeHtmlAttr($block->getUsername()) ?>"
+                                           autocomplete="off"
+                                           autocapitalize="none"
+                                           autocorrect="off"
+                                           spellcheck="false"
+                                           data-lpignore="true"
+                                           data-1p-ignore="true"
+                                           id="email" type="email" class="input-text"
+                                           title="<?= $escaper->escapeHtmlAttr(__('Email')) ?>"
+                                           placeholder="<?= $escaper->escapeHtmlAttr(__('Email')) ?>"
+                                           data-mage-init='{"mage/trim-input":{}}'
+                                           data-validate="{required:true, 'validate-email':true}">
+                                </div>
+                            </div>
+                            <div class="field password required">
+                                <label for="pass" class="label"><span><?= $escaper->escapeHtml(__('Password')) ?></span></label>
+                                <div class="control">
+                                    <input name="login[password]" type="password"
+                                           autocomplete="new-password"
+                                           data-lpignore="true"
+                                           data-1p-ignore="true"
+                                           class="input-text" id="password"
+                                           title="<?= $escaper->escapeHtmlAttr(__('Password')) ?>"
+                                           placeholder="<?= $escaper->escapeHtmlAttr(__('Password')) ?>"
+                                           data-validate="{required:true}">
+                                </div>
+                            </div>
+                            <div class="field choice" data-bind="scope: 'showPassword'">
+                                <!-- ko template: getTemplate() --><!-- /ko -->
+                            </div>
+                            <?= $block->getChildHtml('form_additional_info') ?>
+                            <div class="actions-toolbar">
+                                <div class="primary">
+                                    <button type="submit" class="action login primary" name="send" id="send2" <?php if ($block->getButtonLockManager()->isDisabled('customer_login_form_submit')): ?> disabled="disabled" <?php endif; ?>>
+                                        <span><?= $escaper->escapeHtml(__('Login')) ?></span>
+                                    </button>
+                                </div>
+                                <div class="secondary"><a class="action remind" href="<?= $escaper->escapeUrl($block->getForgotPasswordUrl()) ?>"><span><?= $escaper->escapeHtml(__('Forgot Password?')) ?></span></a></div>
+                            </div>
+
+                            <div class="tekntek-login__separator" aria-hidden="true"><span><?= $escaper->escapeHtml(__('OR')) ?></span></div>
+
+                            <a class="tekntek-login__google" href="<?= $escaper->escapeUrl($block->getUrl('tekntek_googlelogin/auth/google')) ?>" aria-label="<?= $escaper->escapeHtmlAttr(__('Login with Google account')) ?>">
+                                <span class="tekntek-login__google-mark">G</span>
+                                <span><?= $escaper->escapeHtml(__('Login with Google account')) ?></span>
+                            </a>
+
+                            <div class="tekntek-login__register">
+                                <p><?= $escaper->escapeHtml(__('Do not have an account yet?')) ?></p>
+                                <a class="action login primary tekntek-login__create-account" href="<?= $escaper->escapeUrl($block->getUrl('customer/account/create')) ?>">
+                                    <span><?= $escaper->escapeHtml(__('Create an Account')) ?></span>
+                                </a>
+                            </div>
+                        </fieldset>
+                    </form>
+                </div>
+            </section>
+
+        </div>
+    </div>
+
+    <script type="text/x-magento-init">
+        {
+            "*": {
+                "Magento_Customer/js/block-submit-on-send": {
+                    "formId": "login-form"
+                },
+                "Magento_Ui/js/core/app": {
+                    "components": {
+                        "showPassword": {
+                            "component": "Magento_Customer/js/show-password",
+                            "passwordSelector": "#password"
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var form = document.getElementById('login-form');
+        if (!form) {
+            return;
+        }
+
+        var messagesWrap = document.querySelector('[data-role="login-messages"]');
+        var messageText = document.querySelector('[data-role="login-message-text"]');
+
+        function setError(message) {
+            if (!messagesWrap || !messageText) {
+                return;
+            }
+            messageText.textContent = message || '';
+            messagesWrap.hidden = !message;
+        }
+
+        form.addEventListener('submit', function (event) {
+            event.preventDefault();
+
+            var formData = new FormData(form);
+
+            fetch('<?= $escaper->escapeJs($block->getUrl('tekntek_signup/account/login')) ?>', {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: formData
+            }).then(function (resp) {
+                return resp.text();
+            }).then(function (text) {
+                var data = {};
+                try {
+                    data = text ? JSON.parse(text) : {};
+                } catch (e) {
+                    data = {};
+                }
+
+                if (!data.success) {
+                    setError((data && data.message) || 'Unable to sign in right now. Please try again.');
+                    return;
+                }
+
+                window.location.href = data.redirect_url || '<?= $escaper->escapeJs($block->getUrl('customer/account')) ?>';
+            }).catch(function () {
+                setError('Unable to sign in right now. Please try again.');
+            });
+        });
+    });
+    </script>
+</div>

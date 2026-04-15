@@ -1,0 +1,249 @@
+<?php
+/**
+ * @var $block \Magento\Catalog\Block\Product\View\Gallery
+ * @var $escaper \Magento\Framework\Escaper
+ */
+
+$images = $block->getGalleryImages()->getItems();
+$helper = $block->getData('imageHelper');
+
+$galleryItems = [];
+$mainIndex = 0;
+$idx = 0;
+$seenImageKeys = [];
+
+foreach ($images as $image) {
+    $full = (string) ($image->getData('large_image_url') ?: $image->getData('medium_image_url'));
+    $thumb = (string) ($image->getData('small_image_url') ?: $image->getData('medium_image_url'));
+    $file = (string) $image->getData('file');
+
+    if ($full === '') {
+        continue;
+    }
+
+    if ($thumb === '') {
+        $thumb = $full;
+    }
+
+    // Some imported products contain duplicated files like image.jpg and image_1.jpg.
+    // Normalize trailing "_1" chains to keep only one thumbnail per logical image.
+    $sourceForKey = $file !== '' ? basename($file) : basename(parse_url($full, PHP_URL_PATH) ?: $full);
+    $normalizedKey = strtolower((string) preg_replace('/(_1)+(\.[a-z0-9]+)$/i', '$2', $sourceForKey));
+    if (isset($seenImageKeys[$normalizedKey])) {
+        continue;
+    }
+    $seenImageKeys[$normalizedKey] = true;
+
+    $alt = (string) ($image->getLabel() ?: $block->getProduct()->getName() ?: 'Product image');
+
+    $galleryItems[] = [
+        'full' => $full,
+        'thumb' => $thumb,
+        'alt' => $alt
+    ];
+
+    if ($block->isMainImage($image)) {
+        $mainIndex = $idx;
+    }
+
+    $idx++;
+}
+
+if (empty($galleryItems)) {
+    $fallback = (string) $helper->getDefaultPlaceholderUrl('image');
+    $galleryItems[] = [
+        'full' => $fallback,
+        'thumb' => $fallback,
+        'alt' => (string) ($block->getProduct()->getName() ?: 'Product image')
+    ];
+    $mainIndex = 0;
+}
+
+$active = $galleryItems[$mainIndex] ?? $galleryItems[0];
+?>
+
+<style>
+.catalog-product-view .tekntek-pdp-gallery {
+    max-width: 760px;
+    margin: 0 auto 20px;
+}
+
+.catalog-product-view .tekntek-pdp-gallery__stage-wrap {
+    position: relative;
+    height: 640px;
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.catalog-product-view .tekntek-pdp-gallery__stage {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.catalog-product-view .tekntek-pdp-gallery__arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 42px;
+    height: 64px;
+    border: 0;
+    border-radius: 8px;
+    background: rgba(17, 24, 39, 0.28);
+    color: #fff;
+    font-size: 34px;
+    line-height: 1;
+    cursor: pointer;
+    z-index: 2;
+}
+
+.catalog-product-view .tekntek-pdp-gallery__arrow--prev {
+    left: 10px;
+}
+
+.catalog-product-view .tekntek-pdp-gallery__arrow--next {
+    right: 10px;
+}
+
+.catalog-product-view .tekntek-pdp-gallery__thumbs {
+    margin-top: 12px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(76px, 1fr));
+    gap: 10px;
+}
+
+.catalog-product-view .tekntek-pdp-gallery__thumb {
+    height: 76px;
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+    background: #fff;
+    padding: 4px;
+    cursor: pointer;
+}
+
+.catalog-product-view .tekntek-pdp-gallery__thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.catalog-product-view .tekntek-pdp-gallery__thumb.is-active {
+    border-color: #111827;
+    box-shadow: inset 0 0 0 1px #111827;
+}
+
+@media (max-width: 1024px) {
+    .catalog-product-view .tekntek-pdp-gallery__stage-wrap {
+        height: 520px;
+    }
+}
+
+@media (max-width: 640px) {
+    .catalog-product-view .tekntek-pdp-gallery {
+        max-width: 100%;
+    }
+
+    .catalog-product-view .tekntek-pdp-gallery__stage-wrap {
+        height: 380px;
+    }
+
+    .catalog-product-view .tekntek-pdp-gallery__thumbs {
+        grid-template-columns: repeat(auto-fill, minmax(60px, 1fr));
+    }
+
+    .catalog-product-view .tekntek-pdp-gallery__thumb {
+        height: 60px;
+    }
+}
+</style>
+
+<div class="tekntek-pdp-gallery" data-role="tekntek-pdp-gallery">
+    <div class="tekntek-pdp-gallery__stage-wrap">
+        <button type="button" class="tekntek-pdp-gallery__arrow tekntek-pdp-gallery__arrow--prev" data-action="prev" aria-label="Previous image">&#8249;</button>
+        <img class="tekntek-pdp-gallery__stage" data-role="stage" src="<?= $escaper->escapeUrl((string) $active['full']) ?>" alt="<?= $escaper->escapeHtmlAttr((string) $active['alt']) ?>" />
+        <button type="button" class="tekntek-pdp-gallery__arrow tekntek-pdp-gallery__arrow--next" data-action="next" aria-label="Next image">&#8250;</button>
+    </div>
+
+    <div class="tekntek-pdp-gallery__thumbs" role="listbox" aria-label="Product image thumbnails">
+        <?php foreach ($galleryItems as $index => $item): ?>
+            <button
+                type="button"
+                class="tekntek-pdp-gallery__thumb<?= $index === $mainIndex ? ' is-active' : '' ?>"
+                data-role="thumb"
+                data-full="<?= $escaper->escapeUrl((string) $item['full']) ?>"
+                data-alt="<?= $escaper->escapeHtmlAttr((string) $item['alt']) ?>"
+                aria-selected="<?= $index === $mainIndex ? 'true' : 'false' ?>"
+            >
+                <img src="<?= $escaper->escapeUrl((string) $item['thumb']) ?>" alt="<?= $escaper->escapeHtmlAttr((string) $item['alt']) ?>" loading="lazy" />
+            </button>
+        <?php endforeach; ?>
+    </div>
+
+    <link itemprop="image" href="<?= $escaper->escapeUrl((string) $active['full']) ?>" />
+</div>
+
+<script>
+(function () {
+    var galleries = document.querySelectorAll('[data-role="tekntek-pdp-gallery"]');
+
+    galleries.forEach(function (gallery) {
+        var stage = gallery.querySelector('[data-role="stage"]');
+        var thumbs = Array.prototype.slice.call(gallery.querySelectorAll('[data-role="thumb"]'));
+        var prev = gallery.querySelector('[data-action="prev"]');
+        var next = gallery.querySelector('[data-action="next"]');
+        var imageLink = gallery.querySelector('link[itemprop="image"]');
+        var current = Math.max(0, thumbs.findIndex(function (thumb) {
+            return thumb.classList.contains('is-active');
+        }));
+
+        if (!stage || thumbs.length === 0) {
+            return;
+        }
+
+        function render(index) {
+            var safeIndex = (index + thumbs.length) % thumbs.length;
+            var activeThumb = thumbs[safeIndex];
+            var full = activeThumb.getAttribute('data-full') || '';
+            var alt = activeThumb.getAttribute('data-alt') || 'Product image';
+
+            current = safeIndex;
+            stage.src = full;
+            stage.alt = alt;
+
+            if (imageLink) {
+                imageLink.setAttribute('href', full);
+            }
+
+            thumbs.forEach(function (thumb, idx) {
+                var isActive = idx === safeIndex;
+                thumb.classList.toggle('is-active', isActive);
+                thumb.setAttribute('aria-selected', isActive ? 'true' : 'false');
+            });
+        }
+
+        thumbs.forEach(function (thumb, idx) {
+            thumb.addEventListener('click', function () {
+                render(idx);
+            });
+        });
+
+        if (prev) {
+            prev.addEventListener('click', function () {
+                render(current - 1);
+            });
+        }
+
+        if (next) {
+            next.addEventListener('click', function () {
+                render(current + 1);
+            });
+        }
+
+        render(current);
+    });
+})();
+</script>

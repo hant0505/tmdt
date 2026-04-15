@@ -1,0 +1,48 @@
+<?xml version="1.0"?>
+<view xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Config/etc/view.xsd">
+    <vars module="Magento_Catalog">
+        <var name="gallery">
+            <var name="nav">thumbs</var>
+            <var name="loop">true</var>
+            <var name="keyboard">true</var>
+            <var name="arrows">true</var>
+            <var name="caption">false</var>
+            <var name="allowfullscreen">true</var>
+            <var name="navdir">horizontal</var>
+            <var name="navarrows">true</var>
+            <var name="navtype">slides</var>
+            <var name="transition">
+                <var name="effect">slide</var>
+                <var name="duration">500</var>
+            </var>
+            <var name="fullscreen">
+                <var name="nav">thumbs</var>
+                <var name="loop">true</var>
+                <var name="arrows">true</var>
+                <var name="caption">false</var>
+                <var name="navdir">horizontal</var>
+                <var name="navarrows">false</var>
+                <var name="navtype">slides</var>
+                <var name="transition">
+                    <var name="effect">slide</var>
+                    <var name="duration">500</var>
+                </var>
+            </var>
+            <var name="breakpoints">
+                <var name="mobile">
+                    <var name="conditions">
+                        <var name="max-width">767px</var>
+                    </var>
+                    <var name="options">
+                        <var name="options">
+                            <var name="nav">thumbs</var>
+                            <var name="arrows">true</var>
+                            <var name="navarrows">true</var>
+                            <var name="navdir">horizontal</var>
+                        </var>
+                    </var>
+                </var>
+            </var>
+        </var>
+    </vars>
+</view>
