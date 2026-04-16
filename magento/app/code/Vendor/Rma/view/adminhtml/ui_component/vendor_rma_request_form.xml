@@ -1,0 +1,108 @@
+<?xml version="1.0"?>
+<form xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Ui:etc/ui_configuration.xsd">
+    <argument name="data" xsi:type="array">
+        <item name="js_config" xsi:type="array">
+            <item name="provider" xsi:type="string">vendor_rma_request_form.vendor_rma_request_form_data_source</item>
+        </item>
+        <item name="label" xsi:type="string" translate="true">RMA Information</item>
+        <item name="template" xsi:type="string">templates/form/collapsible</item>
+    </argument>
+    <settings>
+        <buttons>
+            <button name="save" class="Vendor\Rma\Block\Adminhtml\Request\Edit\SaveButton"/>
+            <button name="back" class="Vendor\Rma\Block\Adminhtml\Request\Edit\BackButton"/>
+        </buttons>
+        <namespace>vendor_rma_request_form</namespace>
+        <dataScope>data</dataScope>
+        <deps>
+            <dep>vendor_rma_request_form.vendor_rma_request_form_data_source</dep>
+        </deps>
+    </settings>
+    <dataSource name="vendor_rma_request_form_data_source">
+        <argument name="data" xsi:type="array">
+            <item name="js_config" xsi:type="array">
+                <item name="component" xsi:type="string">Magento_Ui/js/form/provider</item>
+            </item>
+        </argument>
+        <settings>
+            <submitUrl path="vendor_rma/request/save"/>
+        </settings>
+        <dataProvider class="Vendor\Rma\Model\Rma\DataProvider" name="vendor_rma_request_form_data_source">
+            <settings>
+                <requestFieldName>id</requestFieldName>
+                <primaryFieldName>entity_id</primaryFieldName>
+            </settings>
+        </dataProvider>
+    </dataSource>
+    
+    <fieldset name="general">
+        <settings>
+            <label/>
+        </settings>
+        <field name="entity_id" formElement="input">
+            <argument name="data" xsi:type="array">
+                <item name="config" xsi:type="array">
+                    <item name="source" xsi:type="string">rma</item>
+                </item>
+            </argument>
+            <settings>
+                <dataType>text</dataType>
+                <visible>false</visible>
+            </settings>
+        </field>
+        <field name="increment_id" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">RMA Increment ID</label>
+                <disabled>true</disabled>
+            </settings>
+        </field>
+        <field name="order_id" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Order ID</label>
+                <disabled>true</disabled>
+            </settings>
+        </field>
+        <field name="reason" formElement="input">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Reason</label>
+                <disabled>true</disabled>
+            </settings>
+        </field>
+        <field name="customer_comment" formElement="textarea">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Customer Comment</label>
+                <disabled>true</disabled>
+            </settings>
+        </field>
+        <field name="status" formElement="select">
+            <settings>
+                <dataType>text</dataType>
+                <label translate="true">Status</label>
+            </settings>
+            <formElements>
+                <select>
+                    <settings>
+                        <options>
+                            <option name="pending" xsi:type="array">
+                                <item name="value" xsi:type="string">pending</item>
+                                <item name="label" xsi:type="string" translate="true">Pending</item>
+                            </option>
+                            <option name="approved" xsi:type="array">
+                                <item name="value" xsi:type="string">approved</item>
+                                <item name="label" xsi:type="string" translate="true">Approved</item>
+                            </option>
+                            <option name="rejected" xsi:type="array">
+                                <item name="value" xsi:type="string">rejected</item>
+                                <item name="label" xsi:type="string" translate="true">Rejected</item>
+                            </option>
+                        </options>
+                    </settings>
+                </select>
+            </formElements>
+        </field>
+    </fieldset>
+</form>
