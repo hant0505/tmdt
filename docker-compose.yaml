@@ -6,6 +6,18 @@ services:
     volumes:
       - ./magento:/var/www/html
     working_dir: /var/www/html
+    environment:
+      SMTP_MODE: ${SMTP_MODE:-mailpit}
+      SMTP_HOST: ${SMTP_HOST:-}
+      SMTP_PORT: ${SMTP_PORT:-1025}
+      SMTP_FROM: ${SMTP_FROM:-no-reply@localhost}
+      SMTP_USER: ${SMTP_USER:-}
+      SMTP_PASS: ${SMTP_PASS:-}
+      SMTP_AUTH: ${SMTP_AUTH:-off}
+      SMTP_TLS: ${SMTP_TLS:-off}
+      SMTP_STARTTLS: ${SMTP_STARTTLS:-off}
+    depends_on:
+      - mailpit
 
   nginx:
     image: nginx:1.24
@@ -26,8 +38,6 @@ services:
       MYSQL_DATABASE: magento
       MYSQL_USER: magento
       MYSQL_PASSWORD: magento123
-    ports:
-      - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
 
@@ -53,6 +63,13 @@ services:
     ports:
       - "9200:9200"
       - "9600:9600"
+
+  mailpit:
+    image: axllent/mailpit:latest
+    container_name: magento_mailpit
+    ports:
+      - "1025:1025"
+      - "8025:8025"
 
 volumes:
   mysql_data:

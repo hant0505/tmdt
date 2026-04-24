@@ -5,3 +5,4 @@ magento/generated/
 magento/pub/static/
 magento/pub/media/
 magento/app/etc/env.php
+.env

@@ -6,28 +6,36 @@ $categoryCollectionFactory = $objectManager->get(\Magento\Catalog\Model\Resource
 
 $ttkUrlKeyMap = [
     'hard_drives' => 'hard-drives',
-    'computer_mices' => 'computer-mice',
+    'computer_mice' => 'mice',
     'keyboards' => 'keyboards',
     'monitors' => 'monitors',
+    'laptops' => 'laptops',
+    'smartphones' => 'smartphones',
+    'cameras' => 'cameras',
+    'smartwatches' => 'smart-watches',
+    'headphones' => 'headphones',
+    'tablets' => 'tablets',
+    // Legacy aliases kept for safety while the theme is being normalized.
+    'computer_mices' => 'mice',
     'laptop' => 'laptops',
     'smartphone' => 'smartphones',
     'camera' => 'cameras',
     'smart_watch' => 'smart-watches',
-    'audio_headphones' => 'audio-headphones',
+    'audio_headphones' => 'headphones',
     'tablet' => 'tablets'
 ];
 
 $ttkCategoryUrls = [
     'hard_drives' => $block->getUrl($ttkUrlKeyMap['hard_drives']),
-    'computer_mices' => $block->getUrl($ttkUrlKeyMap['computer_mices']),
+    'computer_mice' => $block->getUrl($ttkUrlKeyMap['computer_mice']),
     'keyboards' => $block->getUrl($ttkUrlKeyMap['keyboards']),
     'monitors' => $block->getUrl($ttkUrlKeyMap['monitors']),
-    'laptop' => $block->getUrl($ttkUrlKeyMap['laptop']),
-    'smartphone' => $block->getUrl($ttkUrlKeyMap['smartphone']),
-    'camera' => $block->getUrl($ttkUrlKeyMap['camera']),
-    'smart_watch' => $block->getUrl($ttkUrlKeyMap['smart_watch']),
-    'audio_headphones' => $block->getUrl($ttkUrlKeyMap['audio_headphones']),
-    'tablet' => $block->getUrl($ttkUrlKeyMap['tablet']),
+    'laptops' => $block->getUrl($ttkUrlKeyMap['laptops']),
+    'smartphones' => $block->getUrl($ttkUrlKeyMap['smartphones']),
+    'cameras' => $block->getUrl($ttkUrlKeyMap['cameras']),
+    'smartwatches' => $block->getUrl($ttkUrlKeyMap['smartwatches']),
+    'headphones' => $block->getUrl($ttkUrlKeyMap['headphones']),
+    'tablets' => $block->getUrl($ttkUrlKeyMap['tablets']),
     'exchange_rates' => '#',
     'news' => '#'
 ];
@@ -311,11 +319,17 @@ nav.navigation,
 }
 
 .tekntek-isolated-header .ttk-icon-nav {
-    background: linear-gradient(180deg, #f6f6f6 0%, #ececec 100%);
-    border: 1px solid #c8ccd1;
+    background: linear-gradient(180deg, #eff6ff 0%, #dbeafe 100%);
+    border: 1px solid #bfdbfe;
     border-radius: 10px;
     padding: 12px 14px;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
+}
+
+.tekntek-isolated-header .ttk-icon-item {
+    --ttk-icon-accent: #2563eb;
+    --ttk-icon-accent-soft: rgba(37, 99, 235, 0.12);
+    --ttk-icon-accent-strong: rgba(37, 99, 235, 0.24);
 }
 
 .tekntek-isolated-header .ttk-icon-nav ul {
@@ -324,7 +338,7 @@ nav.navigation,
     padding: 0;
     display: grid;
     grid-template-columns: repeat(12, minmax(0, 1fr));
-    gap: 8px;
+    gap: 10px;
 }
 
 .tekntek-isolated-header .ttk-icon-nav li {
@@ -341,39 +355,82 @@ nav.navigation,
 
 .tekntek-isolated-header .ttk-icon-nav a {
     text-decoration: none;
-    color: #4f545b !important;
+    color: #334155 !important;
+    position: relative;
+    overflow: hidden;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
     gap: 6px;
-    min-height: 56px;
+    min-height: 62px;
+    padding: 8px 7px 7px;
     border-radius: 8px;
-    transition: transform 160ms ease, background-color 160ms ease, color 160ms ease;
+    border: 1px solid rgba(191, 219, 254, 0.92);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.99) 0%, rgba(239, 246, 255, 0.98) 100%);
+    box-shadow: 0 8px 16px rgba(37, 99, 235, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.92);
+    transition: transform 160ms ease, background-color 160ms ease, color 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
 }
 
 .tekntek-isolated-header .ttk-icon-nav a:hover {
-    background: rgba(255, 255, 255, 0.7);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.99) 0%, rgba(219, 234, 254, 0.95) 100%);
     transform: translateY(-2px);
-    color: #1f2937 !important;
+    color: #1d4ed8 !important;
+    border-color: rgba(96, 165, 250, 0.55);
+    box-shadow: 0 12px 20px rgba(37, 99, 235, 0.1), 0 0 0 1px rgba(37, 99, 235, 0.1);
 }
 
-.tekntek-isolated-header .ttk-icon-nav img,
+.tekntek-isolated-header .ttk-icon-badge {
+    width: 32px;
+    height: 32px;
+    border-radius: 10px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(180deg, #3b82f6 0%, #2563eb 100%);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 8px 14px rgba(37, 99, 235, 0.14);
+    flex: 0 0 32px;
+    color: #ffffff;
+    position: relative;
+    z-index: 1;
+}
+
+.tekntek-isolated-header .ttk-icon-badge::after {
+    content: "";
+    position: absolute;
+    inset: 3px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.26);
+    pointer-events: none;
+}
+
 .tekntek-isolated-header .ttk-icon-nav svg {
-    width: 30px;
-    height: 30px;
+    width: 17px;
+    height: 17px;
     object-fit: contain;
 }
 
 .tekntek-isolated-header .ttk-icon-nav svg * {
-    stroke-width: 2.2;
+    stroke-width: 1.45;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    vector-effect: non-scaling-stroke;
 }
 
-.tekntek-isolated-header .ttk-icon-nav span {
+.tekntek-isolated-header .ttk-icon-label {
     font-size: 10px;
-    line-height: 1.15;
+    line-height: 1.12;
     font-weight: 600;
     letter-spacing: -0.1px;
+    text-align: center;
+    color: #334155;
+    position: relative;
+    z-index: 1;
+}
+
+.tekntek-isolated-header .ttk-icon-nav a:hover .ttk-icon-label {
+    color: #111827;
 }
 
 .tekntek-isolated-header .ttk-icon-nav li:nth-child(1) { transition-delay: 20ms; }
@@ -388,6 +445,62 @@ nav.navigation,
 .tekntek-isolated-header .ttk-icon-nav li:nth-child(10) { transition-delay: 200ms; }
 .tekntek-isolated-header .ttk-icon-nav li:nth-child(11) { transition-delay: 220ms; }
 .tekntek-isolated-header .ttk-icon-nav li:nth-child(12) { transition-delay: 240ms; }
+
+body.catalog-category-view .tekntek-isolated-header .ttk-icon-nav ul {
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: 10px;
+}
+
+body.catalog-category-view .tekntek-isolated-header .ttk-icon-nav a {
+    color: #334155 !important;
+    min-height: 62px;
+    padding: 8px 7px 7px;
+    border-radius: 8px;
+    gap: 6px;
+    justify-content: flex-start;
+    box-shadow: 0 8px 16px rgba(37, 99, 235, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.92);
+}
+
+body.catalog-category-view .tekntek-isolated-header .ttk-icon-nav a:hover {
+    transform: translateY(-2px);
+    color: #1d4ed8 !important;
+    border-color: rgba(96, 165, 250, 0.55);
+    box-shadow: 0 12px 20px rgba(37, 99, 235, 0.1), 0 0 0 1px rgba(37, 99, 235, 0.1);
+}
+
+body.catalog-category-view .tekntek-isolated-header .ttk-icon-badge {
+    width: 32px;
+    height: 32px;
+    flex-basis: 32px;
+    border-radius: 10px;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18), 0 8px 14px rgba(37, 99, 235, 0.14);
+}
+
+body.catalog-category-view .tekntek-isolated-header .ttk-icon-badge::after {
+    inset: 3px;
+    border-radius: 8px;
+}
+
+body.catalog-category-view .tekntek-isolated-header .ttk-icon-nav svg {
+    width: 17px;
+    height: 17px;
+}
+
+body.catalog-category-view .tekntek-isolated-header .ttk-icon-nav svg * {
+    stroke-width: 1.25;
+}
+
+body.catalog-category-view .tekntek-isolated-header .ttk-icon-label {
+    font-size: 10px;
+    line-height: 1.12;
+    font-weight: 600;
+    letter-spacing: -0.1px;
+    color: #334155;
+}
+
+body.catalog-category-view .tekntek-isolated-header .ttk-icon-nav a:hover .ttk-icon-label {
+    color: #1d4ed8;
+}
 
 @media (prefers-reduced-motion: reduce) {
     .tekntek-isolated-header .ttk-all-products-btn,
@@ -438,6 +551,50 @@ nav.navigation,
     .tekntek-isolated-header .ttk-icon-nav ul {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
+
+    .tekntek-isolated-header .ttk-icon-nav a {
+        min-height: 104px;
+        padding: 14px 10px 12px;
+    }
+
+    .tekntek-isolated-header .ttk-icon-badge {
+        width: 46px;
+        height: 46px;
+        flex-basis: 46px;
+    }
+
+    body.catalog-category-view .tekntek-isolated-header .ttk-icon-nav ul {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    body.catalog-category-view .tekntek-isolated-header .ttk-icon-nav a {
+        min-height: 104px;
+        padding: 14px 10px 12px;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    body.catalog-category-view .tekntek-isolated-header .ttk-icon-badge {
+        width: 46px;
+        height: 46px;
+        flex-basis: 46px;
+        border-radius: 14px;
+    }
+
+    body.catalog-category-view .tekntek-isolated-header .ttk-icon-badge::after {
+        inset: 4px;
+        border-radius: 10px;
+    }
+
+    body.catalog-category-view .tekntek-isolated-header .ttk-icon-nav svg {
+        width: 20px;
+        height: 20px;
+    }
+
+    body.catalog-category-view .tekntek-isolated-header .ttk-icon-label {
+        font-size: 12px;
+        font-weight: 700;
+    }
 }
 </style>
 
@@ -471,18 +628,18 @@ nav.navigation,
         <div class="ttk-icon-layer-inner">
             <nav class="ttk-icon-nav" id="ttk-icon-nav" aria-label="Category menu">
                 <ul>
-                    <li><a href="<?= $block->escapeUrl($ttkCategoryUrls['hard_drives']) ?>"><svg viewBox="0 0 24 24" role="presentation" focusable="false" aria-hidden="true"><rect x="4" y="5" width="16" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="1.7"/><circle cx="9" cy="15" r="1.4" fill="currentColor"/><circle cx="15" cy="15" r="1.4" fill="currentColor"/></svg><span>Hard Drives</span></a></li>
-                    <li><a href="<?= $block->escapeUrl($ttkCategoryUrls['computer_mices']) ?>"><svg viewBox="0 0 24 24" role="presentation" focusable="false" aria-hidden="true"><rect x="7" y="3.5" width="10" height="17" rx="5" fill="none" stroke="currentColor" stroke-width="1.7"/><line x1="12" y1="7" x2="12" y2="10" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><span>Computer<br/>Mice</span></a></li>
-                    <li><a href="<?= $block->escapeUrl($ttkCategoryUrls['keyboards']) ?>"><svg viewBox="0 0 24 24" role="presentation" focusable="false" aria-hidden="true"><rect x="3" y="7" width="18" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="1.7"/><line x1="7" y1="11" x2="7" y2="11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="11" y1="11" x2="11" y2="11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><line x1="15" y1="11" x2="15" y2="11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><span>Keyboards</span></a></li>
-                    <li><a href="<?= $block->escapeUrl($ttkCategoryUrls['monitors']) ?>"><svg viewBox="0 0 24 24" role="presentation" focusable="false" aria-hidden="true"><rect x="3.5" y="5" width="17" height="12" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.7"/><line x1="8" y1="20" x2="16" y2="20" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><span>Monitors</span></a></li>
-                    <li><a href="<?= $block->escapeUrl($ttkCategoryUrls['laptop']) ?>"><svg viewBox="0 0 24 24" role="presentation" focusable="false" aria-hidden="true"><rect x="4" y="6" width="16" height="10" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.7"/><line x1="8" y1="18.5" x2="16" y2="18.5" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><span>Laptop</span></a></li>
-                    <li><a href="<?= $block->escapeUrl($ttkCategoryUrls['smartphone']) ?>"><svg viewBox="0 0 24 24" role="presentation" focusable="false" aria-hidden="true"><rect x="8" y="3" width="8" height="18" rx="1.8" fill="none" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="18" r="0.9" fill="currentColor"/></svg><span>Smartphone</span></a></li>
-                    <li><a href="<?= $block->escapeUrl($ttkCategoryUrls['camera']) ?>"><svg viewBox="0 0 24 24" role="presentation" focusable="false" aria-hidden="true"><rect x="4" y="7" width="16" height="11" rx="2" fill="none" stroke="currentColor" stroke-width="1.7"/><circle cx="12" cy="12.5" r="2.5" fill="none" stroke="currentColor" stroke-width="1.7"/><circle cx="17" cy="9.5" r="1" fill="currentColor"/></svg><span>Camera</span></a></li>
-                    <li><a href="<?= $block->escapeUrl($ttkCategoryUrls['smart_watch']) ?>"><svg viewBox="0 0 24 24" role="presentation" focusable="false" aria-hidden="true"><rect x="8" y="4" width="8" height="16" rx="3" fill="none" stroke="currentColor" stroke-width="1.7"/><line x1="10" y1="2.8" x2="14" y2="2.8" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><span>Smart<br/>Watch</span></a></li>
-                    <li><a href="<?= $block->escapeUrl($ttkCategoryUrls['audio_headphones']) ?>"><svg viewBox="0 0 24 24" role="presentation" focusable="false" aria-hidden="true"><path d="M5 12a7 7 0 0 1 14 0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><rect x="4" y="12" width="4" height="7" rx="1.4" fill="none" stroke="currentColor" stroke-width="2"/><rect x="16" y="12" width="4" height="7" rx="1.4" fill="none" stroke="currentColor" stroke-width="2"/></svg><span>Audio<br/>Headphones</span></a></li>
-                    <li><a href="<?= $block->escapeUrl($ttkCategoryUrls['tablet']) ?>"><svg viewBox="0 0 24 24" role="presentation" focusable="false" aria-hidden="true"><rect x="5" y="4" width="14" height="16" rx="1.8" fill="none" stroke="currentColor" stroke-width="1.7"/><line x1="9" y1="8" x2="15" y2="8" stroke="currentColor" stroke-width="1.7"/><line x1="9" y1="12" x2="15" y2="12" stroke="currentColor" stroke-width="1.7"/></svg><span>Tablet</span></a></li>
-                    <li><a href="<?= $block->escapeUrl($ttkCategoryUrls['exchange_rates']) ?>"><svg viewBox="0 0 24 24" role="presentation" focusable="false" aria-hidden="true"><path d="M6 8h10" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="m13 5 3 3-3 3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/><path d="M18 16H8" fill="none" stroke="currentColor" stroke-width="1.7"/><path d="m11 13-3 3 3 3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Exchange<br/>Rates</span></a></li>
-                    <li><a href="<?= $block->escapeUrl($ttkCategoryUrls['news']) ?>"><svg viewBox="0 0 24 24" role="presentation" focusable="false" aria-hidden="true"><rect x="4" y="5" width="16" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="1.7"/><line x1="7" y1="9" x2="17" y2="9" stroke="currentColor" stroke-width="1.7"/><line x1="7" y1="13" x2="14" y2="13" stroke="currentColor" stroke-width="1.7"/></svg><span>News</span></a></li>
+                    <li class="ttk-icon-item ttk-icon-item--hard-drives"><a href="<?= $block->escapeUrl($ttkCategoryUrls['hard_drives']) ?>"><span class="ttk-icon-badge"><svg viewBox="0 0 24 24" role="presentation" focusable="false" aria-hidden="true"><rect x="4" y="5" width="16" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="1.25"/><circle cx="9" cy="15" r="1.4" fill="currentColor"/><circle cx="15" cy="15" r="1.4" fill="currentColor"/></svg></span><span class="ttk-icon-label">Hard Drives</span></a></li>
+                    <li class="ttk-icon-item ttk-icon-item--computer-mice"><a href="<?= $block->escapeUrl($ttkCategoryUrls['computer_mice']) ?>"><span class="ttk-icon-badge"><svg viewBox="0 0 24 24" role="presentation" focusable="false" aria-hidden="true"><rect x="7" y="3.5" width="10" height="17" rx="5" fill="none" stroke="currentColor" stroke-width="1.25"/><line x1="12" y1="7" x2="12" y2="10" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/></svg></span><span class="ttk-icon-label">Computer<br/>Mice</span></a></li>
+                    <li class="ttk-icon-item ttk-icon-item--keyboards"><a href="<?= $block->escapeUrl($ttkCategoryUrls['keyboards']) ?>"><span class="ttk-icon-badge"><svg viewBox="0 0 24 24" role="presentation" focusable="false" aria-hidden="true"><rect x="3" y="7" width="18" height="10" rx="2" fill="none" stroke="currentColor" stroke-width="1.25"/><line x1="7" y1="11" x2="7" y2="11" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/><line x1="11" y1="11" x2="11" y2="11" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/><line x1="15" y1="11" x2="15" y2="11" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/></svg></span><span class="ttk-icon-label">Keyboards</span></a></li>
+                    <li class="ttk-icon-item ttk-icon-item--monitors"><a href="<?= $block->escapeUrl($ttkCategoryUrls['monitors']) ?>"><span class="ttk-icon-badge"><svg viewBox="0 0 24 24" role="presentation" focusable="false" aria-hidden="true"><rect x="3.5" y="5" width="17" height="12" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.25"/><line x1="8" y1="20" x2="16" y2="20" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/></svg></span><span class="ttk-icon-label">Monitors</span></a></li>
+                    <li class="ttk-icon-item ttk-icon-item--laptops"><a href="<?= $block->escapeUrl($ttkCategoryUrls['laptops']) ?>"><span class="ttk-icon-badge"><svg viewBox="0 0 24 24" role="presentation" focusable="false" aria-hidden="true"><rect x="4" y="6" width="16" height="10" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.25"/><line x1="8" y1="18.5" x2="16" y2="18.5" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/></svg></span><span class="ttk-icon-label">Laptops</span></a></li>
+                    <li class="ttk-icon-item ttk-icon-item--smartphones"><a href="<?= $block->escapeUrl($ttkCategoryUrls['smartphones']) ?>"><span class="ttk-icon-badge"><svg viewBox="0 0 24 24" role="presentation" focusable="false" aria-hidden="true"><rect x="8" y="3" width="8" height="18" rx="1.8" fill="none" stroke="currentColor" stroke-width="1.25"/><circle cx="12" cy="18" r="0.9" fill="currentColor"/></svg></span><span class="ttk-icon-label">Smartphones</span></a></li>
+                    <li class="ttk-icon-item ttk-icon-item--cameras"><a href="<?= $block->escapeUrl($ttkCategoryUrls['cameras']) ?>"><span class="ttk-icon-badge"><svg viewBox="0 0 24 24" role="presentation" focusable="false" aria-hidden="true"><rect x="4" y="7" width="16" height="11" rx="2" fill="none" stroke="currentColor" stroke-width="1.25"/><circle cx="12" cy="12.5" r="2.5" fill="none" stroke="currentColor" stroke-width="1.25"/><circle cx="17" cy="9.5" r="1" fill="currentColor"/></svg></span><span class="ttk-icon-label">Cameras</span></a></li>
+                    <li class="ttk-icon-item ttk-icon-item--smartwatches"><a href="<?= $block->escapeUrl($ttkCategoryUrls['smartwatches']) ?>"><span class="ttk-icon-badge"><svg viewBox="0 0 24 24" role="presentation" focusable="false" aria-hidden="true"><rect x="8" y="4" width="8" height="16" rx="3" fill="none" stroke="currentColor" stroke-width="1.25"/><line x1="10" y1="2.8" x2="14" y2="2.8" stroke="currentColor" stroke-width="1.25" stroke-linecap="round"/></svg></span><span class="ttk-icon-label">Smartwatches</span></a></li>
+                    <li class="ttk-icon-item ttk-icon-item--headphones"><a href="<?= $block->escapeUrl($ttkCategoryUrls['headphones']) ?>"><span class="ttk-icon-badge"><svg viewBox="0 0 24 24" role="presentation" focusable="false" aria-hidden="true"><path d="M5 12a7 7 0 0 1 14 0" fill="none" stroke="currentColor" stroke-width="1.35" stroke-linecap="round"/><rect x="4" y="12" width="4" height="7" rx="1.4" fill="none" stroke="currentColor" stroke-width="1.35"/><rect x="16" y="12" width="4" height="7" rx="1.4" fill="none" stroke="currentColor" stroke-width="1.35"/></svg></span><span class="ttk-icon-label">Headphones</span></a></li>
+                    <li class="ttk-icon-item ttk-icon-item--tablets"><a href="<?= $block->escapeUrl($ttkCategoryUrls['tablets']) ?>"><span class="ttk-icon-badge"><svg viewBox="0 0 24 24" role="presentation" focusable="false" aria-hidden="true"><rect x="5" y="4" width="14" height="16" rx="1.8" fill="none" stroke="currentColor" stroke-width="1.25"/><line x1="9" y1="8" x2="15" y2="8" stroke="currentColor" stroke-width="1.25"/><line x1="9" y1="12" x2="15" y2="12" stroke="currentColor" stroke-width="1.25"/></svg></span><span class="ttk-icon-label">Tablets</span></a></li>
+                    <li class="ttk-icon-item ttk-icon-item--exchange-rates"><a href="<?= $block->escapeUrl($ttkCategoryUrls['exchange_rates']) ?>"><span class="ttk-icon-badge"><svg viewBox="0 0 24 24" role="presentation" focusable="false" aria-hidden="true"><path d="M6 8h10" fill="none" stroke="currentColor" stroke-width="1.25"/><path d="m13 5 3 3-3 3" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/><path d="M18 16H8" fill="none" stroke="currentColor" stroke-width="1.25"/><path d="m11 13-3 3 3 3" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="ttk-icon-label">Exchange<br/>Rates</span></a></li>
+                    <li class="ttk-icon-item ttk-icon-item--news"><a href="<?= $block->escapeUrl($ttkCategoryUrls['news']) ?>"><span class="ttk-icon-badge"><svg viewBox="0 0 24 24" role="presentation" focusable="false" aria-hidden="true"><rect x="4" y="5" width="16" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="1.25"/><line x1="7" y1="9" x2="17" y2="9" stroke="currentColor" stroke-width="1.25"/><line x1="7" y1="13" x2="14" y2="13" stroke="currentColor" stroke-width="1.25"/></svg></span><span class="ttk-icon-label">News</span></a></li>
                 </ul>
             </nav>
         </div>

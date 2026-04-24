@@ -13,6 +13,8 @@ if (!$product) {
 $imageHelper = $om->get(\Magento\Catalog\Helper\Image::class);
 $outputHelper = $om->get(\Magento\Catalog\Helper\Output::class);
 $priceHelper = $om->get(\Magento\Framework\Pricing\Helper\Data::class);
+$storeManager = $om->get(\Magento\Store\Model\StoreManagerInterface::class);
+$reviewFactory = $om->get(\Magento\Review\Model\ReviewFactory::class);
 $formKey = $om->get(\Magento\Framework\Data\Form\FormKey::class)->getFormKey();
 $urlEncoder = $om->get(\Magento\Framework\Url\EncoderInterface::class);
 
@@ -20,9 +22,9 @@ $name = (string) $product->getName();
 $shortDesc = trim((string) $product->getShortDescription());
 $description = trim((string) $product->getDescription());
 $descriptionSource = $description !== '' ? $description : $shortDesc;
-$descriptionHtml = trim($descriptionSource) !== ''
+$rawDescriptionHtml = trim($descriptionSource) !== ''
     ? (string) $outputHelper->productAttribute($product, $descriptionSource, 'description')
-    : '<p>No description available.</p>';
+    : '';
 $regular = (float) $product->getPrice();
 $final = (float) $product->getFinalPrice();
 $buyNowUrl = $block->getUrl('checkout/cart/add', [
@@ -39,19 +41,150 @@ $httpContext = $om->get(\Magento\Framework\App\Http\Context::class);
 $isLoggedIn = (bool) $httpContext->getValue(\Magento\Customer\Model\Context::CONTEXT_AUTH);
 $currentUrl = $block->getUrl('*/*/*', ['_current' => true, '_use_rewrite' => true]);
 $loginUrl = $block->getUrl('customer/account/login', ['referer' => base64_encode($currentUrl)]);
+$wishlistUenc = $urlEncoder->encode($currentUrl);
 
-$ratingCount = 84;
-$ratingValue = 4;
+$reviewFactory->create()->getEntitySummary($product, (int) $storeManager->getStore()->getId());
+$reviewsCountRaw = $product->getReviewsCount();
+$ratingSummaryRaw = $product->getRatingSummary();
+
+if ($reviewsCountRaw instanceof \Magento\Framework\DataObject) {
+    $reviewsCountRaw = $reviewsCountRaw->getData('reviews_count');
+}
+if ($ratingSummaryRaw instanceof \Magento\Framework\DataObject) {
+    $ratingSummaryRaw = $ratingSummaryRaw->getData('rating_summary');
+}
+
+$ratingCount = max(0, (int) $reviewsCountRaw);
+$ratingSummary = max(0, (int) $ratingSummaryRaw);
+$ratingValue = $ratingSummary > 0 ? (int) round($ratingSummary / 20) : 0;
+
+$normalizeSpecLabel = static function (string $label): string {
+    $normalized = html_entity_decode($label, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+    $normalized = preg_replace('/\s+/', ' ', trim($normalized)) ?? trim($normalized);
+    $slug = strtolower($normalized);
+    $slug = preg_replace('/[^a-z0-9]+/', '_', $slug) ?? $slug;
+    $slug = trim($slug, '_');
+
+    $map = [
+        'brand' => 'Brand',
+        'manufacturer' => 'Brand',
+        'model' => 'Model',
+        'model_name' => 'Model',
+        'model_number' => 'Model',
+        'series' => 'Series',
+        'color' => 'Color',
+        'colour' => 'Color',
+        'item_weight' => 'Weight',
+        'weight_item' => 'Weight',
+        'weight' => 'Weight',
+        'product_dimensions' => 'Dimensions',
+        'dimensions' => 'Dimensions',
+        'screen_size' => 'Screen size',
+        'display_size' => 'Screen size',
+        'display' => 'Display',
+        'display_resolution' => 'Resolution',
+        'resolution' => 'Resolution',
+        'processor' => 'Processor',
+        'processor_type' => 'Processor',
+        'cpu_model' => 'Processor',
+        'chipset' => 'Chipset',
+        'ram' => 'RAM',
+        'memory' => 'RAM',
+        'internal_memory' => 'RAM',
+        'storage' => 'Storage',
+        'storage_capacity' => 'Storage',
+        'ssd_capacity' => 'Storage',
+        'hard_drive_capacity' => 'Storage',
+        'hard_drive_size' => 'Storage',
+        'graphics_card' => 'Graphics',
+        'graphics_processor' => 'Graphics',
+        'video_card' => 'Graphics',
+        'operating_system' => 'Operating system',
+        'os' => 'Operating system',
+        'battery_life' => 'Battery life',
+        'maximum_battery_battery_life' => 'Battery life',
+        'battery_average_life' => 'Battery life',
+        'connectivity_technology' => 'Connectivity',
+        'wireless_type' => 'Wireless',
+        'bluetooth' => 'Bluetooth',
+        'special_features' => 'Special features',
+        'compatible_devices' => 'Compatible devices',
+        'dpi' => 'DPI',
+        'mouse_maximum_sensitivity' => 'DPI',
+        'hand_orientation' => 'Hand orientation',
+        'movement_detection' => 'Sensor',
+        'buttons' => 'Buttons',
+        'number_of_buttons' => 'Buttons',
+        'warranty_type' => 'Warranty',
+        'warranty_description' => 'Warranty',
+    ];
+
+    return $map[$slug] ?? $normalized;
+};
+
+$cleanSpecValue = static function (string $value): string {
+    $normalized = html_entity_decode($value, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+    $normalized = preg_replace('/\s+/', ' ', trim($normalized)) ?? trim($normalized);
+
+    if ($normalized === '' || $normalized === '0.000000' || strtolower($normalized) === 'none') {
+        return '';
+    }
+
+    return $normalized;
+};
+
+$isAllowedSpecLabel = static function (string $label): bool {
+    $allowed = [
+        'Brand',
+        'Model',
+        'Series',
+        'Color',
+        'Weight',
+        'Dimensions',
+        'Screen size',
+        'Display',
+        'Resolution',
+        'Processor',
+        'Chipset',
+        'RAM',
+        'Storage',
+        'Graphics',
+        'Operating system',
+        'Battery life',
+        'Connectivity',
+        'Wireless',
+        'Bluetooth',
+        'Special features',
+        'Compatible devices',
+        'DPI',
+        'Hand orientation',
+        'Sensor',
+        'Buttons',
+        'Warranty',
+    ];
+
+    return in_array($label, $allowed, true);
+};
 
 $specMap = [
-    'Display' => ['display', 'display_size', 'screen_size', 'screen_diagonal', 'resolution', 'display_resolution'],
+    'Brand' => ['brand', 'manufacturer'],
+    'Model' => ['model', 'model_name', 'model_number', 'series'],
+    'Color' => ['color', 'colour'],
+    'Display' => ['display', 'display_size', 'screen_size', 'screen_diagonal'],
+    'Resolution' => ['resolution', 'display_resolution'],
     'Processor' => ['processor', 'cpu', 'processor_type', 'chipset'],
-    'Internal memory (RAM)' => ['ram', 'memory', 'internal_memory', 'ram_type'],
-    'Hard drive capacity' => ['hard_drive_size', 'hard_drive_capacity', 'storage_capacity', 'storage', 'ssd_capacity'],
-    'Video card' => ['graphics_card', 'video_card', 'graphics_processor', 'graphics_coprocessor'],
+    'RAM' => ['ram', 'memory', 'internal_memory', 'ram_type'],
+    'Storage' => ['hard_drive_size', 'hard_drive_capacity', 'storage_capacity', 'storage', 'ssd_capacity'],
+    'Graphics' => ['graphics_card', 'video_card', 'graphics_processor', 'graphics_coprocessor'],
     'Operating system' => ['operating_system', 'os'],
-    'Weight' => ['weight_item', 'weight'],
-    'Battery life' => ['battery_life', 'maximum_battery_battery_life']
+    'Battery life' => ['battery_life', 'maximum_battery_battery_life', 'battery_average_life'],
+    'Connectivity' => ['connectivity_technology', 'wireless_type', 'bluetooth'],
+    'DPI' => ['dpi', 'mouse_maximum_sensitivity'],
+    'Hand orientation' => ['hand_orientation'],
+    'Sensor' => ['movement_detection'],
+    'Buttons' => ['buttons', 'number_of_buttons'],
+    'Weight' => ['item_weight', 'weight_item', 'weight'],
+    'Warranty' => ['warranty_type', 'warranty_description']
 ];
 
 $findFirstValue = static function (\Magento\Catalog\Model\Product $source, array $codes): string {
@@ -74,32 +207,120 @@ $findFirstValue = static function (\Magento\Catalog\Model\Product $source, array
 
 $specRows = [];
 foreach ($specMap as $label => $codes) {
-    $value = $findFirstValue($product, $codes);
+    $value = $cleanSpecValue($findFirstValue($product, $codes));
     if ($value !== '') {
         $specRows[$label] = $value;
     }
+}
+
+$featureBullets = [];
+$descriptionHtml = '';
+
+if ($rawDescriptionHtml !== '') {
+    $normalizedDescriptionHtml = preg_replace('/<br\s*\/?>/i', "\n", $rawDescriptionHtml) ?? $rawDescriptionHtml;
+
+    if (preg_match('/<ul\b[^>]*>(.*?)<\/ul>/is', $normalizedDescriptionHtml, $featureMatch)) {
+        if (preg_match_all('/<li\b[^>]*>(.*?)<\/li>/is', $featureMatch[1], $featureItems)) {
+            foreach ($featureItems[1] as $itemHtml) {
+                $bullet = trim(html_entity_decode(strip_tags($itemHtml), ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+                if ($bullet !== '') {
+                    $featureBullets[] = $bullet;
+                }
+            }
+        }
+    }
+
+    if (preg_match_all('/<tr\b[^>]*>\s*<td\b[^>]*>(.*?)<\/td>\s*<td\b[^>]*>(.*?)<\/td>\s*<\/tr>/is', $normalizedDescriptionHtml, $tableRows, PREG_SET_ORDER)) {
+        foreach ($tableRows as $row) {
+            $label = $normalizeSpecLabel(trim(strip_tags($row[1])));
+            $value = $cleanSpecValue(trim(strip_tags($row[2])));
+            if ($label !== '' && $value !== '' && $isAllowedSpecLabel($label) && !isset($specRows[$label])) {
+                $specRows[$label] = $value;
+            }
+        }
+    }
+
+    $cleanDescriptionHtml = preg_replace('/<h[1-6][^>]*>\s*(Đặc điểm|Features?)\s*<\/h[1-6]>\s*<ul\b[^>]*>.*?<\/ul>/isu', '', $normalizedDescriptionHtml);
+    $cleanDescriptionHtml = preg_replace('/<h[1-6][^>]*>\s*(Thông số kỹ thuật|Specifications?)\s*<\/h[1-6]>\s*<table\b[^>]*>.*?<\/table>/isu', '', (string) $cleanDescriptionHtml);
+    $cleanDescriptionHtml = preg_replace('/<table\b[^>]*>.*?<\/table>/is', '', (string) $cleanDescriptionHtml);
+    $cleanDescriptionHtml = preg_replace('/(?:\s*<br\s*\/?>\s*){2,}/i', '<br>', (string) $cleanDescriptionHtml);
+    $cleanDescriptionHtml = trim((string) $cleanDescriptionHtml);
+
+    if ($cleanDescriptionHtml !== '') {
+        $descriptionHtml = $cleanDescriptionHtml;
+    }
+}
+
+if (empty($featureBullets)) {
+    $fallbackText = $shortDesc !== '' ? $shortDesc : strip_tags($descriptionSource);
+    $fallbackText = trim(preg_replace('/\s+/', ' ', (string) $fallbackText));
+    if ($fallbackText !== '') {
+        $featureBullets[] = $fallbackText;
+    }
+}
+
+if ($descriptionHtml === '') {
+    $fallbackDescription = trim(strip_tags($shortDesc !== '' ? $shortDesc : $descriptionSource));
+    $descriptionHtml = $fallbackDescription !== ''
+        ? '<p>' . $escaper->escapeHtml($fallbackDescription) . '</p>'
+        : '<p>No description available.</p>';
 }
 
 if (empty($specRows)) {
     $specRows = [
         'Display' => '-',
         'Processor' => '-',
-        'Internal memory (RAM)' => '-',
-        'Hard drive capacity' => '-',
-        'Video card' => '-',
+        'RAM' => '-',
+        'Storage' => '-',
+        'Graphics' => '-',
         'Operating system' => '-',
         'Weight' => '-',
         'Battery life' => '-'
     ];
 }
 
-$featureBullets = [
-    'Intel Core i7 processor for smooth multitasking and high responsiveness.',
-    '16 GB RAM and fast NVMe SSD for startup and app loading speed.',
-    'Lightweight design suitable for work, study, and travel.',
-    'Long battery life and quiet cooling for daily productivity.',
-    'Full HD IPS display with solid color and viewing angles.'
-];
+if (!empty($specRows)) {
+    $preferredSpecOrder = [
+        'Brand',
+        'Model',
+        'Series',
+        'Color',
+        'Display',
+        'Screen size',
+        'Resolution',
+        'Processor',
+        'Chipset',
+        'RAM',
+        'Storage',
+        'Graphics',
+        'Operating system',
+        'Connectivity',
+        'Wireless',
+        'Bluetooth',
+        'DPI',
+        'Hand orientation',
+        'Sensor',
+        'Buttons',
+        'Battery life',
+        'Weight',
+        'Dimensions',
+        'Compatible devices',
+        'Special features',
+        'Warranty',
+    ];
+    $orderedRows = [];
+    foreach ($preferredSpecOrder as $label) {
+        if (isset($specRows[$label])) {
+            $orderedRows[$label] = $specRows[$label];
+        }
+    }
+    foreach ($specRows as $label => $value) {
+        if (!isset($orderedRows[$label])) {
+            $orderedRows[$label] = $value;
+        }
+    }
+    $specRows = array_slice($orderedRows, 0, 10, true);
+}
 
 $related = $product->getRelatedProductCollection();
 $related->addAttributeToSelect(['name', 'small_image', 'price', 'final_price', 'short_description']);
@@ -115,12 +336,84 @@ $upsell->setPageSize(4);
 $upsell->setCurPage(1);
 $upsell->load();
 
-$galleryBlock = $block->getLayout()
-    ->createBlock(\Magento\Catalog\Block\Product\View\Gallery::class)
-    ->setTemplate('Magento_Catalog::product/view/gallery.phtml')
-    ->setProduct($product)
-    ->setData('imageHelper', $imageHelper);
-$galleryHtml = $galleryBlock->toHtml();
+$galleryItems = [];
+$gallerySeenFiles = [];
+$gallerySeenUrls = [];
+$registerGalleryItem = static function (string $url, string $label, string $file = '') use (&$galleryItems, &$gallerySeenFiles, &$gallerySeenUrls): void {
+    $normalizedUrl = trim($url);
+    if ($normalizedUrl === '') {
+        return;
+    }
+
+    $normalizedFile = trim($file);
+    if ($normalizedFile !== '' && in_array($normalizedFile, $gallerySeenFiles, true)) {
+        return;
+    }
+    if (in_array($normalizedUrl, $gallerySeenUrls, true)) {
+        return;
+    }
+
+    $galleryItems[] = [
+        'url' => $normalizedUrl,
+        'label' => $label !== '' ? $label : 'Product image'
+    ];
+    $gallerySeenUrls[] = $normalizedUrl;
+    if ($normalizedFile !== '') {
+        $gallerySeenFiles[] = $normalizedFile;
+    }
+};
+$mainImageUrl = '';
+$mainImageFile = trim((string) $product->getImage());
+try {
+    $mainImageUrl = (string) $imageHelper->init($product, 'product_page_image_large')->getUrl();
+} catch (\Throwable $e) {
+    $mainImageUrl = '';
+}
+if ($mainImageUrl === '') {
+    try {
+        $mainImageUrl = (string) $imageHelper->init($product, 'product_base_image')->getUrl();
+    } catch (\Throwable $e) {
+        $mainImageUrl = '';
+    }
+}
+if ($mainImageUrl !== '') {
+    $registerGalleryItem($mainImageUrl, $name !== '' ? $name : 'Product image', $mainImageFile);
+}
+
+$galleryImages = $product->getMediaGalleryImages();
+if ($galleryImages && $galleryImages->getSize() > 0) {
+    foreach ($galleryImages as $galleryImage) {
+        $galleryFile = trim((string) $galleryImage->getFile());
+        if ($galleryFile === '') {
+            continue;
+        }
+
+        $galleryUrl = '';
+        try {
+            $galleryUrl = (string) $galleryImage->getUrl();
+        } catch (\Throwable $e) {
+            $galleryUrl = '';
+        }
+
+        if ($galleryUrl === '') {
+            continue;
+        }
+
+        $registerGalleryItem(
+            $galleryUrl,
+            trim((string) $galleryImage->getLabel()) !== '' ? (string) $galleryImage->getLabel() : $name,
+            $galleryFile
+        );
+    }
+}
+
+if ($galleryItems === []) {
+    $placeholderUrl = (string) $block->getViewFileUrl('Magento_Catalog::images/product/placeholder/image.jpg');
+    $galleryItems[] = [
+        'url' => $placeholderUrl,
+        'label' => $name !== '' ? $name : 'Product image'
+    ];
+}
 
 $compareItems = [];
 $compareItems[] = $product;
@@ -318,6 +611,15 @@ $reviewData = [
     ]
 ];
 
+if ($ratingCount === 0 && !empty($reviewData)) {
+    $ratingCount = count($reviewData);
+    $ratingTotal = 0;
+    foreach ($reviewData as $reviewItem) {
+        $ratingTotal += max(0, min(5, (int) ($reviewItem['stars'] ?? 0)));
+    }
+    $ratingValue = $ratingCount > 0 ? (int) round($ratingTotal / $ratingCount) : 0;
+}
+
 $compareSeed = [];
 $mainCompareItem = [
     'id' => (int) $product->getId(),
@@ -335,10 +637,6 @@ $mainCompareItem = [
 .tekntek-buy h1 { margin: 0; font-size: 34px; line-height: 1.2; font-weight: 800; }
 .tekntek-rating { margin-top: 10px; display: inline-flex; align-items: center; gap: 10px; font-size: 14px; }
 .tekntek-rating-stars { color: #111; letter-spacing: 1px; }
-.tekntek-option { margin-top: 16px; }
-.tekntek-option label { font-size: 13px; color: #666; display: block; margin-bottom: 8px; }
-.tekntek-colors { display: flex; gap: 8px; }
-.tekntek-color { width: 20px; height: 20px; border-radius: 50%; border: 1px solid #d1d5db; display: inline-block; }
 .tekntek-price { margin-top: 18px; display: flex; align-items: baseline; gap: 10px; }
 .tekntek-price-old { color: #9ca3af; text-decoration: line-through; font-size: 14px; }
 .tekntek-price-new { color: #dc2626; font-size: 34px; font-weight: 800; }
@@ -355,7 +653,6 @@ $mainCompareItem = [
 .tekntek-section { margin-top: 28px; background: #fff; border: 1px solid #eceff3; border-radius: 12px; padding: 16px; }
 .tekntek-sec-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
 .tekntek-sec-head h2 { margin: 0; font-size: 16px; }
-.tekntek-sec-link { color: #1f5fbf; font-size: 12px; text-decoration: none; }
 .tekntek-info-specs { display: grid; grid-template-columns: 3fr 2fr; gap: 20px; }
 .tekntek-features { margin: 0; padding-left: 18px; line-height: 1.7; font-size: 13px; }
 .tekntek-spec-box { background: #f8f8f8; border-radius: 10px; padding: 10px 14px; }
@@ -364,7 +661,6 @@ $mainCompareItem = [
 .tekntek-spec-table td:first-child { width: 38%; font-weight: 700; color: #1f2937; }
 .tekntek-spec-table tr:last-child td { border-bottom: 0; }
 .tekntek-description { font-size: 13px; line-height: 1.7; color: #374151; }
-.tekntek-description.is-collapsed { max-height: 82px; overflow: hidden; }
 .tekntek-reviews { display: grid; grid-template-columns: 35% 65%; gap: 16px; }
 .tekntek-rev-card { border: 1px solid #e5e7eb; border-radius: 10px; padding: 12px; }
 .tekntek-bars { display: grid; gap: 10px; margin: 12px 0 14px; }
@@ -392,6 +688,16 @@ $mainCompareItem = [
 .tekntek-prod-conf { font-size: 11px; color: #6b7280; min-height: 30px; }
 .tekntek-prod-price { margin-top: 6px; font-size: 13px; font-weight: 700; color: #111827; }
 .tekntek-tag { position: absolute; top: 8px; right: 8px; background: #ef4444; color: #fff; border-radius: 4px; font-size: 10px; padding: 2px 5px; }
+.tekntek-gallery { display: grid; grid-template-columns: 1fr; gap: 12px; }
+.tekntek-gallery-stage { position: relative; border: 1px solid #dbe1ea; border-radius: 14px; background: #fff; min-height: 540px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.tekntek-gallery-stage img { width: 100%; height: 100%; max-height: 520px; object-fit: contain; display: block; }
+.tekntek-gallery-nav { position: absolute; top: 50%; transform: translateY(-50%); width: 42px; height: 64px; border: 0; border-radius: 10px; background: rgba(156, 163, 175, 0.78); color: #fff; font-size: 36px; line-height: 1; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; }
+.tekntek-gallery-nav--prev { left: 12px; }
+.tekntek-gallery-nav--next { right: 12px; }
+.tekntek-gallery-thumbs { display: flex; gap: 10px; flex-wrap: wrap; }
+.tekntek-gallery-thumb { width: 78px; height: 78px; border: 1px solid #cbd5e1; border-radius: 10px; background: #fff; padding: 4px; display: inline-flex; align-items: center; justify-content: center; cursor: pointer; overflow: hidden; }
+.tekntek-gallery-thumb.is-active { border-color: #1f5fbf; box-shadow: 0 0 0 2px rgba(31, 95, 191, 0.12); }
+.tekntek-gallery-thumb img { width: 100%; height: 100%; object-fit: contain; display: block; }
 .tekntek-compare-bar { display: none; position: fixed; left: 0; right: 0; bottom: 0; background: #fff; border-top: 1px solid #e5e7eb; box-shadow: 0 -8px 20px rgba(0, 0, 0, 0.06); z-index: 80; }
 .tekntek-compare-inner { width: min(1240px, calc(100vw - 32px)); margin: 0 auto; min-height: 72px; display: flex; gap: 12px; align-items: center; justify-content: space-between; }
 .tekntek-compare-items { display: flex; gap: 10px; align-items: center; }
@@ -421,7 +727,29 @@ $mainCompareItem = [
 <div class="tekntek-pdp-wrap">
     <section class="tekntek-hero">
         <div class="tekntek-media">
-            <?= /* @noEscape */ $galleryHtml ?>
+            <div class="tekntek-gallery" id="tekntek-gallery">
+                <div class="tekntek-gallery-stage">
+                    <button type="button" class="tekntek-gallery-nav tekntek-gallery-nav--prev" id="tekntek-gallery-prev" aria-label="Previous image">‹</button>
+                    <img id="tekntek-gallery-main" src="<?= $escaper->escapeUrl($galleryItems[0]['url']) ?>" alt="<?= $escaper->escapeHtmlAttr($galleryItems[0]['label']) ?>" />
+                    <button type="button" class="tekntek-gallery-nav tekntek-gallery-nav--next" id="tekntek-gallery-next" aria-label="Next image">›</button>
+                </div>
+                <?php if (count($galleryItems) > 1): ?>
+                    <div class="tekntek-gallery-thumbs" id="tekntek-gallery-thumbs">
+                        <?php foreach ($galleryItems as $index => $galleryItem): ?>
+                            <button
+                                type="button"
+                                class="tekntek-gallery-thumb<?= $index === 0 ? ' is-active' : '' ?>"
+                                data-gallery-index="<?= (int) $index ?>"
+                                data-gallery-src="<?= $escaper->escapeUrl($galleryItem['url']) ?>"
+                                data-gallery-alt="<?= $escaper->escapeHtmlAttr($galleryItem['label']) ?>"
+                                aria-label="Show image <?= (int) ($index + 1) ?>"
+                            >
+                                <img src="<?= $escaper->escapeUrl($galleryItem['url']) ?>" alt="<?= $escaper->escapeHtmlAttr($galleryItem['label']) ?>" />
+                            </button>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
+            </div>
         </div>
 
         <div class="tekntek-buy">
@@ -429,16 +757,6 @@ $mainCompareItem = [
             <div class="tekntek-rating">
                 <span class="tekntek-rating-stars"><?= str_repeat('★', $ratingValue) . str_repeat('☆', 5 - $ratingValue) ?></span>
                 <span>(<?= (int) $ratingCount ?>)</span>
-            </div>
-
-            <div class="tekntek-option">
-                <label>Kleur</label>
-                <div class="tekntek-colors">
-                    <span class="tekntek-color" style="background:#cfd3d8"></span>
-                    <span class="tekntek-color" style="background:#1f2937"></span>
-                    <span class="tekntek-color" style="background:#111827"></span>
-                    <span class="tekntek-color" style="background:#f8fafc"></span>
-                </div>
             </div>
 
             <div class="tekntek-price">
@@ -455,7 +773,12 @@ $mainCompareItem = [
                     <button class="tekntek-btn tekntek-btn-cart" type="submit">Add to Cart</button>
                 </form>
                 <button type="button" class="tekntek-btn tekntek-btn-compare" id="tekntek-add-main-compare">Compare</button>
-                <a class="tekntek-btn tekntek-btn-heart" href="<?= $escaper->escapeUrl($wishlistUrl) ?>" aria-label="Wishlist">♡</a>
+                <form action="<?= $escaper->escapeUrl($wishlistUrl) ?>" method="post">
+                    <input type="hidden" name="form_key" value="<?= $escaper->escapeHtmlAttr($formKey) ?>" />
+                    <input type="hidden" name="product" value="<?= (int) $product->getId() ?>" />
+                    <input type="hidden" name="uenc" value="<?= $escaper->escapeHtmlAttr($wishlistUenc) ?>" />
+                    <button class="tekntek-btn tekntek-btn-heart" type="submit" aria-label="Add to wishlist">♡</button>
+                </form>
             </div>
             <span class="tekntek-compare-error" id="tekntek-compare-error"></span>
 
@@ -469,8 +792,7 @@ $mainCompareItem = [
 
     <section class="tekntek-section">
         <div class="tekntek-sec-head">
-            <h2>Product Information &amp; Specifications</h2>
-            <a class="tekntek-sec-link" href="#">Show less</a>
+            <h2>Product highlights</h2>
         </div>
         <div class="tekntek-info-specs">
             <ul class="tekntek-features">
@@ -479,6 +801,7 @@ $mainCompareItem = [
                 <?php endforeach; ?>
             </ul>
             <div class="tekntek-spec-box">
+                <div style="font-size:13px;font-weight:700;color:#111827;margin-bottom:8px;">Detailed specifications</div>
                 <table class="tekntek-spec-table">
                     <tbody>
                         <?php foreach ($specRows as $label => $value): ?>
@@ -496,15 +819,14 @@ $mainCompareItem = [
     <section class="tekntek-section">
         <div class="tekntek-sec-head">
             <h2>Description</h2>
-            <a class="tekntek-sec-link" data-role="desc-toggle" href="#">Show more</a>
         </div>
-        <div class="tekntek-description is-collapsed" data-role="desc-text">
+        <div class="tekntek-description">
             <?= /* @noEscape */ $descriptionHtml ?>
         </div>
     </section>
 
     <section class="tekntek-section">
-        <div class="tekntek-sec-head"><h2>User ratings and reviews</h2><a class="tekntek-sec-link" href="#">Read all</a></div>
+        <div class="tekntek-sec-head"><h2>User ratings and reviews</h2></div>
         <div class="tekntek-reviews">
             <div class="tekntek-rev-card" id="tekntek-review-summary"></div>
             <div>
@@ -550,17 +872,6 @@ $mainCompareItem = [
 
 <script>
 (function () {
-    var link = document.querySelector('[data-role="desc-toggle"]');
-    var text = document.querySelector('[data-role="desc-text"]');
-    if (!link || !text) {
-        return;
-    }
-    link.addEventListener('click', function (event) {
-        event.preventDefault();
-        var collapsed = text.classList.toggle('is-collapsed');
-        link.textContent = collapsed ? 'Show more' : 'Show less';
-    });
-
     var dataNode = document.getElementById('tekntek-mock-json');
     var similarGrid = document.getElementById('tekntek-similar-grid');
     var accessoryGrid = document.getElementById('tekntek-accessory-grid');
@@ -572,6 +883,10 @@ $mainCompareItem = [
     var compareLink = document.getElementById('tekntek-compare-link');
     var addMainCompareBtn = document.getElementById('tekntek-add-main-compare');
     var compareError = document.getElementById('tekntek-compare-error');
+    var galleryMain = document.getElementById('tekntek-gallery-main');
+    var galleryPrev = document.getElementById('tekntek-gallery-prev');
+    var galleryNext = document.getElementById('tekntek-gallery-next');
+    var galleryThumbButtons = Array.prototype.slice.call(document.querySelectorAll('[data-gallery-index]'));
 
     if (!dataNode || !similarGrid || !accessoryGrid || !reviewSummary || !reviewList || !compareBar || !compareItemsWrap || !compareLink || !viewMoreBtn || !addMainCompareBtn || !compareError) {
         return;
@@ -820,6 +1135,57 @@ $mainCompareItem = [
         accessoryGrid.innerHTML = accessories.map(function (item) { return cardTemplate(item, true); }).join('');
     }
 
+    function bindGallery() {
+        if (!galleryMain || !galleryThumbButtons.length) {
+            return;
+        }
+
+        var currentIndex = 0;
+
+        function updateGallery(index) {
+            if (index < 0) {
+                index = galleryThumbButtons.length - 1;
+            }
+            if (index >= galleryThumbButtons.length) {
+                index = 0;
+            }
+
+            currentIndex = index;
+            var activeButton = galleryThumbButtons[currentIndex];
+            var src = activeButton.getAttribute('data-gallery-src') || '';
+            var alt = activeButton.getAttribute('data-gallery-alt') || '';
+
+            if (src) {
+                galleryMain.src = src;
+            }
+            galleryMain.alt = alt;
+
+            galleryThumbButtons.forEach(function (button, buttonIndex) {
+                button.classList.toggle('is-active', buttonIndex === currentIndex);
+            });
+        }
+
+        galleryThumbButtons.forEach(function (button) {
+            button.addEventListener('click', function () {
+                updateGallery(Number(button.getAttribute('data-gallery-index') || 0));
+            });
+        });
+
+        if (galleryPrev) {
+            galleryPrev.addEventListener('click', function () {
+                updateGallery(currentIndex - 1);
+            });
+        }
+
+        if (galleryNext) {
+            galleryNext.addEventListener('click', function () {
+                updateGallery(currentIndex + 1);
+            });
+        }
+
+        updateGallery(0);
+    }
+
     function renderReviewSummary() {
         var counts = [5, 4, 3, 2, 1].map(function (star) {
             return reviews.filter(function (r) { return Number(r.stars) === star; }).length;
@@ -959,6 +1325,7 @@ $mainCompareItem = [
     renderReviewSummary();
     renderReviews();
     compareState = loadCompareState();
+    bindGallery();
     bindAddReview();
     bindViewMore();
     addMainCompareBtn.addEventListener('click', function () {
