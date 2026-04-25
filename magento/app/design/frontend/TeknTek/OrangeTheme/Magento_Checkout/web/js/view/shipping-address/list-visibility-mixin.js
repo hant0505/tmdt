@@ -1,7 +1,8 @@
 define([
     'ko',
-    'Magento_Customer/js/model/address-list'
-], function (ko, addressList) {
+    'Magento_Customer/js/model/address-list',
+    'Magento_Checkout/js/model/quote'
+], function (ko, addressList, quote) {
     'use strict';
 
     return function (Target) {
@@ -14,15 +15,11 @@ define([
             initialize: function () {
                 this._super();
 
-                console.log('[LIST-VISIBILITY] Initialize, addressList length:', addressList().length);
-
                 if (typeof this.visible !== 'function') {
                     this.visible = ko.observable(addressList().length > 0);
                 }
 
                 addressList.subscribe(function (items) {
-                    console.log('[LIST-VISIBILITY] addressList subscriber fired, new length:', items.length);
-                    console.log('[LIST-VISIBILITY] Updated visible to:', items.length > 0);
                     this.visible(items.length > 0);
                 }, this);
 
@@ -36,13 +33,11 @@ define([
              */
             getSingleAddressRenderers: function () {
                 var items = typeof this.elems === 'function' ? this.elems() : this.elems || [],
-                    selected = null;
-
-                console.log('[LIST-VISIBILITY] getSingleAddressRenderers called, total items:', items.length);
+                    selected = null,
+                    selectedQuoteAddress = typeof quote.shippingAddress === 'function' ? quote.shippingAddress() : null;
 
                 items.some(function (item) {
                     if (item && typeof item.isSelected === 'function' && item.isSelected()) {
-                        console.log('[LIST-VISIBILITY] Found selected item:', item);
                         selected = item;
                         return true;
                     }
@@ -51,11 +46,19 @@ define([
                 });
 
                 if (selected) {
-                    console.log('[LIST-VISIBILITY] Returning selected address');
+                    if (
+                        selectedQuoteAddress &&
+                        typeof selected.address === 'function' &&
+                        selected.address() &&
+                        typeof selected.address().getKey === 'function' &&
+                        typeof selectedQuoteAddress.getKey === 'function' &&
+                        selected.address().getKey() === selectedQuoteAddress.getKey()
+                    ) {
+                        selected.address(selectedQuoteAddress);
+                    }
+
                     return [selected];
                 }
-
-                console.log('[LIST-VISIBILITY] Returning first address (or empty)');
                 return items.length ? [items[0]] : [];
             }
         });

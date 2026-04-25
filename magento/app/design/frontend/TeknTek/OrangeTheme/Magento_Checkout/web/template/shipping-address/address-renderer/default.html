@@ -26,11 +26,7 @@
         <text args="address().postcode"></text><br>
         <text args="getCountryName(address().countryId)"></text><br>
         <if args="address().telephone">
-            <span>
-                <translate args="'Phone number:'"></translate>
-                <a attr="'href': 'tel:' + address().telephone" text="address().telephone"></a>
-            </span>
-            <br>
+            <a attr="'href': 'tel:' + address().telephone" text="address().telephone"></a><br>
         </if>
         <if args="address().vatId">
             <translate args="'VAT'"></translate>: <text args="address().vatId"></text><br>
