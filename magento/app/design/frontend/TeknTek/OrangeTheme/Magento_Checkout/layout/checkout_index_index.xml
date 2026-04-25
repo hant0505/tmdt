@@ -1,6 +1,26 @@
 <?xml version="1.0"?>
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
+        <!-- Add Header -->
+        <block class="Magento\Framework\View\Element\Template"
+               name="page.header"
+               as="header"
+               template="Magento_Theme::html/tekntek-header.phtml"
+               before="checkout.root"/>
+        <block class="Magento\Theme\Block\Html\Topmenu"
+               name="catalog.topnav"
+               template="Magento_Theme::html/topmenu.phtml"
+               ttl="3600"
+               before="-">
+            <arguments>
+                <argument name="parent" xsi:type="string">page.header</argument>
+            </arguments>
+        </block>
+
+        <!-- Move Minicart to Header -->
+        <move element="minicart" destination="page.header"/>
+
+        <!-- Checkout Content -->
         <referenceBlock name="checkout.root">
             <arguments>
                 <argument name="jsLayout" xsi:type="array">
@@ -34,24 +54,11 @@
             </arguments>
         </referenceBlock>
 
-        <referenceContainer name="content">
-            <block class="Magento\Framework\View\Element\Template"
-                   name="tekntek.checkout.header"
-                   template="Magento_Theme::html/tekntek-header.phtml"
-                   before="checkout.root">
-                <block class="Magento\Theme\Block\Html\Topmenu"
-                       name="checkout.catalog.topnav"
-                       template="Magento_Theme::html/topmenu.phtml"
-                       ttl="3600"
-                       as="catalog.topnav"/>
-            </block>
-
-            <block class="Magento\Framework\View\Element\Template"
-                   name="tekntek.checkout.footer"
-                   template="Magento_Theme::html/tekntek-footer.phtml"
-                     after="checkout.root"/>
-        </referenceContainer>
-
-        <move element="minicart" destination="tekntek.checkout.header" as="minicart"/>
+        <!-- Add Footer -->
+        <block class="Magento\Framework\View\Element\Template"
+               name="page.footer"
+               as="footer"
+               template="Magento_Theme::html/tekntek-footer.phtml"
+               after="checkout.root"/>
     </body>
 </page>

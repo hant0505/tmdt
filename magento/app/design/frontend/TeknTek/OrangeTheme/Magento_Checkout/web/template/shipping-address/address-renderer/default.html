@@ -4,11 +4,13 @@
  * See COPYING.txt for license details.
  */
 -->
-<div class="shipping-address-item tekntek-shipping-address-item" css="'selected-item': isSelected(), 'not-selected-item': !isSelected()">
+<div class="shipping-address-item tekntek-shipping-address-item"
+     css="'selected-item': isSelected(), 'not-selected-item': !isSelected()"
+     click="function () { if (!isSelected()) { selectAddress(); } }">
     <button visible="address().isEditable()"
             type="button"
             class="action edit-address-link"
-            click="editAddress"
+            click="function (data, event) { if (event && event.stopPropagation) { event.stopPropagation(); } editAddress(); }"
             title="Edit address">
         <span translate="'Edit'"></span>
     </button>

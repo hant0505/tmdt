@@ -4,28 +4,10 @@
  * See COPYING.txt for license details.
  */
 -->
-<ul class="opc-progress-bar tekntek-opc-progress-bar">
-    <li class="opc-progress-bar-item tekntek-opc-progress-bar-item"
-        data-bind="css: {
-            _active: steps().length && steps().sort(sortItems)[0].isVisible(),
-            _complete: steps().length && !steps().sort(sortItems)[0].isVisible()
-        }">
-        <span translate="'Address'"></span>
-    </li>
-
-    <li class="opc-progress-bar-item tekntek-opc-progress-bar-item"
-        data-bind="css: {
-            _active: steps().length > 1 && steps().sort(sortItems)[1].isVisible(),
-            _complete: steps().length > 1 && isProcessed(steps().sort(sortItems)[1])
-        }">
-        <span translate="'Payment'"></span>
-    </li>
-
-    <li class="opc-progress-bar-item tekntek-opc-progress-bar-item tekntek-opc-progress-overview"
-        data-bind="css: {
-            _active: steps().length > 1 && isProcessed(steps().sort(sortItems)[1]),
-            _complete: steps().length > 1 && isProcessed(steps().sort(sortItems)[1])
-        }">
-        <span translate="'Overview'"></span>
-    </li>
+<ul class="opc-progress-bar">
+    <!-- ko foreach: { data: steps().sort(sortItems), as: 'item' } -->
+        <li class="opc-progress-bar-item" data-bind="css: item.isVisible() ? '_active' : ($parent.isProcessed(item) ? '_complete' : '')">
+            <span data-bind="i18n: item.title, click: $parent.navigateTo"></span>
+        </li>
+    <!-- /ko -->
 </ul>
