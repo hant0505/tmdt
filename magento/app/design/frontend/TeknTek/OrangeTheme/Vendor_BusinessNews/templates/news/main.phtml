@@ -1,0 +1,243 @@
+<?php
+/**
+ * main.phtml — Trang chính BusinessNews
+ *
+ * Cấu trúc:
+ *   1. Hero card (bài đầu tiên, full-width ảnh lớn)
+ *   2. Section title "Tin Tức Kinh Doanh"
+ *   3. Grid 2 cột — phân trang JS (4 bài/trang)
+ *   4. Gadgets section "What's your go-to gadget for travel?"
+ *
+ * @var \Vendor\BusinessNews\Block\BusinessNews $block
+ */
+$allNews  = $block->getNewsList(20);   // tối đa 20 bài cho phân trang
+$gadgets  = $block->getGadgets();      // offset 8..11
+
+$heroItem = array_shift($allNews);     // tách bài đầu làm hero
+// $allNews bây giờ là bài 2..20, hiển thị dạng grid phân trang
+
+$perPage  = 4;   // số bài mỗi trang trong grid
+$total    = count($allNews);
+$pages    = $total > 0 ? ceil($total / $perPage) : 0;
+
+$esc = function(string $s): string {
+    return htmlspecialchars($s, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+};
+?>
+
+<!-- ═══════════════════════════════════════════
+     1. HERO CARD — bài báo đầu tiên full-width
+════════════════════════════════════════════ -->
+<?php if ($heroItem): ?>
+<article class="bn-hero">
+    <a href="<?= $esc($heroItem['link'] ?? '#') ?>"
+       class="bn-hero__link"
+       target="_blank" rel="noopener noreferrer">
+
+        <div class="bn-hero__image-wrap">
+            <img
+                src="<?= $esc($heroItem['image'] ?? 'https://via.placeholder.com/1200x500') ?>"
+                alt="<?= $esc($heroItem['title'] ?? '') ?>"
+                class="bn-hero__image"
+                loading="eager"
+                onerror="this.src='https://via.placeholder.com/1200x500?text=No+Image'"
+            />
+        </div>
+
+        <div class="bn-hero__body">
+            <span class="bn-hero__date"><?= $esc($heroItem['date'] ?? '') ?></span>
+            <h1 class="bn-hero__title"><?= $esc($heroItem['title'] ?? '') ?></h1>
+            <p class="bn-hero__desc"><?= $esc($heroItem['description'] ?? '') ?></p>
+        </div>
+    </a>
+</article>
+<?php endif; ?>
+
+<!-- ═══════════════════════════════════════════
+     2. SECTION TITLE + GRID PHÂN TRANG
+════════════════════════════════════════════ -->
+<?php if (!empty($allNews)): ?>
+<section class="bn-section">
+    <h2 class="bn-section__title">Tin Tức Kinh Doanh</h2>
+
+    <!-- Wrapper grid — JS sẽ ẩn/hiện theo trang -->
+    <div class="bn-grid" id="bn-grid">
+        <?php foreach ($allNews as $i => $news): ?>
+        <article class="bn-card"
+                 data-page="<?= floor($i / $perPage) + 1 ?>"
+                 style="<?= $i >= $perPage ? 'display:none' : '' ?>">
+
+            <a href="<?= $esc($news['link'] ?? '#') ?>"
+               class="bn-card__link"
+               target="_blank" rel="noopener noreferrer">
+
+                <!-- Ảnh + date badge -->
+                <div class="bn-card__image-wrap">
+                    <img
+                        src="<?= $esc($news['image'] ?? 'https://via.placeholder.com/600x380') ?>"
+                        alt="<?= $esc($news['title'] ?? '') ?>"
+                        class="bn-card__image"
+                        loading="lazy"
+                        onerror="this.src='https://via.placeholder.com/600x380?text=No+Image'"
+                    />
+                    <span class="bn-card__date-badge"><?= $esc($news['date'] ?? '') ?></span>
+                </div>
+
+                <!-- Nội dung -->
+                <div class="bn-card__body">
+                    <h3 class="bn-card__title"><?= $esc($news['title'] ?? '') ?></h3>
+                    <p class="bn-card__desc"><?= $esc($news['description'] ?? '') ?></p>
+                    <span class="bn-card__readmore">
+                        <svg class="bn-icon-chevron" viewBox="0 0 16 16" fill="none">
+                            <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.8"
+                                  stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Đọc thêm về <?= $esc(mb_strtolower($news['title'] ?? '', 'UTF-8')) ?>.
+                    </span>
+                </div>
+
+            </a>
+        </article>
+        <?php endforeach; ?>
+    </div>
+
+    <!-- Phân trang -->
+    <?php if ($pages > 1): ?>
+    <nav class="bn-pagination" id="bn-pagination" aria-label="Phân trang tin tức">
+        <button class="bn-page-btn bn-page-btn--prev" id="bn-prev" disabled aria-label="Trang trước">
+            <svg viewBox="0 0 16 16" fill="none"><path d="M10 4L6 8l4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+
+        <div class="bn-page-numbers" id="bn-page-numbers">
+            <?php for ($p = 1; $p <= $pages; $p++): ?>
+                <button class="bn-page-num <?= $p === 1 ? 'bn-page-num--active' : '' ?>"
+                        data-page="<?= $p ?>"
+                        aria-label="Trang <?= $p ?>"
+                        aria-current="<?= $p === 1 ? 'page' : 'false' ?>">
+                    <?= $p ?>
+                </button>
+            <?php endfor; ?>
+        </div>
+
+        <button class="bn-page-btn bn-page-btn--next" id="bn-next"
+                <?= $pages <= 1 ? 'disabled' : '' ?> aria-label="Trang sau">
+            <svg viewBox="0 0 16 16" fill="none"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+    </nav>
+    <?php endif; ?>
+
+</section>
+<?php endif; ?>
+
+<!-- ═══════════════════════════════════════════
+     3. GADGETS SECTION
+════════════════════════════════════════════ -->
+<?php if (!empty($gadgets)): ?>
+<section class="bn-gadgets">
+    <div class="bn-gadgets__header">
+        <h4 class="bn-gadgets__title">Các tin tức khác</h4>
+        <a href="#" class="bn-gadgets__view-all">
+            View all
+            <svg viewBox="0 0 16 16" fill="none" class="bn-icon-arrow">
+                <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.8"
+                      stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+        </a>
+    </div>
+
+    <div class="bn-gadgets__grid">
+        <?php foreach ($gadgets as $gadget): ?>
+        <article class="bn-gadget-card">
+            <a href="<?= $esc($gadget['link'] ?? '#') ?>"
+               class="bn-gadget-card__link"
+               target="_blank" rel="noopener noreferrer">
+
+                <div class="bn-gadget-card__thumb-wrap">
+                    <img
+                        src="<?= $esc($gadget['image'] ?? 'https://via.placeholder.com/400x260') ?>"
+                        alt="<?= $esc($gadget['title'] ?? '') ?>"
+                        class="bn-gadget-card__thumb"
+                        loading="lazy"
+                        onerror="this.src='https://via.placeholder.com/400x260?text=No+Image'"
+                    />
+                    <span class="bn-gadget-card__badge"><?= $esc($gadget['date'] ?? '') ?></span>
+                </div>
+
+                <div class="bn-gadget-card__body">
+                    <h5 class="bn-gadget-card__title"><?= $esc($gadget['title'] ?? '') ?></h5>
+                    <p class="bn-gadget-card__desc"><?= $esc($gadget['description'] ?? '') ?></p>
+                    <span class="bn-gadget-card__readmore">
+                        <svg class="bn-icon-chevron" viewBox="0 0 16 16" fill="none">
+                            <path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.8"
+                                  stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                        Xem chi tiết
+                    </span>
+                </div>
+
+            </a>
+        </article>
+        <?php endforeach; ?>
+    </div>
+</section>
+<?php endif; ?>
+
+<!-- ═══════════════════════════════════════════
+     JS PHÂN TRANG (không dùng require.js để đơn giản)
+════════════════════════════════════════════ -->
+<script>
+(function () {
+    'use strict';
+
+    var currentPage = 1;
+    var totalPages  = <?= (int)$pages ?>;
+
+    var grid       = document.getElementById('bn-grid');
+    var prev       = document.getElementById('bn-prev');
+    var next       = document.getElementById('bn-next');
+    var pageNums   = document.querySelectorAll('.bn-page-num');
+
+    if (!grid || totalPages <= 1) return;
+
+    function showPage(page) {
+        // Ẩn/hiện card
+        var cards = grid.querySelectorAll('.bn-card');
+        cards.forEach(function (card) {
+            card.style.display = card.dataset.page == page ? '' : 'none';
+        });
+
+        // Update số trang active
+        pageNums.forEach(function (btn) {
+            var active = parseInt(btn.dataset.page) === page;
+            btn.classList.toggle('bn-page-num--active', active);
+            btn.setAttribute('aria-current', active ? 'page' : 'false');
+        });
+
+        // Nút prev / next
+        if (prev) prev.disabled = page <= 1;
+        if (next) next.disabled = page >= totalPages;
+
+        currentPage = page;
+
+        // Scroll nhẹ về đầu section
+        var section = document.querySelector('.bn-section');
+        if (section) {
+            section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    }
+
+    // Bind số trang
+    pageNums.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            showPage(parseInt(this.dataset.page));
+        });
+    });
+
+    // Bind prev / next
+    if (prev) prev.addEventListener('click', function () { if (currentPage > 1) showPage(currentPage - 1); });
+    if (next) next.addEventListener('click', function () { if (currentPage < totalPages) showPage(currentPage + 1); });
+
+    // Khởi tạo trang 1
+    showPage(1);
+}());
+</script>
