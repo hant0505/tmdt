@@ -1,0 +1,518 @@
+body.customer-account {
+    background: linear-gradient(180deg, #eef3fb 0, #f8fafc 220px, #ffffff 520px);
+}
+
+body.customer-account .page-main {
+    padding-top: 26px;
+    padding-bottom: 36px;
+}
+
+body.customer-account .page-title-wrapper {
+    margin-bottom: 18px;
+}
+
+body.customer-account .page-title-wrapper .page-title {
+    margin: 0;
+    font-size: 32px;
+    line-height: 1.15;
+    font-weight: 700;
+    color: #0f172a;
+    letter-spacing: -0.02em;
+}
+
+body.customer-account .columns {
+    gap: 28px;
+}
+
+body.customer-account .sidebar-main,
+body.customer-account .sidebar-additional {
+    margin-bottom: 0;
+}
+
+body.customer-account .sidebar .block-collapsible-nav {
+    border: 1px solid #dbe4f0 !important;
+    border-radius: 18px !important;
+    background: rgba(255, 255, 255, 0.98) !important;
+    box-shadow: 0 14px 34px rgba(15, 23, 42, 0.06) !important;
+    padding: 12px !important;
+}
+
+body.customer-account .sidebar .block-collapsible-nav .title {
+    display: block !important;
+    margin: 0 0 10px !important;
+    padding: 6px 10px 2px !important;
+    border: 0 !important;
+}
+
+body.customer-account .sidebar .block-collapsible-nav .title strong {
+    font-size: 13px !important;
+    line-height: 1.2 !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.06em !important;
+    color: #64748b !important;
+}
+
+body.customer-account .sidebar .block-collapsible-nav .content,
+body.customer-account .sidebar .nav.items,
+body.customer-account .sidebar .nav.item {
+    padding: 0 !important;
+    margin: 0 !important;
+    border: 0 !important;
+}
+
+body.customer-account .sidebar .nav.item a,
+body.customer-account .sidebar .nav.item > strong,
+body.customer-account .account-nav .item a,
+body.customer-account .account-nav .item > strong {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    min-height: 44px !important;
+    margin: 0 !important;
+    padding: 12px 16px !important;
+    border: 0 !important;
+    border-left: 0 !important;
+    border-radius: 12px !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    color: #374151 !important;
+    font-size: 15px !important;
+    font-weight: 600 !important;
+    line-height: 1.35 !important;
+    text-decoration: none !important;
+    transition: background-color .24s ease, color .24s ease, transform .24s ease, box-shadow .24s ease !important;
+}
+
+body.customer-account .sidebar .nav.item a:hover,
+body.customer-account .sidebar .nav.item a:focus-visible,
+body.customer-account .account-nav .item a:hover,
+body.customer-account .account-nav .item a:focus-visible {
+    background: #f3f4f6 !important;
+    color: #1f2937 !important;
+    transform: translateX(2px);
+}
+
+body.customer-account .sidebar .nav.item.current > a,
+body.customer-account .sidebar .nav.item.current > strong,
+body.customer-account .account-nav .item.current > a,
+body.customer-account .account-nav .item.current > strong {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+    color: #ffffff !important;
+    border: 0 !important;
+    border-left: 0 !important;
+    box-shadow: 0 10px 22px rgba(46, 99, 215, 0.20) !important;
+}
+
+body.customer-account .sidebar .nav.item a::before,
+body.customer-account .sidebar .nav.item > strong::before,
+body.customer-account .account-nav .item a::before,
+body.customer-account .account-nav .item > strong::before {
+    font-family: "Font Awesome 6 Free" !important;
+    font-weight: 900 !important;
+    font-size: 16px !important;
+    line-height: 1 !important;
+    width: 18px !important;
+    flex: 0 0 18px !important;
+    text-align: center !important;
+    color: currentColor !important;
+    content: "\f111";
+}
+
+body.customer-account .sidebar .nav.item.current > a::before,
+body.customer-account .sidebar .nav.item.current > strong::before,
+body.customer-account .account-nav .item.current > a::before,
+body.customer-account .account-nav .item.current > strong::before {
+    color: #ffffff !important;
+}
+
+body.customer-account .account-nav .item a[href*="customer/account/"]::before,
+body.customer-account .sidebar .nav.item a[href*="customer/account/"]::before {
+    content: "\f007";
+}
+
+body.customer-account .account-nav .item a[href*="sales/order/history/"]::before,
+body.customer-account .sidebar .nav.item a[href*="sales/order/history/"]::before {
+    content: "\f290";
+}
+
+body.customer-account .account-nav .item a[href*="downloadable/customer/products/"]::before,
+body.customer-account .sidebar .nav.item a[href*="downloadable/customer/products/"]::before {
+    content: "\f019";
+}
+
+body.customer-account .account-nav .item a[href*="wishlist/"]::before,
+body.customer-account .sidebar .nav.item a[href*="wishlist/"]::before {
+    content: "\f004";
+}
+
+body.customer-account .account-nav .item a[href*="customer/address/"]::before,
+body.customer-account .sidebar .nav.item a[href*="customer/address/"]::before {
+    content: "\f2b9";
+}
+
+body.customer-account .account-nav .item a[href*="customer/account/edit/"]::before,
+body.customer-account .sidebar .nav.item a[href*="customer/account/edit/"]::before {
+    content: "\f013";
+}
+
+body.customer-account .account-nav .item a[href*="vault/cards/listaction/"]::before,
+body.customer-account .sidebar .nav.item a[href*="vault/cards/listaction/"]::before {
+    content: "\f09d";
+}
+
+body.customer-account .account-nav .item a[href*="review/customer/"]::before,
+body.customer-account .sidebar .nav.item a[href*="review/customer/"]::before {
+    content: "\f005";
+}
+
+body.customer-account .account-nav .item a[href*="newsletter/manage/"]::before,
+body.customer-account .sidebar .nav.item a[href*="newsletter/manage/"]::before {
+    content: "\f0e0";
+}
+
+body.customer-account.customer-account-index .account-nav .item.current > strong::before {
+    content: "\f007";
+}
+
+body.sales-order-history .account-nav .item.current > strong::before {
+    content: "\f290";
+}
+
+body.downloadable-customer-products .account-nav .item.current > strong::before {
+    content: "\f019";
+}
+
+body.wishlist-index-index .account-nav .item.current > strong::before {
+    content: "\f004";
+}
+
+body.customer-address-index .account-nav .item.current > strong::before,
+body.customer-address-form .account-nav .item.current > strong::before {
+    content: "\f2b9";
+}
+
+body.customer-account-edit .account-nav .item.current > strong::before {
+    content: "\f013";
+}
+
+body.vault-cards-listaction .account-nav .item.current > strong::before {
+    content: "\f09d";
+}
+
+body.review-customer-index .account-nav .item.current > strong::before {
+    content: "\f005";
+}
+
+body.newsletter-manage-index .account-nav .item.current > strong::before {
+    content: "\f0e0";
+}
+
+body.account {
+    background: linear-gradient(180deg, #eef3fb 0, #f8fafc 220px, #ffffff 520px);
+}
+
+body.account .page-main {
+    padding-top: 26px;
+    padding-bottom: 36px;
+}
+
+body.account .page-title-wrapper {
+    margin-bottom: 18px;
+}
+
+body.account .page-title-wrapper .page-title {
+    margin: 0;
+    font-size: 32px;
+    line-height: 1.15;
+    font-weight: 700;
+    color: #0f172a;
+    letter-spacing: -0.02em;
+}
+
+body.account .columns {
+    gap: 28px;
+}
+
+body.account .sidebar-main,
+body.account .sidebar-additional {
+    margin-bottom: 0;
+}
+
+body.account .sidebar .block.account-nav {
+    border: 1px solid #dbe4f0 !important;
+    border-radius: 18px !important;
+    background: rgba(255, 255, 255, 0.98) !important;
+    box-shadow: 0 14px 34px rgba(15, 23, 42, 0.06) !important;
+    padding: 12px !important;
+}
+
+body.account .sidebar .block.account-nav > .title {
+    display: block !important;
+    margin: 0 0 10px !important;
+    padding: 6px 10px 2px !important;
+    border: 0 !important;
+}
+
+body.account .sidebar .block.account-nav > .title strong {
+    font-size: 13px !important;
+    line-height: 1.2 !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.06em !important;
+    color: #64748b !important;
+}
+
+body.account .sidebar .block.account-nav > .content,
+body.account .sidebar .block.account-nav .nav.items,
+body.account .sidebar .block.account-nav .nav.item {
+    padding: 0 !important;
+    margin: 0 !important;
+    border: 0 !important;
+}
+
+body.account .sidebar .block.account-nav .nav.item a,
+body.account .sidebar .block.account-nav .nav.item > strong,
+body.account .sidebar nav.account-nav .item a,
+body.account .sidebar nav.account-nav .item > strong {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    min-height: 44px !important;
+    margin: 0 !important;
+    padding: 12px 16px !important;
+    border: 0 !important;
+    border-left: 0 !important;
+    border-radius: 12px !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    color: #374151 !important;
+    font-size: 15px !important;
+    font-weight: 600 !important;
+    line-height: 1.35 !important;
+    text-decoration: none !important;
+    transition: background-color .24s ease, color .24s ease, transform .24s ease, box-shadow .24s ease !important;
+}
+
+body.account .sidebar .block.account-nav .nav.item a:hover,
+body.account .sidebar .block.account-nav .nav.item a:focus-visible,
+body.account .sidebar nav.account-nav .item a:hover,
+body.account .sidebar nav.account-nav .item a:focus-visible {
+    background: #f3f4f6 !important;
+    color: #1f2937 !important;
+    transform: translateX(2px);
+}
+
+body.account .sidebar .block.account-nav .nav.item.current > a,
+body.account .sidebar .block.account-nav .nav.item.current > strong,
+body.account .sidebar nav.account-nav .item.current > a,
+body.account .sidebar nav.account-nav .item.current > strong {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%) !important;
+    color: #ffffff !important;
+    border: 0 !important;
+    border-left: 0 !important;
+    box-shadow: 0 10px 22px rgba(46, 99, 215, 0.20) !important;
+}
+
+body.account .sidebar .block.account-nav .nav.item a::before,
+body.account .sidebar .block.account-nav .nav.item > strong::before,
+body.account .sidebar nav.account-nav .item a::before,
+body.account .sidebar nav.account-nav .item > strong::before {
+    font-family: "Font Awesome 6 Free" !important;
+    font-weight: 900 !important;
+    font-size: 16px !important;
+    line-height: 1 !important;
+    width: 18px !important;
+    flex: 0 0 18px !important;
+    text-align: center !important;
+    color: currentColor !important;
+    content: "\f111";
+}
+
+body.account .sidebar .block.account-nav .nav.item.current > a::before,
+body.account .sidebar .block.account-nav .nav.item.current > strong::before,
+body.account .sidebar nav.account-nav .item.current > a::before,
+body.account .sidebar nav.account-nav .item.current > strong::before {
+    color: #ffffff !important;
+}
+
+body.account .sidebar .block.account-nav .nav.item a[href*="customer/account/"]::before,
+body.account .sidebar nav.account-nav .item a[href*="customer/account/"]::before {
+    content: "\f007";
+}
+
+body.account .sidebar .block.account-nav .nav.item a[href*="sales/order/history/"]::before,
+body.account .sidebar nav.account-nav .item a[href*="sales/order/history/"]::before {
+    content: "\f290";
+}
+
+body.account .sidebar .block.account-nav .nav.item a[href*="downloadable/customer/products/"]::before,
+body.account .sidebar nav.account-nav .item a[href*="downloadable/customer/products/"]::before {
+    content: "\f019";
+}
+
+body.account .sidebar .block.account-nav .nav.item a[href*="wishlist/"]::before,
+body.account .sidebar nav.account-nav .item a[href*="wishlist/"]::before {
+    content: "\f004";
+}
+
+body.account .sidebar .block.account-nav .nav.item a[href*="customer/address/"]::before,
+body.account .sidebar nav.account-nav .item a[href*="customer/address/"]::before {
+    content: "\f2b9";
+}
+
+body.account .sidebar .block.account-nav .nav.item a[href*="customer/account/edit/"]::before,
+body.account .sidebar nav.account-nav .item a[href*="customer/account/edit/"]::before {
+    content: "\f013";
+}
+
+body.account .sidebar .block.account-nav .nav.item a[href*="vault/cards/listaction/"]::before,
+body.account .sidebar nav.account-nav .item a[href*="vault/cards/listaction/"]::before {
+    content: "\f09d";
+}
+
+body.account .sidebar .block.account-nav .nav.item a[href*="review/customer/"]::before,
+body.account .sidebar nav.account-nav .item a[href*="review/customer/"]::before {
+    content: "\f005";
+}
+
+body.account .sidebar .block.account-nav .nav.item a[href*="newsletter/manage/"]::before,
+body.account .sidebar nav.account-nav .item a[href*="newsletter/manage/"]::before {
+    content: "\f0e0";
+}
+
+body.account.customer-account-index .sidebar nav.account-nav .item.current > strong::before {
+    content: "\f007";
+}
+
+body.customer-account .column.main .block {
+    margin-bottom: 22px;
+}
+
+body.customer-account .column.main .block .block-title {
+    margin-bottom: 14px;
+    padding: 0;
+    border: 0;
+}
+
+body.customer-account .column.main .block .block-title strong {
+    font-size: 22px;
+    line-height: 1.25;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+body.customer-account .column.main .block .block-content > .box,
+body.customer-account .column.main .block-dashboard-addresses .box,
+body.customer-account .column.main .block-dashboard-info .box {
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+    background: #ffffff;
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.05);
+    padding: 20px;
+}
+
+body.customer-account .column.main .block-dashboard-info .block-content,
+body.customer-account .column.main .block-dashboard-addresses .block-content {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+}
+
+body.customer-account .column.main .box .box-title {
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eef2f7;
+}
+
+body.customer-account .column.main .box .box-title span {
+    font-size: 16px;
+    line-height: 1.35;
+    font-weight: 700;
+    color: #111827;
+}
+
+body.customer-account .column.main .box .box-content,
+body.customer-account .column.main .box .box-content p,
+body.customer-account .column.main .box .box-content address {
+    font-size: 14px;
+    line-height: 1.7;
+    color: #475569;
+}
+
+body.customer-account .column.main .box-actions {
+    margin-top: 14px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+body.customer-account .column.main .box-actions .action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 34px;
+    padding: 0 12px;
+    border: 1px solid #d7e2f1;
+    border-radius: 999px;
+    background: #f8fbff;
+    color: #1d4ed8;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1;
+    text-decoration: none;
+    transition: background-color .24s ease, border-color .24s ease, color .24s ease;
+}
+
+body.customer-account .column.main .box-actions .action:hover,
+body.customer-account .column.main .box-actions .action:focus-visible {
+    background: #e9f1ff;
+    border-color: #bfd3fb;
+    color: #1846b8;
+}
+
+body.customer-account .column.main .box-actions .action::after {
+    display: none;
+}
+
+@media (max-width: 1023px) {
+    body.customer-account .columns {
+        gap: 18px;
+    }
+
+    body.customer-account .column.main .block-dashboard-info .block-content,
+    body.customer-account .column.main .block-dashboard-addresses .block-content {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 767px) {
+    body.customer-account .page-title-wrapper .page-title {
+        font-size: 26px;
+    }
+
+    body.customer-account .sidebar .block-collapsible-nav {
+        border-radius: 14px !important;
+        padding: 10px !important;
+    }
+
+    body.customer-account .sidebar .nav.item a,
+    body.customer-account .sidebar .nav.item > strong,
+    body.customer-account .account-nav .item a,
+    body.customer-account .account-nav .item > strong {
+        min-height: 42px !important;
+        padding: 0 12px !important;
+        font-size: 14px !important;
+    }
+
+    body.customer-account .column.main .block .block-title strong {
+        font-size: 20px;
+    }
+
+    body.customer-account .column.main .block .block-content > .box,
+    body.customer-account .column.main .block-dashboard-addresses .box,
+    body.customer-account .column.main .block-dashboard-info .box {
+        padding: 16px;
+        border-radius: 12px;
+    }
+}

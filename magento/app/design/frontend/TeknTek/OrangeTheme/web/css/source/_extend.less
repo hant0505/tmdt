@@ -538,6 +538,381 @@
     }
 }
 
+/* Customer account dashboard refresh */
+body.customer-account-index {
+    background: linear-gradient(180deg, #eef3fb 0, #f8fafc 220px, #ffffff 520px);
+}
+
+.customer-account-index .page-main {
+    padding-top: 26px;
+    padding-bottom: 36px;
+}
+
+.customer-account-index .page-title-wrapper {
+    margin-bottom: 18px;
+}
+
+.customer-account-index .page-title-wrapper .page-title {
+    margin: 0;
+    font-size: 32px;
+    line-height: 1.15;
+    font-weight: 700;
+    color: #0f172a;
+    letter-spacing: -0.02em;
+}
+
+.customer-account-index .columns {
+    gap: 28px;
+}
+
+.customer-account .sidebar-main,
+.customer-account .sidebar-additional,
+.customer-account-index .sidebar-main,
+.customer-account-index .sidebar-additional {
+    margin-bottom: 0;
+}
+
+.customer-account .sidebar .block-collapsible-nav,
+.customer-account-index .sidebar .block-collapsible-nav {
+    border: 1px solid #dbe4f0;
+    border-radius: 18px;
+    background: rgba(255, 255, 255, 0.96);
+    box-shadow: 0 14px 34px rgba(15, 23, 42, 0.06);
+    padding: 12px;
+}
+
+.customer-account .sidebar .block-collapsible-nav .title,
+.customer-account-index .sidebar .block-collapsible-nav .title {
+    display: block !important;
+    margin: 0 0 10px;
+    padding: 6px 10px 2px;
+    border: 0;
+}
+
+.customer-account .sidebar .block-collapsible-nav .title strong,
+.customer-account-index .sidebar .block-collapsible-nav .title strong {
+    font-size: 13px;
+    line-height: 1.2;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: #64748b;
+}
+
+.customer-account .sidebar .block-collapsible-nav .content,
+.customer-account-index .sidebar .block-collapsible-nav .content {
+    padding: 0;
+}
+
+.customer-account .sidebar .nav.items,
+.customer-account-index .sidebar .nav.items {
+    margin: 0;
+}
+
+.customer-account .sidebar .nav.item,
+.customer-account-index .sidebar .nav.item {
+    margin: 0;
+    border: 0;
+}
+
+.customer-account .account-nav .item.current > strong,
+.customer-account .account-nav .item.current > a,
+.customer-account-index .sidebar .nav.item a,
+.customer-account-index .sidebar .nav.item > strong {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 44px;
+    margin: 0;
+    padding: 12px 16px;
+    border: 0 !important;
+    border-left: 0 !important;
+    border-radius: 12px;
+    background: transparent;
+    box-shadow: none;
+    color: #374151;
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.35;
+    text-decoration: none;
+    transition: background-color .24s ease, color .24s ease, transform .24s ease, box-shadow .24s ease;
+}
+
+.customer-account .sidebar .nav.item a,
+.customer-account .sidebar .nav.item > strong {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 44px;
+    margin: 0;
+    padding: 12px 16px;
+    border: 0 !important;
+    border-left: 0 !important;
+    border-radius: 12px;
+    background: transparent;
+    box-shadow: none;
+    color: #374151;
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.35;
+    text-decoration: none;
+    transition: background-color .24s ease, color .24s ease, transform .24s ease, box-shadow .24s ease;
+}
+
+.customer-account .account-nav .item > a:hover,
+.customer-account .account-nav .item > a:focus-visible,
+.customer-account-index .sidebar .nav.item a:hover,
+.customer-account-index .sidebar .nav.item a:focus-visible {
+    background: #f1f5f9;
+    color: #1e293b;
+    transform: translateX(2px);
+}
+
+.customer-account .account-nav .item.current > a,
+.customer-account .account-nav .item.current > strong,
+.customer-account-index .sidebar .nav.item.current > a,
+.customer-account-index .sidebar .nav.item.current > strong {
+    border: 0 !important;
+    border-left: 0 !important;
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    color: #ffffff !important;
+    box-shadow: 0 10px 22px rgba(46, 99, 215, 0.20);
+}
+
+.customer-account .account-nav .item a::before,
+.customer-account .account-nav .item > strong::before,
+.customer-account-index .sidebar .nav.item a::before,
+.customer-account-index .sidebar .nav.item > strong::before {
+    font-family: "Font Awesome 6 Free";
+    font-weight: 900;
+    font-size: 16px;
+    line-height: 1;
+    width: 18px;
+    text-align: center;
+    color: currentColor;
+    content: "\f111";
+    flex: 0 0 18px;
+}
+
+.customer-account .account-nav .item.current > a::before,
+.customer-account .account-nav .item.current > strong::before,
+.customer-account-index .sidebar .nav.item.current > a::before,
+.customer-account-index .sidebar .nav.item.current > strong::before {
+    color: #ffffff;
+}
+
+.customer-account .account-nav .item a[href*="customer/account/"]::before,
+.customer-account-index .sidebar .nav.item a[href*="customer/account/"]::before {
+    content: "\f007";
+}
+
+.customer-account .account-nav .item a[href*="sales/order/history/"]::before,
+.customer-account-index .sidebar .nav.item a[href*="sales/order/history/"]::before {
+    content: "\f290";
+}
+
+.customer-account .account-nav .item a[href*="downloadable/customer/products/"]::before,
+.customer-account-index .sidebar .nav.item a[href*="downloadable/customer/products/"]::before {
+    content: "\f019";
+}
+
+.customer-account .account-nav .item a[href*="wishlist/"]::before,
+.customer-account-index .sidebar .nav.item a[href*="wishlist/"]::before {
+    content: "\f004";
+}
+
+.customer-account .account-nav .item a[href*="customer/address/"]::before,
+.customer-account-index .sidebar .nav.item a[href*="customer/address/"]::before {
+    content: "\f2b9";
+}
+
+.customer-account .account-nav .item a[href*="customer/account/edit/"]::before,
+.customer-account-index .sidebar .nav.item a[href*="customer/account/edit/"]::before {
+    content: "\f013";
+}
+
+.customer-account .account-nav .item a[href*="vault/cards/listaction/"]::before,
+.customer-account-index .sidebar .nav.item a[href*="vault/cards/listaction/"]::before {
+    content: "\f09d";
+}
+
+.customer-account .account-nav .item a[href*="review/customer/"]::before,
+.customer-account-index .sidebar .nav.item a[href*="review/customer/"]::before {
+    content: "\f005";
+}
+
+.customer-account .account-nav .item a[href*="newsletter/manage/"]::before,
+.customer-account-index .sidebar .nav.item a[href*="newsletter/manage/"]::before {
+    content: "\f0e0";
+}
+
+.customer-account-index.customer-account-index .sidebar .nav.item.current > strong::before {
+    content: "\f007";
+}
+
+.sales-order-history .sidebar .nav.item.current > strong::before {
+    content: "\f290";
+}
+
+.downloadable-customer-products .sidebar .nav.item.current > strong::before {
+    content: "\f019";
+}
+
+.wishlist-index-index .sidebar .nav.item.current > strong::before {
+    content: "\f004";
+}
+
+.customer-address-index .sidebar .nav.item.current > strong::before,
+.customer-address-form .sidebar .nav.item.current > strong::before {
+    content: "\f2b9";
+}
+
+.customer-account-edit .sidebar .nav.item.current > strong::before {
+    content: "\f013";
+}
+
+.vault-cards-listaction .sidebar .nav.item.current > strong::before {
+    content: "\f09d";
+}
+
+.review-customer-index .sidebar .nav.item.current > strong::before {
+    content: "\f005";
+}
+
+.newsletter-manage-index .sidebar .nav.item.current > strong::before {
+    content: "\f0e0";
+}
+
+.customer-account-index .column.main .block {
+    margin-bottom: 22px;
+}
+
+.customer-account-index .column.main .block .block-title {
+    margin-bottom: 14px;
+    padding: 0;
+    border: 0;
+}
+
+.customer-account-index .column.main .block .block-title strong {
+    font-size: 22px;
+    line-height: 1.25;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+.customer-account-index .column.main .block .block-content > .box,
+.customer-account-index .column.main .block-dashboard-addresses .box,
+.customer-account-index .column.main .block-dashboard-info .box {
+    border: 1px solid #e5e7eb;
+    border-radius: 14px;
+    background: #ffffff;
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.05);
+    padding: 20px;
+}
+
+.customer-account-index .column.main .block-dashboard-info .block-content,
+.customer-account-index .column.main .block-dashboard-addresses .block-content {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.customer-account-index .column.main .box .box-title {
+    margin-bottom: 10px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eef2f7;
+}
+
+.customer-account-index .column.main .box .box-title span {
+    font-size: 16px;
+    line-height: 1.35;
+    font-weight: 700;
+    color: #111827;
+}
+
+.customer-account-index .column.main .box .box-content,
+.customer-account-index .column.main .box .box-content p,
+.customer-account-index .column.main .box .box-content address {
+    font-size: 14px;
+    line-height: 1.7;
+    color: #475569;
+}
+
+.customer-account-index .column.main .box-actions {
+    margin-top: 14px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.customer-account-index .column.main .box-actions .action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 34px;
+    padding: 0 12px;
+    border: 1px solid #d7e2f1;
+    border-radius: 999px;
+    background: #f8fbff;
+    color: #1d4ed8;
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 1;
+    text-decoration: none;
+    transition: background-color .24s ease, border-color .24s ease, color .24s ease;
+}
+
+.customer-account-index .column.main .box-actions .action:hover,
+.customer-account-index .column.main .box-actions .action:focus-visible {
+    background: #e9f1ff;
+    border-color: #bfd3fb;
+    color: #1846b8;
+}
+
+.customer-account-index .column.main .box-actions .action::after {
+    display: none;
+}
+
+@media (max-width: 1023px) {
+    .customer-account-index .columns {
+        gap: 18px;
+    }
+
+    .customer-account-index .column.main .block-dashboard-info .block-content,
+    .customer-account-index .column.main .block-dashboard-addresses .block-content {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 767px) {
+    .customer-account-index .page-title-wrapper .page-title {
+        font-size: 26px;
+    }
+
+    .customer-account-index .sidebar .block-collapsible-nav {
+        border-radius: 14px;
+        padding: 10px;
+    }
+
+    .customer-account-index .sidebar .nav.item a,
+    .customer-account-index .sidebar .nav.item > strong {
+        min-height: 42px;
+        padding: 0 12px;
+        font-size: 14px;
+    }
+
+    .customer-account-index .column.main .block .block-title strong {
+        font-size: 20px;
+    }
+
+    .customer-account-index .column.main .block .block-content > .box,
+    .customer-account-index .column.main .block-dashboard-addresses .box,
+    .customer-account-index .column.main .block-dashboard-info .box {
+        padding: 16px;
+        border-radius: 12px;
+    }
+}
+
 /* Desktop login page matching the supplied Figma reference */
 @media (min-width: 1024px) {
     body.customer-account-login {
