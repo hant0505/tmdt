@@ -12,8 +12,8 @@ rm -rf /var/www/html/var/cache/* \
            /var/www/html/generated/* 2>/dev/null || true
 
 
-chown -R www-data:www-data var/ generated/ pub/static/ pub/media/ app/etc/ 2>/dev/null || true
+# chown -R www-data:www-data var/ generated/ pub/static/ pub/media/ app/etc/ 2>/dev/null || true
     
-find var generated pub/static pub/media app/etc -type d -exec chmod 775 {} + 2>/dev/null || true
+# find var generated pub/static pub/media app/etc -type d -exec chmod 775 {} + 2>/dev/null || true
     
-find var generated pub/static pub/media app/etc -type f -exec chmod 664 {} + 2>/dev/null || true
+# find var generated pub/static pub/media app/etc -type f -exec chmod 664 {} + 2>/dev/null || true

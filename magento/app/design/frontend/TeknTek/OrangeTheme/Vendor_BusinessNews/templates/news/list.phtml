@@ -1,0 +1,28 @@
+<?php
+/**
+ * list.phtml — Danh sách bài báo chính (2 cột)
+ *
+ * Block: Vendor\BusinessNews\Block\BusinessNews
+ * Mỗi item được render qua item.phtml (child block tái sử dụng)
+ *
+ * @var \Vendor\BusinessNews\Block\BusinessNews $block
+ */
+$newsList = $block->getNewsList(8);
+?>
+<div class="bn-wrapper">
+    <h2 class="bn-main-title">Tin Tức Kinh Doanh</h2>
+
+    <div class="bn-list">
+        <?php if (!empty($newsList)): ?>
+            <?php foreach ($newsList as $news): ?>
+                <?= $this->getLayout()
+                    ->createBlock(\Magento\Framework\View\Element\Template::class)
+                    ->setTemplate('Vendor_BusinessNews::news/item.phtml')
+                    ->setData('news', $news)
+                    ->toHtml(); ?>
+            <?php endforeach; ?>
+        <?php else: ?>
+            <p class="bn-no-news">Chưa có bài báo nào.</p>
+        <?php endif; ?>
+    </div>
+</div>

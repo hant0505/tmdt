@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!--
+    Layout: businessnews/index/index
+    - sidebar.main : sidebar (tin thị trường, RSS thi-truong)
+    - content      : main.phtml (hero + grid + phân trang + gadgets)
+-->
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      layout="2columns-left"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <title>Bản tin Kinh doanh</title>
+        <css src="Vendor_BusinessNews::css/businessnews.css"/>
+    </head>
+    <body>
+        <referenceContainer name="sidebar.main">
+            <block class="Vendor\BusinessNews\Block\BusinessNews"
+                   name="businessnews.sidebar"
+                   template="Vendor_BusinessNews::news/sidebar.phtml"/>
+        </referenceContainer>
+
+        <referenceContainer name="content">
+            <block class="Vendor\BusinessNews\Block\BusinessNews"
+                   name="businessnews.main"
+                   template="Vendor_BusinessNews::news/main.phtml"/>
+        </referenceContainer>
+    </body>
+</page>
