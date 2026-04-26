@@ -131,10 +131,10 @@ if ($customLoginError !== '') {
                                 </div>
                             </div>
                             <div class="field password required">
-                                <label for="pass" class="label"><span><?= $escaper->escapeHtml(__('Password')) ?></span></label>
+                                <label for="password" class="label"><span><?= $escaper->escapeHtml(__('Password')) ?></span></label>
                                 <div class="control">
                                     <input name="login[password]" type="password"
-                                           autocomplete="new-password"
+                                           autocomplete="current-password"
                                            data-lpignore="true"
                                            data-1p-ignore="true"
                                            class="input-text" id="password"
@@ -204,6 +204,7 @@ if ($customLoginError !== '') {
 
         var messagesWrap = document.querySelector('[data-role="login-messages"]');
         var messageText = document.querySelector('[data-role="login-message-text"]');
+        var isSubmittingNatively = false;
 
         function setError(message) {
             if (!messagesWrap || !messageText) {
@@ -213,8 +214,31 @@ if ($customLoginError !== '') {
             messagesWrap.hidden = !message;
         }
 
+        function submitNatively() {
+            if (isSubmittingNatively) {
+                return;
+            }
+
+            isSubmittingNatively = true;
+            HTMLFormElement.prototype.submit.call(form);
+        }
+
         form.addEventListener('submit', function (event) {
+            if (isSubmittingNatively) {
+                return;
+            }
+
             event.preventDefault();
+
+            var emailField = form.querySelector('input[name="login[username]"]');
+            var passwordField = form.querySelector('input[name="login[password]"]');
+            var email = emailField ? (emailField.value || '').trim() : '';
+            var password = passwordField ? (passwordField.value || '') : '';
+
+            if (!email || !password) {
+                setError('Please enter both email and password.');
+                return;
+            }
 
             var formData = new FormData(form);
 
@@ -231,7 +255,8 @@ if ($customLoginError !== '') {
                 try {
                     data = text ? JSON.parse(text) : {};
                 } catch (e) {
-                    data = {};
+                    submitNatively();
+                    return;
                 }
 
                 if (!data.success) {
@@ -241,7 +266,7 @@ if ($customLoginError !== '') {
 
                 window.location.href = data.redirect_url || '<?= $escaper->escapeJs($block->getUrl('customer/account')) ?>';
             }).catch(function () {
-                setError('Unable to sign in right now. Please try again.');
+                submitNatively();
             });
         });
     });

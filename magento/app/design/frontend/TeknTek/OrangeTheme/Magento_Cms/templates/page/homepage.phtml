@@ -7,28 +7,36 @@ $categoryCollectionFactory = $objectManager->get(\Magento\Catalog\Model\Resource
 
 $ttkUrlKeyMap = [
     'hard_drives' => 'hard-drives',
-    'computer_mices' => 'computer-mice',
+    'computer_mice' => 'mice',
     'keyboards' => 'keyboards',
     'monitors' => 'monitors',
+    'laptops' => 'laptops',
+    'smartphones' => 'smartphones',
+    'cameras' => 'cameras',
+    'smartwatches' => 'smart-watches',
+    'headphones' => 'headphones',
+    'tablets' => 'tablets',
+    // Legacy aliases kept while the theme is being normalized.
+    'computer_mices' => 'mice',
     'laptop' => 'laptops',
     'smartphone' => 'smartphones',
     'camera' => 'cameras',
     'smart_watch' => 'smart-watches',
-    'audio_headphones' => 'audio-headphones',
+    'audio_headphones' => 'headphones',
     'tablet' => 'tablets'
 ];
 
 $ttkCategoryUrls = [
     'hard_drives' => $block->getUrl($ttkUrlKeyMap['hard_drives']),
-    'computer_mices' => $block->getUrl($ttkUrlKeyMap['computer_mices']),
+    'computer_mice' => $block->getUrl($ttkUrlKeyMap['computer_mice']),
     'keyboards' => $block->getUrl($ttkUrlKeyMap['keyboards']),
     'monitors' => $block->getUrl($ttkUrlKeyMap['monitors']),
-    'laptop' => $block->getUrl($ttkUrlKeyMap['laptop']),
-    'smartphone' => $block->getUrl($ttkUrlKeyMap['smartphone']),
-    'camera' => $block->getUrl($ttkUrlKeyMap['camera']),
-    'smart_watch' => $block->getUrl($ttkUrlKeyMap['smart_watch']),
-    'audio_headphones' => $block->getUrl($ttkUrlKeyMap['audio_headphones']),
-    'tablet' => $block->getUrl($ttkUrlKeyMap['tablet']),
+    'laptops' => $block->getUrl($ttkUrlKeyMap['laptops']),
+    'smartphones' => $block->getUrl($ttkUrlKeyMap['smartphones']),
+    'cameras' => $block->getUrl($ttkUrlKeyMap['cameras']),
+    'smartwatches' => $block->getUrl($ttkUrlKeyMap['smartwatches']),
+    'headphones' => $block->getUrl($ttkUrlKeyMap['headphones']),
+    'tablets' => $block->getUrl($ttkUrlKeyMap['tablets']),
     'exchange_rates' => '#',
     'news' => '#'
 ];
@@ -308,11 +316,11 @@ nav.navigation,
 }
 
 .tekntek-isolated-header .ttk-icon-nav {
-    background: linear-gradient(180deg, #f6f6f6 0%, #ececec 100%);
-    border: 1px solid #c8ccd1;
+    background: linear-gradient(180deg, #eff6ff 0%, #dbeafe 100%);
+    border: 1px solid #bfdbfe;
     border-radius: 10px;
     padding: 12px 14px;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.65);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.72);
 }
 
 .tekntek-isolated-header .ttk-icon-nav ul {
@@ -338,7 +346,7 @@ nav.navigation,
 
 .tekntek-isolated-header .ttk-icon-nav a {
     text-decoration: none;
-    color: #4f545b !important;
+    color: #334155 !important;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -346,13 +354,18 @@ nav.navigation,
     gap: 6px;
     min-height: 56px;
     border-radius: 8px;
-    transition: transform 160ms ease, background-color 160ms ease, color 160ms ease;
+    border: 1px solid rgba(191, 219, 254, 0.9);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.99) 0%, rgba(239, 246, 255, 0.98) 100%);
+    box-shadow: 0 8px 18px rgba(37, 99, 235, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.92);
+    transition: transform 160ms ease, background-color 160ms ease, color 160ms ease, box-shadow 160ms ease, border-color 160ms ease;
 }
 
 .tekntek-isolated-header .ttk-icon-nav a:hover {
-    background: rgba(255, 255, 255, 0.7);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.99) 0%, rgba(219, 234, 254, 0.95) 100%);
     transform: translateY(-2px);
-    color: #1f2937 !important;
+    color: #1d4ed8 !important;
+    border-color: rgba(96, 165, 250, 0.55);
+    box-shadow: 0 12px 22px rgba(37, 99, 235, 0.12), 0 0 0 1px rgba(37, 99, 235, 0.12);
 }
 
 .tekntek-isolated-header .ttk-icon-nav img,
@@ -363,7 +376,10 @@ nav.navigation,
 }
 
 .tekntek-isolated-header .ttk-icon-nav svg * {
-    stroke-width: 2.2;
+    stroke-width: 1.45;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    vector-effect: non-scaling-stroke;
 }
 
 .tekntek-isolated-header .ttk-icon-nav span {
@@ -573,32 +589,64 @@ nav.navigation,
 }
 
 #tekntek-home-v2 .ttk-benefits {
-    margin-top: 10px;
-    background: #fff;
-    border: 1px solid #e5e7eb;
-    border-radius: 8px;
-    padding: 12px 10px;
-    display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-    gap: 10px;
+    margin-top: 14px;
+    padding: 30px 24px;
+    display: flex;
+    justify-content: space-around;
+    align-items: stretch;
+    gap: 16px;
+    flex-wrap: wrap;
+    background: linear-gradient(180deg, #f7fbff 0%, #f9fafb 100%);
+    border: 1px solid #dbe7fb;
+    border-radius: 16px;
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
+    border-bottom: 1px solid #cfe0ff;
 }
 
 #tekntek-home-v2 .ttk-benefit {
     display: flex;
     align-items: center;
-    gap: 8px;
-    justify-content: center;
+    gap: 14px;
+    justify-content: flex-start;
+    flex: 1 1 180px;
+    min-width: 0;
+    padding: 14px 16px;
+    border-radius: 14px;
+    transition: transform .25s ease, background-color .25s ease, box-shadow .25s ease;
+}
+
+#tekntek-home-v2 .ttk-benefit:hover {
+    transform: translateY(-3px);
+    background: rgba(255, 255, 255, 0.92);
+    box-shadow: 0 10px 22px rgba(46, 99, 215, 0.08);
 }
 
 #tekntek-home-v2 .ttk-benefit img {
-    width: 18px;
-    height: 18px;
+    width: 36px;
+    height: 36px;
+    flex: 0 0 36px;
 }
 
-#tekntek-home-v2 .ttk-benefit span {
-    font-size: 11px;
-    color: #6b7280;
+#tekntek-home-v2 .ttk-benefit-copy {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+
+#tekntek-home-v2 .ttk-benefit-title {
+    font-size: 13px;
     line-height: 1.2;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    color: #0f172a;
+}
+
+#tekntek-home-v2 .ttk-benefit-subtitle {
+    font-size: 12px;
+    line-height: 1.4;
+    color: #6b7280;
 }
 
 #tekntek-home-v2 .ttk-offers .ttk-card {
@@ -714,22 +762,40 @@ nav.navigation,
     border: 1px solid #e5e7eb;
     border-radius: 10px;
     padding: 10px;
+    position: relative;
+    z-index: 0;
+    transition: border-color .28s ease, box-shadow .28s ease, transform .28s ease;
+    will-change: transform;
+}
+
+#tekntek-home-v2 .ttk-card:hover {
+    border-color: #2e63d7;
+    box-shadow: 0 14px 32px rgba(46, 99, 215, .10), 0 4px 12px rgba(15, 23, 42, .06);
+    transform: translateY(-4px);
+    z-index: 2;
 }
 
 #tekntek-home-v2 .ttk-card-link {
     display: block;
     color: inherit;
     text-decoration: none;
+    height: 100%;
 }
 
 #tekntek-home-v2 .ttk-card-image {
     position: relative;
     border-radius: 8px;
-    background: #f9fafb;
+    background: #fff;
     height: 130px;
     display: flex;
     align-items: center;
     justify-content: center;
+    overflow: hidden;
+    transition: background-color .28s ease;
+}
+
+#tekntek-home-v2 .ttk-card:hover .ttk-card-image {
+    background: #f4f8ff;
 }
 
 #tekntek-home-v2 .ttk-card-image img {
@@ -737,18 +803,22 @@ nav.navigation,
     max-width: 90%;
     max-height: 116px;
     object-fit: contain;
-    transition: opacity .25s ease;
+    transition: opacity .25s ease, transform .28s ease;
+}
+
+#tekntek-home-v2 .ttk-card:hover .ttk-card-image img {
+    transform: scale(1.02);
 }
 
 #tekntek-home-v2 .ttk-card-image .ttk-card-image-secondary {
     opacity: 0;
 }
 
-#tekntek-home-v2 .ttk-card-link:hover .ttk-card-image .ttk-card-image-primary {
+#tekntek-home-v2 .ttk-card--has-secondary:hover .ttk-card-image .ttk-card-image-primary {
     opacity: 0;
 }
 
-#tekntek-home-v2 .ttk-card-link:hover .ttk-card-image .ttk-card-image-secondary {
+#tekntek-home-v2 .ttk-card--has-secondary:hover .ttk-card-image .ttk-card-image-secondary {
     opacity: 1;
 }
 
@@ -789,7 +859,7 @@ nav.navigation,
 }
 
 #tekntek-home-v2 .ttk-card-new {
-    color: #ef4444;
+    color: #c99600;
     font-weight: 700;
 }
 
@@ -838,6 +908,152 @@ nav.navigation,
     font-size: 9px;
 }
 
+#tekntek-home-v2 .tekn-faq {
+    margin-top: 28px;
+    padding: 60px 0;
+    background: #f8f9fa;
+    border-top: 1px solid #e5e7eb;
+}
+
+#tekntek-home-v2 .tekn-faq__header {
+    max-width: 760px;
+    margin: 0 auto 28px;
+    text-align: center;
+}
+
+#tekntek-home-v2 .tekn-faq__eyebrow {
+    display: inline-block;
+    margin-bottom: 8px;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+    color: #2e63d7;
+}
+
+#tekntek-home-v2 .tekn-faq__title {
+    margin: 0;
+    font-size: 30px;
+    line-height: 1.2;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+#tekntek-home-v2 .tekn-faq__intro {
+    margin: 12px auto 0;
+    max-width: 620px;
+    font-size: 15px;
+    line-height: 1.7;
+    color: #4b5563;
+}
+
+#tekntek-home-v2 .tekn-faq__grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
+    align-items: start;
+}
+
+#tekntek-home-v2 .tekn-faq__group {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 18px;
+    padding: 22px;
+    box-shadow: 0 12px 28px rgba(15, 23, 42, 0.04);
+}
+
+#tekntek-home-v2 .tekn-faq__group-title {
+    margin: 0 0 16px;
+    font-size: 18px;
+    font-weight: 700;
+    color: #0f172a;
+}
+
+#tekntek-home-v2 .tekn-faq__item {
+    border-top: 1px solid #e5e7eb;
+}
+
+#tekntek-home-v2 .tekn-faq__item:first-of-type {
+    border-top: 0;
+}
+
+#tekntek-home-v2 .tekn-faq__item > summary {
+    list-style: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 18px 0;
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 1.5;
+    font-weight: 700;
+    color: #111827;
+}
+
+#tekntek-home-v2 .tekn-faq__item > summary::-webkit-details-marker,
+#tekntek-home-v2 .tekn-faq__item > summary::marker {
+    display: none;
+    content: "";
+}
+
+#tekntek-home-v2 .tekn-faq__icon {
+    width: 18px;
+    height: 18px;
+    flex: 0 0 18px;
+    position: relative;
+    color: #2e63d7;
+    transition: transform .28s ease, color .28s ease;
+}
+
+#tekntek-home-v2 .tekn-faq__icon::before,
+#tekntek-home-v2 .tekn-faq__icon::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 12px;
+    height: 2px;
+    border-radius: 999px;
+    background: currentColor;
+    transform: translate(-50%, -50%);
+}
+
+#tekntek-home-v2 .tekn-faq__icon::after {
+    transform: translate(-50%, -50%) rotate(90deg);
+}
+
+#tekntek-home-v2 .tekn-faq__item[open] .tekn-faq__icon {
+    transform: rotate(180deg);
+    color: #1d4ed8;
+}
+
+#tekntek-home-v2 .tekn-faq__item[open] .tekn-faq__icon::after {
+    opacity: 0;
+}
+
+#tekntek-home-v2 .tekn-faq__panel {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows .3s ease;
+}
+
+#tekntek-home-v2 .tekn-faq__item[open] .tekn-faq__panel {
+    grid-template-rows: 1fr;
+}
+
+#tekntek-home-v2 .tekn-faq__answer {
+    overflow: hidden;
+}
+
+#tekntek-home-v2 .tekn-faq__answer p {
+    margin: 0;
+    padding: 0 0 18px;
+    font-size: 15px;
+    line-height: 1.75;
+    color: #4b5563;
+}
+
 @media (max-width: 840px) {
     .tekntek-isolated-header .ttk-main-header {
         padding: 8px 10px;
@@ -877,9 +1093,41 @@ nav.navigation,
     .tekntek-isolated-header .ttk-icon-nav ul,
     #tekntek-home-v2 .ttk-offers,
     #tekntek-home-v2 .ttk-product-grid,
-    #tekntek-home-v2 .ttk-benefits,
     #tekntek-home-v2 .ttk-footer {
         grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    #tekntek-home-v2 .ttk-benefits {
+        padding: 22px 16px;
+        gap: 12px;
+        justify-content: flex-start;
+    }
+
+    #tekntek-home-v2 .ttk-benefit {
+        flex: 1 1 calc(50% - 12px);
+    }
+
+    #tekntek-home-v2 .tekn-faq {
+        padding: 48px 0;
+    }
+
+    #tekntek-home-v2 .tekn-faq__title {
+        font-size: 24px;
+    }
+
+    #tekntek-home-v2 .tekn-faq__grid {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    #tekntek-home-v2 .tekn-faq__group {
+        padding: 18px;
+        border-radius: 16px;
+    }
+
+    #tekntek-home-v2 .tekn-faq__item > summary {
+        padding: 16px 0;
+        font-size: 15px;
     }
 
     #tekntek-home-v2 .ttk-banners {
@@ -927,16 +1175,47 @@ nav.navigation,
             </div>
     </section>
 
+    <section class="ttk-benefits" aria-label="Store trust bar">
+      <div class="ttk-benefit">
+        <img src="<?= $block->escapeUrl($block->getViewFileUrl('images/truck-fast.svg')) ?>" alt="Free shipping" />
+        <div class="ttk-benefit-copy">
+          <span class="ttk-benefit-title">Free Shipping</span>
+          <span class="ttk-benefit-subtitle">On orders over $50 nationwide</span>
+        </div>
+      </div>
+      <div class="ttk-benefit">
+        <img src="<?= $block->escapeUrl($block->getViewFileUrl('images/wallet-check.svg')) ?>" alt="Cash on delivery" />
+        <div class="ttk-benefit-copy">
+          <span class="ttk-benefit-title">Cash on Delivery</span>
+          <span class="ttk-benefit-subtitle">Flexible payment when your order arrives</span>
+        </div>
+      </div>
+      <div class="ttk-benefit">
+        <img src="<?= $block->escapeUrl($block->getViewFileUrl('images/rotate-left.svg')) ?>" alt="Easy returns" />
+        <div class="ttk-benefit-copy">
+          <span class="ttk-benefit-title">Easy Returns</span>
+          <span class="ttk-benefit-subtitle">7-day hassle-free exchange support</span>
+        </div>
+      </div>
+      <div class="ttk-benefit">
+        <img src="<?= $block->escapeUrl($block->getViewFileUrl('images/support.svg')) ?>" alt="24 7 support" />
+        <div class="ttk-benefit-copy">
+          <span class="ttk-benefit-title">24/7 Support</span>
+          <span class="ttk-benefit-subtitle">Real help for setup, orders, and warranty</span>
+        </div>
+      </div>
+      <div class="ttk-benefit">
+        <img src="<?= $block->escapeUrl($block->getViewFileUrl('images/gift.svg')) ?>" alt="Member rewards" />
+        <div class="ttk-benefit-copy">
+          <span class="ttk-benefit-title">Member Rewards</span>
+          <span class="ttk-benefit-subtitle">Exclusive deals for returning customers</span>
+        </div>
+      </div>
+    </section>
+
     <section class="ttk-section">
       <div class="ttk-heading"><h2>Special offers</h2><a href="#">View all ⓘ</a></div>
       <div id="ttk-offers" class="ttk-offers"></div>
-      <div class="ttk-benefits">
-                <div class="ttk-benefit"><img src="<?= $block->escapeUrl($block->getViewFileUrl('images/truck-fast.svg')) ?>" alt="Free shipping" /><span>Free shipping<br/>24h service</span></div>
-                <div class="ttk-benefit"><img src="<?= $block->escapeUrl($block->getViewFileUrl('images/rotate-left.svg')) ?>" alt="Easy return" /><span>Easy return<br/>No extra duty</span></div>
-                <div class="ttk-benefit"><img src="<?= $block->escapeUrl($block->getViewFileUrl('images/gift.svg')) ?>" alt="Special gift" /><span>Special gift<br/>For your order</span></div>
-                <div class="ttk-benefit"><img src="<?= $block->escapeUrl($block->getViewFileUrl('images/support.svg')) ?>" alt="Support 24/7" /><span>Support 24/7<br/>Always available</span></div>
-                <div class="ttk-benefit"><img src="<?= $block->escapeUrl($block->getViewFileUrl('images/wallet-check.svg')) ?>" alt="Secured payment" /><span>Secured payment<br/>Safe and fast</span></div>
-      </div>
       <div class="ttk-banners">
                                 <article class="ttk-banner ttk-banner--macbook">
                                         <img src="https://cloudfront-us-east-1.images.arcpublishing.com/crain/D22QC2UKU5COJFE7TOLWRJFR5E.jpg" alt="Macbook" />
@@ -951,6 +1230,70 @@ nav.navigation,
 
     <section id="ttk-products" class="ttk-products"></section>
 
+    <section class="tekn-faq" aria-labelledby="tekn-faq-title">
+      <div class="tekn-faq__header">
+        <span class="tekn-faq__eyebrow">Support</span>
+        <h2 class="tekn-faq__title" id="tekn-faq-title">Frequently Asked Questions</h2>
+        <p class="tekn-faq__intro">Get quick answers about shopping, shipping, warranty coverage, and after-sales support at TeknTek.</p>
+      </div>
+      <div class="tekn-faq__grid">
+        <div class="tekn-faq__group">
+          <h3 class="tekn-faq__group-title">Order &amp; Shipping</h3>
+          <details class="tekn-faq__item" open>
+            <summary>How long does delivery usually take?<span class="tekn-faq__icon" aria-hidden="true"></span></summary>
+            <div class="tekn-faq__panel">
+              <div class="tekn-faq__answer">
+                <p>Most in-stock orders are processed within 24 hours and delivered in 2 to 5 business days depending on your location. A tracking link is sent as soon as the package leaves our warehouse.</p>
+              </div>
+            </div>
+          </details>
+          <details class="tekn-faq__item">
+            <summary>Can I pay cash on delivery?<span class="tekn-faq__icon" aria-hidden="true"></span></summary>
+            <div class="tekn-faq__panel">
+              <div class="tekn-faq__answer">
+                <p>Yes. Cash on delivery is available for eligible addresses. During checkout, TeknTek will show whether COD is supported for your order before you confirm payment.</p>
+              </div>
+            </div>
+          </details>
+          <details class="tekn-faq__item">
+            <summary>What should I do if my order arrives damaged?<span class="tekn-faq__icon" aria-hidden="true"></span></summary>
+            <div class="tekn-faq__panel">
+              <div class="tekn-faq__answer">
+                <p>Please contact support within 48 hours and send photos of the outer box and the product. We will review the case quickly and guide you through exchange or return options.</p>
+              </div>
+            </div>
+          </details>
+        </div>
+        <div class="tekn-faq__group">
+          <h3 class="tekn-faq__group-title">Warranty &amp; Support</h3>
+          <details class="tekn-faq__item">
+            <summary>Do your products include official warranty?<span class="tekn-faq__icon" aria-hidden="true"></span></summary>
+            <div class="tekn-faq__panel">
+              <div class="tekn-faq__answer">
+                <p>Yes. Eligible products include manufacturer warranty or TeknTek store warranty depending on the brand. Warranty information is shown on the product page and in your order confirmation.</p>
+              </div>
+            </div>
+          </details>
+          <details class="tekn-faq__item">
+            <summary>How can I request technical support after purchase?<span class="tekn-faq__icon" aria-hidden="true"></span></summary>
+            <div class="tekn-faq__panel">
+              <div class="tekn-faq__answer">
+                <p>You can reach us through the help center, hotline, or your account order history. Prepare your order number and product serial number so our team can support you faster.</p>
+              </div>
+            </div>
+          </details>
+          <details class="tekn-faq__item">
+            <summary>Can I exchange a product with a hardware fault?<span class="tekn-faq__icon" aria-hidden="true"></span></summary>
+            <div class="tekn-faq__panel">
+              <div class="tekn-faq__answer">
+                <p>Yes. If a verified hardware issue appears within the applicable exchange window, TeknTek will help arrange a replacement, repair, or warranty handling based on the item condition and policy.</p>
+              </div>
+            </div>
+          </details>
+        </div>
+      </div>
+    </section>
+
   </div>
 </div>
 
@@ -958,79 +1301,17 @@ nav.navigation,
 $productCollectionFactory = $objectManager->get(\Magento\Catalog\Model\ResourceModel\Product\CollectionFactory::class);
 $priceHelper = $objectManager->get(\Magento\Framework\Pricing\Helper\Data::class);
 $imageHelper = $objectManager->get(\Magento\Catalog\Helper\Image::class);
-$mediaConfig = $objectManager->get(\Magento\Catalog\Model\Product\Media\Config::class);
 $placeholderImage = $block->getViewFileUrl('Magento_Catalog::images/product/placeholder/small_image.jpg');
 
-$productCollection = $productCollectionFactory->create();
-$productCollection->addAttributeToSelect(['name', 'small_image', 'price', 'final_price', 'status', 'visibility']);
-$productCollection->addAttributeToFilter('status', \Magento\Catalog\Model\Product\Attribute\Source\Status::STATUS_ENABLED);
-$productCollection->addAttributeToFilter(
-    'visibility',
-    ['in' => [
-        \Magento\Catalog\Model\Product\Visibility::VISIBILITY_IN_CATALOG,
-        \Magento\Catalog\Model\Product\Visibility::VISIBILITY_IN_SEARCH,
-        \Magento\Catalog\Model\Product\Visibility::VISIBILITY_BOTH
-    ]]
-);
-$productCollection->setPageSize(16);
-$productCollection->setCurPage(1);
-$productCollection->addMediaGalleryData();
-
-$realCards = [];
-foreach ($productCollection as $product) {
-    $regularPrice = (float) $product->getPrice();
-    $finalPrice = (float) $product->getFinalPrice();
-    if ($finalPrice <= 0) {
-        continue;
-    }
-
-    $discountLabel = '';
-    if ($regularPrice > 0 && $finalPrice < $regularPrice) {
-        $percent = (int) round((($regularPrice - $finalPrice) / $regularPrice) * 100);
-        if ($percent > 0) {
-            $discountLabel = $percent . '%';
-        }
-    }
-
-    $imageUrl = '';
-    try {
-        $imageUrl = (string) $imageHelper->init($product, 'product_small_image')->getUrl();
-    } catch (\Throwable $e) {
-        $imageUrl = '';
-    }
-    if ($imageUrl === '') {
-        $imageUrl = $placeholderImage;
-    }
-
-    $secondaryImageUrl = '';
-    $galleryImages = $product->getMediaGalleryImages();
-    if ($galleryImages && $galleryImages->getSize() > 0) {
-        foreach ($galleryImages as $galleryImage) {
-            $galleryFile = (string) $galleryImage->getFile();
-            if ($galleryFile === '') {
-                continue;
-            }
-
-            $candidateUrl = (string) $mediaConfig->getMediaUrl($galleryFile);
-            if ($candidateUrl !== '' && $candidateUrl !== $imageUrl) {
-                $secondaryImageUrl = $candidateUrl;
-                break;
-            }
-        }
-    }
-
-    $realCards[] = [
-        'id' => (int) $product->getId(),
-        'name' => (string) $product->getName(),
-        'image' => $imageUrl,
-        'secondary_image' => $secondaryImageUrl,
-        'old' => $regularPrice > $finalPrice ? $priceHelper->currency($regularPrice, true, false) : '',
-        'price' => $priceHelper->currency($finalPrice, true, false),
-        'compare_price' => $finalPrice,
-        'discount' => $discountLabel,
-        'reviews' => 0,
-        'url' => (string) $product->getProductUrl()
-    ];
+$homepageSectionsViewModel = $block->getData('view_model');
+$offersData = [];
+$homepageSections = [];
+if ($homepageSectionsViewModel instanceof \TeknTek\Homepage\ViewModel\Sections) {
+    $offersData = $homepageSectionsViewModel->getFeaturedProducts(4);
+    $homepageSections = $homepageSectionsViewModel->getSections(
+        (array) $block->getData('homepage_category_ids'),
+        (int) $block->getData('homepage_category_product_limit')
+    );
 }
 
 $fallbackCards = [[
@@ -1043,14 +1324,12 @@ $fallbackCards = [[
     'compare_price' => 0,
     'discount' => '',
     'reviews' => 0,
+    'rating_summary' => 0,
     'url' => $block->getUrl('catalogsearch/result')
 ]];
 
-$cardsPool = !empty($realCards) ? $realCards : $fallbackCards;
-$offersData = array_slice($cardsPool, 0, 4);
-$cardsData = array_slice($cardsPool, 4, 4);
-if (empty($cardsData)) {
-    $cardsData = $offersData;
+if ($offersData === []) {
+    $offersData = $fallbackCards;
 }
 
 $searchSuggestionItems = [];
@@ -1102,16 +1381,13 @@ if (empty($searchSuggestionItems)) {
             'url' => $item['url'] ?? '',
             'price' => $item['price'] ?? ''
         ];
-    }, $realCards);
+    }, $offersData);
 }
 
 $homepageData = [
     'offers' => $offersData,
     'searchSuggestions' => array_slice($searchSuggestionItems, 0, 120),
-    'sections' => [
-        'Laptop', 'Smartphone', 'Tablet', 'Audio & Headphones', 'Smart Watch', 'Camera', 'Monitors', 'Keyboards', 'Computer Mices', 'Hard Drives'
-    ],
-    'cards' => $cardsData
+    'sections' => $homepageSections
 ];
 ?>
 
@@ -1303,20 +1579,23 @@ $homepageData = [
     }
 
     var sectionIconMap = {
-        'laptop': '<?= $block->escapeUrl($block->getViewFileUrl('images/categories/laptop.png')) ?>',
-        'smartphone': '<?= $block->escapeUrl($block->getViewFileUrl('images/categories/smartphone.png')) ?>',
-        'tablet': '<?= $block->escapeUrl($block->getViewFileUrl('images/categories/tablet.png')) ?>?v=20260407-1',
-        'audio-and-headphones': '<?= $block->escapeUrl($block->getViewFileUrl('images/categories/headphones.png')) ?>',
-        'smart-watch': '<?= $block->escapeUrl($block->getViewFileUrl('images/categories/smartwatch.png')) ?>',
-        'camera': '<?= $block->escapeUrl($block->getViewFileUrl('images/categories/camera.png')) ?>',
+        'laptops': '<?= $block->escapeUrl($block->getViewFileUrl('images/categories/laptop.png')) ?>',
+        'smartphones': '<?= $block->escapeUrl($block->getViewFileUrl('images/categories/smartphone.png')) ?>',
+        'tablets': '<?= $block->escapeUrl($block->getViewFileUrl('images/categories/tablet.png')) ?>?v=20260407-1',
+        'headphones': '<?= $block->escapeUrl($block->getViewFileUrl('images/categories/headphones.png')) ?>',
+        'smartwatches': '<?= $block->escapeUrl($block->getViewFileUrl('images/categories/smartwatch.png')) ?>',
+        'cameras': '<?= $block->escapeUrl($block->getViewFileUrl('images/categories/camera.png')) ?>',
         'monitors': '<?= $block->escapeUrl($block->getViewFileUrl('images/categories/monitor.png')) ?>',
         'keyboards': '<?= $block->escapeUrl($block->getViewFileUrl('images/categories/keyboard-cropped.png')) ?>',
-        'computer-mices': '<?= $block->escapeUrl($block->getViewFileUrl('images/categories/mouse.png')) ?>',
+        'computer-mice': '<?= $block->escapeUrl($block->getViewFileUrl('images/categories/mouse.png')) ?>',
         'hard-drives': '<?= $block->escapeUrl($block->getViewFileUrl('images/categories/hard-drive.png')) ?>'
     };
 
-    function stars() {
-        return '<span>★★★★★</span>';
+    function stars(item) {
+        var ratingSummary = Number(item && item.rating_summary ? item.rating_summary : 0);
+        var filledStars = Math.max(0, Math.min(5, Math.round(ratingSummary / 20)));
+        var emptyStars = Math.max(0, 5 - filledStars);
+        return '<span>' + '★'.repeat(filledStars) + '☆'.repeat(emptyStars) + '</span>';
     }
 
     function cardTemplate(item) {
@@ -1324,31 +1603,38 @@ $homepageData = [
         var openLink = item.url ? '<a class="ttk-card-link" href="' + item.url + '">' : '';
         var closeLink = item.url ? '</a>' : '';
         var secondaryImage = item.secondary_image ? '<img class="ttk-card-image-secondary" src="' + item.secondary_image + '" alt="' + item.name + '" loading="lazy"/>' : '';
-        return '<article class="ttk-card">' +
+        var cardClass = 'ttk-card' + (item.secondary_image ? ' ttk-card--has-secondary' : '');
+        return '<article class="' + cardClass + '">' +
             openLink +
             '<div class="ttk-card-image">' + badge + '<img class="ttk-card-image-primary" src="' + item.image + '" alt="' + item.name + '" loading="lazy"/>' + secondaryImage + '</div>' +
             '<div class="ttk-card-title">' + item.name + '</div>' +
             '<div class="ttk-card-price"><span class="ttk-card-old">' + item.old + '</span><span class="ttk-card-new">' + item.price + '</span></div>' +
-            '<div class="ttk-card-rating">' + stars() + ' (' + item.reviews + ')</div>' +
+            '<div class="ttk-card-rating">' + stars(item) + ' (' + (item.reviews || 0) + ')</div>' +
             closeLink +
             '</article>';
     }
 
     offersNode.innerHTML = data.offers.map(cardTemplate).join('');
 
-    productsNode.innerHTML = data.sections.map(function (name) {
-        var iconName = normalizeName(name);
+    productsNode.innerHTML = data.sections.map(function (section) {
+        var name = section && section.name ? section.name : '';
+        var cards = Array.isArray(section && section.cards) ? section.cards : [];
+        if (!name || !cards.length) {
+            return '';
+        }
+
+        var iconName = section && section.icon_key ? section.icon_key : normalizeName(name);
         var sectionIconUrl = sectionIconMap[iconName] || ('icon-' + iconName + '.svg');
         var sectionIconModifierMap = {
-            'computer-mices': 'ttk-section-icon--mice',
+            'computer-mice': 'ttk-section-icon--mice',
             'keyboards': 'ttk-section-icon--keyboard',
             'hard-drives': 'ttk-section-icon--hard-drive'
         };
         var sectionIconModifier = sectionIconModifierMap[iconName] || '';
         var sectionIconClass = 'ttk-section-icon' + (sectionIconModifier ? ' ' + sectionIconModifier : '');
         return '<section class="ttk-product-section">' +
-            '<div class="ttk-heading"><h3><img class="' + sectionIconClass + '" src="' + sectionIconUrl + '" alt=""/>' + name + '</h3><a href="<?= $block->escapeUrl($block->getUrl('catalogsearch/result')) ?>">View all ⓘ</a></div>' +
-            '<div class="ttk-product-grid">' + data.cards.map(function (card) {
+            '<div class="ttk-heading"><h3><img class="' + sectionIconClass + '" src="' + sectionIconUrl + '" alt=""/>' + name + '</h3><a href="' + escapeHtml(section.url || '#') + '">View all ⓘ</a></div>' +
+            '<div class="ttk-product-grid">' + cards.map(function (card) {
                 return cardTemplate(card);
             }).join('') + '</div>' +
             '</section>';

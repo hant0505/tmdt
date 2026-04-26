@@ -1,14 +1,37 @@
 <?php
+$om = \Magento\Framework\App\ObjectManager::getInstance();
 /** @var \Magento\Framework\View\Element\Template $block */
 
-$listBlock = $block->getLayout()->getBlock('category.products.list');
-if (!$listBlock) {
-    $listBlock = $block->getLayout()->getBlock('search_result_list');
+$registry = $om->get(\Magento\Framework\Registry::class);
+$currentCategory = $registry->registry('current_category');
+$collection = null;
+
+if ($currentCategory) {
+    try {
+        $collectionFactory = $om->get(\Magento\Catalog\Model\ResourceModel\Product\CollectionFactory::class);
+        $storeManager = $om->get(\Magento\Store\Model\StoreManagerInterface::class);
+        $productVisibility = $om->get(\Magento\Catalog\Model\Product\Visibility::class);
+
+        $collection = $collectionFactory->create();
+        $collection->setStoreId((int) $storeManager->getStore()->getId());
+        $collection->addStoreFilter();
+        $collection->addAttributeToSelect('*');
+        $collection->addCategoriesFilter(['in' => [(int) $currentCategory->getId()]]);
+        $collection->setVisibility($productVisibility->getVisibleInCatalogIds());
+    } catch (\Throwable $e) {
+        $collection = null;
+    }
 }
 
-$collection = $listBlock ? $listBlock->getLoadedProductCollection() : null;
+if (!$collection) {
+    $listBlock = $block->getLayout()->getBlock('category.products.list');
+    if (!$listBlock) {
+        $listBlock = $block->getLayout()->getBlock('search_result_list');
+    }
 
-$om = \Magento\Framework\App\ObjectManager::getInstance();
+    $collection = $listBlock ? $listBlock->getLoadedProductCollection() : null;
+}
+
 if (!$collection) {
     try {
         $layerResolver = $om->get(\Magento\Catalog\Model\Layer\Resolver::class);
@@ -21,9 +44,6 @@ if (!$collection) {
 if (!$collection) {
     return;
 }
-
-$registry = $om->get(\Magento\Framework\Registry::class);
-$currentCategory = $registry->registry('current_category');
 $queryText = strtolower(trim((string) $block->getRequest()->getParam('q')));
 $categoryText = strtolower(trim((string) ($currentCategory ? $currentCategory->getName() : '')));
 $contextText = trim($categoryText . ' ' . $queryText);
@@ -522,6 +542,45 @@ $stockOnly = (string) $block->getRequest()->getParam('stock') === '1';
 .ttk-facet-range {
     width: 100%;
     margin: 2px 0;
+    -webkit-appearance: none;
+    appearance: none;
+    background: transparent;
+}
+
+.ttk-facet-range::-webkit-slider-runnable-track {
+    height: 4px;
+    border-radius: 999px;
+    background: #f6c445;
+}
+
+.ttk-facet-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    margin-top: -7px;
+    border-radius: 50%;
+    border: 2px solid #ffffff;
+    background: #f6c445;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.2);
+    cursor: pointer;
+}
+
+.ttk-facet-range::-moz-range-track {
+    height: 4px;
+    border: 0;
+    border-radius: 999px;
+    background: #f6c445;
+}
+
+.ttk-facet-range::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border: 2px solid #ffffff;
+    border-radius: 50%;
+    background: #f6c445;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.2);
+    cursor: pointer;
 }
 
 .ttk-facet-toggle {

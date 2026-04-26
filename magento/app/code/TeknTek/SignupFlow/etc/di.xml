@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <preference for="Magento\Customer\Controller\Account\ForgotPasswordPost"
+                type="TeknTek\SignupFlow\Controller\Account\ForgotPasswordPost"/>
+
+    <type name="Magento\Catalog\Model\Layer\Category\ItemCollectionProvider">
+        <plugin name="tekntek_signupflow_include_child_category_products"
+                type="TeknTek\SignupFlow\Plugin\Category\IncludeChildProducts"/>
+    </type>
+</config>

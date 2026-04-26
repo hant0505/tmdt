@@ -83,6 +83,10 @@ $active = $galleryItems[$mainIndex] ?? $galleryItems[0];
     width: 100%;
     height: 100%;
     object-fit: contain;
+    transition: opacity 220ms ease, transform 220ms ease;
+    will-change: opacity, transform;
+    opacity: 1;
+    transform: scale(1);
 }
 
 .catalog-product-view .tekntek-pdp-gallery__arrow {
@@ -170,16 +174,20 @@ $active = $galleryItems[$mainIndex] ?? $galleryItems[0];
 
     <div class="tekntek-pdp-gallery__thumbs" role="listbox" aria-label="Product image thumbnails">
         <?php foreach ($galleryItems as $index => $item): ?>
-            <button
-                type="button"
+            <a
+                href="<?= $escaper->escapeUrl((string) $item['full']) ?>"
+                target="_blank"
+                rel="noopener"
                 class="tekntek-pdp-gallery__thumb<?= $index === $mainIndex ? ' is-active' : '' ?>"
                 data-role="thumb"
+                data-index="<?= (int) $index ?>"
                 data-full="<?= $escaper->escapeUrl((string) $item['full']) ?>"
                 data-alt="<?= $escaper->escapeHtmlAttr((string) $item['alt']) ?>"
                 aria-selected="<?= $index === $mainIndex ? 'true' : 'false' ?>"
+                aria-label="<?= $escaper->escapeHtmlAttr((string) $item['alt']) ?>"
             >
                 <img src="<?= $escaper->escapeUrl((string) $item['thumb']) ?>" alt="<?= $escaper->escapeHtmlAttr((string) $item['alt']) ?>" loading="lazy" />
-            </button>
+            </a>
         <?php endforeach; ?>
     </div>
 
@@ -190,18 +198,24 @@ $active = $galleryItems[$mainIndex] ?? $galleryItems[0];
 (function () {
     var galleries = document.querySelectorAll('[data-role="tekntek-pdp-gallery"]');
 
-    galleries.forEach(function (gallery) {
+    for (var galleryIndex = 0; galleryIndex < galleries.length; galleryIndex++) {
+        var gallery = galleries[galleryIndex];
         var stage = gallery.querySelector('[data-role="stage"]');
         var thumbs = Array.prototype.slice.call(gallery.querySelectorAll('[data-role="thumb"]'));
         var prev = gallery.querySelector('[data-action="prev"]');
         var next = gallery.querySelector('[data-action="next"]');
         var imageLink = gallery.querySelector('link[itemprop="image"]');
-        var current = Math.max(0, thumbs.findIndex(function (thumb) {
-            return thumb.classList.contains('is-active');
-        }));
+        var current = 0;
+
+        for (var thumbIndex = 0; thumbIndex < thumbs.length; thumbIndex++) {
+            if (thumbs[thumbIndex].classList.contains('is-active')) {
+                current = thumbIndex;
+                break;
+            }
+        }
 
         if (!stage || thumbs.length === 0) {
-            return;
+            continue;
         }
 
         function render(index) {
@@ -209,26 +223,76 @@ $active = $galleryItems[$mainIndex] ?? $galleryItems[0];
             var activeThumb = thumbs[safeIndex];
             var full = activeThumb.getAttribute('data-full') || '';
             var alt = activeThumb.getAttribute('data-alt') || 'Product image';
+            var currentSrc = stage.getAttribute('src') || '';
 
-            current = safeIndex;
-            stage.src = full;
-            stage.alt = alt;
-
-            if (imageLink) {
-                imageLink.setAttribute('href', full);
+            if (currentSrc === full) {
+                current = safeIndex;
+                if (imageLink) {
+                    imageLink.setAttribute('href', full);
+                }
+                for (var keep = 0; keep < thumbs.length; keep++) {
+                    var keepThumb = thumbs[keep];
+                    var keepActive = keep === safeIndex;
+                    keepThumb.classList.toggle('is-active', keepActive);
+                    keepThumb.setAttribute('aria-selected', keepActive ? 'true' : 'false');
+                }
+                return;
             }
 
-            thumbs.forEach(function (thumb, idx) {
-                var isActive = idx === safeIndex;
+            current = safeIndex;
+            stage.style.opacity = '0.28';
+            stage.style.transform = 'scale(0.985)';
+
+            var preloaded = new Image();
+            preloaded.onload = function () {
+                stage.src = full;
+                stage.alt = alt;
+
+                if (imageLink) {
+                    imageLink.setAttribute('href', full);
+                }
+
+                window.requestAnimationFrame(function () {
+                    stage.style.opacity = '1';
+                    stage.style.transform = 'scale(1)';
+                });
+            };
+            preloaded.onerror = function () {
+                stage.src = full;
+                stage.alt = alt;
+                if (imageLink) {
+                    imageLink.setAttribute('href', full);
+                }
+                window.requestAnimationFrame(function () {
+                    stage.style.opacity = '1';
+                    stage.style.transform = 'scale(1)';
+                });
+            };
+            preloaded.src = full;
+
+            for (var i = 0; i < thumbs.length; i++) {
+                var thumb = thumbs[i];
+                var isActive = i === safeIndex;
                 thumb.classList.toggle('is-active', isActive);
                 thumb.setAttribute('aria-selected', isActive ? 'true' : 'false');
-            });
+            }
         }
 
-        thumbs.forEach(function (thumb, idx) {
-            thumb.addEventListener('click', function () {
-                render(idx);
-            });
+        for (var j = 0; j < thumbs.length; j++) {
+            (function (thumb, idx) {
+                thumb.addEventListener('click', function (event) {
+                    event.preventDefault();
+                    render(idx);
+                });
+            })(thumbs[j], j);
+        }
+
+        stage.addEventListener('click', function () {
+            var activeThumb = thumbs[current];
+            var full = activeThumb && activeThumb.getAttribute('data-full');
+            if (full) {
+                window.open(full, '_blank', 'noopener');
+            }
         });
 
         if (prev) {
@@ -243,7 +307,12 @@ $active = $galleryItems[$mainIndex] ?? $galleryItems[0];
             });
         }
 
+        stage.addEventListener('load', function () {
+            stage.style.opacity = '1';
+            stage.style.transform = 'scale(1)';
+        });
+
         render(current);
-    });
+    }
 })();
 </script>

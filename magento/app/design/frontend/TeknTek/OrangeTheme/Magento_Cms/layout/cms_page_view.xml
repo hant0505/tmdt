@@ -15,7 +15,24 @@
             <block class="Magento\Framework\View\Element\Template"
                    name="tekntek.homepage"
                    cacheable="false"
-                   template="Magento_Cms::page/homepage.phtml"/>
+                   template="Magento_Cms::page/homepage.phtml">
+                <arguments>
+                    <argument name="view_model" xsi:type="object">TeknTek\Homepage\ViewModel\Sections</argument>
+                    <argument name="homepage_category_ids" xsi:type="array">
+                        <item name="laptops" xsi:type="number">13</item>
+                        <item name="smartphones" xsi:type="number">14</item>
+                        <item name="tablets" xsi:type="number">16</item>
+                        <item name="headphones" xsi:type="number">19</item>
+                        <item name="smartwatches" xsi:type="number">15</item>
+                        <item name="cameras" xsi:type="number">22</item>
+                        <item name="monitors" xsi:type="number">21</item>
+                        <item name="keyboards" xsi:type="number">18</item>
+                        <item name="computer_mice" xsi:type="number">4</item>
+                        <item name="hard_drives" xsi:type="number">20</item>
+                    </argument>
+                    <argument name="homepage_category_product_limit" xsi:type="number">4</argument>
+                </arguments>
+            </block>
         </referenceContainer>
     </body>
 </page>
