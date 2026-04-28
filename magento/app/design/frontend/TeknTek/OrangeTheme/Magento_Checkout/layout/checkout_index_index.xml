@@ -1,24 +1,25 @@
 <?xml version="1.0"?>
-<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="checkout" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
-        <!-- Add Header -->
-        <block class="Magento\Framework\View\Element\Template"
-               name="page.header"
-               as="header"
-               template="Magento_Theme::html/tekntek-header.phtml"
-               before="checkout.root"/>
-        <block class="Magento\Theme\Block\Html\Topmenu"
-               name="catalog.topnav"
-               template="Magento_Theme::html/topmenu.phtml"
-               ttl="3600"
-               before="-">
-            <arguments>
-                <argument name="parent" xsi:type="string">page.header</argument>
-            </arguments>
-        </block>
+        <!-- Render custom header inside checkout header wrapper -->
+        <referenceBlock name="logo" remove="true"/>
+        <referenceContainer name="checkout.header.wrapper">
+            <block class="Magento\Framework\View\Element\Template"
+                   name="tekntek.checkout.header"
+                   template="Magento_Theme::html/tekntek-header.phtml"/>
+        </referenceContainer>
 
-        <!-- Move Minicart to Header -->
-        <move element="minicart" destination="page.header"/>
+        <!-- Render custom footer below checkout content -->
+        <referenceContainer name="page.wrapper">
+            <container name="tekntek.checkout.footer.container"
+                       htmlTag="div"
+                       htmlClass="tekntek-checkout-footer-container"
+                       after="main.content">
+                <block class="Magento\Framework\View\Element\Template"
+                       name="tekntek.checkout.footer"
+                       template="Magento_Theme::html/tekntek-footer.phtml"/>
+            </container>
+        </referenceContainer>
 
         <!-- Checkout Content -->
         <referenceBlock name="checkout.root">
@@ -53,12 +54,5 @@
                 </argument>
             </arguments>
         </referenceBlock>
-
-        <!-- Add Footer -->
-        <block class="Magento\Framework\View\Element\Template"
-               name="page.footer"
-               as="footer"
-               template="Magento_Theme::html/tekntek-footer.phtml"
-               after="checkout.root"/>
     </body>
 </page>

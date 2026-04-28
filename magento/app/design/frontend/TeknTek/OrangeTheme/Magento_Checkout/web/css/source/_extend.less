@@ -293,6 +293,11 @@
     display: none;
 }
 
+/* Theme global CSS hides .page-header .header.content; restore it for checkout header wrapper. */
+.checkout-index-index .page-header .header.content {
+    display: block !important;
+}
+
 .checkout-index-index .page-main {
     padding-top: 0;
 }
@@ -1198,6 +1203,162 @@ body {
     color: #000;
 }
 
+/* ====== Checkout Visual Polish v2 ====== */
+.checkout-index-index {
+    background: radial-gradient(circle at 10% 0, #f6f9ff 0, #f4f5f7 34%, #f6f6f6 100%);
+}
+
+.checkout-index-index .checkout-container {
+    width: min(1160px, calc(100vw - 32px));
+    column-gap: 36px;
+    margin: 24px auto 56px;
+}
+
+.checkout-index-index .opc-wrapper .step-content,
+.checkout-index-index .opc-block-summary {
+    border: 1px solid #d9dee8;
+    border-radius: 14px;
+    background: #ffffff;
+    box-shadow: 0 10px 30px rgba(30, 41, 59, 0.06);
+}
+
+.checkout-index-index .opc-wrapper .checkout-shipping-address .step-content,
+.checkout-index-index .opc-wrapper .checkout-shipping-method .step-content {
+    padding: 24px;
+    margin-top: 14px;
+}
+
+.checkout-index-index .opc .checkout-shipping-address .step-title,
+.checkout-index-index .opc .checkout-shipping-method .step-title {
+    font-family: 'Roboto', sans-serif;
+    font-size: 24px;
+    font-weight: 700;
+    letter-spacing: 0;
+    margin: 0 0 18px;
+    color: #111827;
+}
+
+.checkout-index-index .field .label,
+.checkout-index-index .label {
+    color: #374151;
+    font-weight: 500;
+}
+
+.checkout-index-index .field input.input-text,
+.checkout-index-index .field select,
+.checkout-index-index .field textarea {
+    border: 1px solid #d1d5db;
+    border-radius: 10px;
+    min-height: 44px;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.checkout-index-index .field input.input-text:focus,
+.checkout-index-index .field select:focus,
+.checkout-index-index .field textarea:focus {
+    border-color: #3b649e;
+    box-shadow: 0 0 0 3px rgba(59, 100, 158, 0.16);
+}
+
+.checkout-index-index .tekntek-checkout-addresses__title {
+    margin-bottom: 10px;
+    color: #4b5563;
+    font-size: 13px;
+}
+
+.checkout-index-index .tekntek-shipping-address-item {
+    border: 1px solid #d7dce6;
+    border-radius: 12px;
+    box-shadow: 0 6px 18px rgba(17, 24, 39, 0.05);
+    padding: 14px 16px;
+    min-height: 0;
+    line-height: 1.35;
+}
+
+.checkout-index-index .tekntek-shipping-address-item__content {
+    color: #374151;
+    font-size: 14px;
+}
+
+.checkout-index-index .tekntek-shipping-address-item__content a {
+    color: #1d4ed8;
+}
+
+.checkout-index-index .tekntek-shipping-address-item .edit-address-link {
+    top: 12px;
+    right: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.checkout-index-index .tekntek-new-address-popup .action-show-popup {
+    border: 1px dashed #b8c2d3;
+    border-radius: 12px;
+    background: #fbfcff;
+}
+
+.checkout-index-index .opc-block-summary {
+    position: sticky;
+    top: 24px;
+    padding: 22px;
+    gap: 18px;
+}
+
+.checkout-index-index .opc-block-summary > .title {
+    margin-bottom: 8px;
+    color: #111827;
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.checkout-index-index #shipping-method-buttons-container .action.continue.primary,
+.checkout-index-index .opc-block-summary .checkout-methods-items .action.primary.checkout,
+.checkout-index-index .payment-method-content .actions-toolbar .primary .action.primary.checkout {
+    min-height: 46px;
+    border-radius: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1px;
+}
+
+.checkout-index-index .opc-progress-bar {
+    margin-bottom: 38px;
+}
+
+@media (max-width: 1024px) {
+    .checkout-index-index .checkout-container {
+        width: min(780px, calc(100vw - 24px));
+        row-gap: 18px;
+    }
+
+    .checkout-index-index .opc-block-summary {
+        position: static;
+        top: auto;
+    }
+}
+
+@media (max-width: 640px) {
+    .checkout-index-index .checkout-container {
+        width: calc(100vw - 16px);
+        margin: 12px auto 40px;
+    }
+
+    .checkout-index-index .opc-wrapper .checkout-shipping-address .step-content,
+    .checkout-index-index .opc-wrapper .checkout-shipping-method .step-content {
+        padding: 16px;
+    }
+
+    .checkout-index-index .opc .checkout-shipping-address .step-title,
+    .checkout-index-index .opc .checkout-shipping-method .step-title {
+        font-size: 20px;
+        margin-bottom: 14px;
+    }
+
+    .checkout-index-index .opc-block-summary > .title {
+        font-size: 20px;
+    }
+}
+
 .tekntek-payment-cards {
     display: flex;
     gap: 32px;
@@ -1506,14 +1667,48 @@ body {
 .checkout-index-index .opc-block-summary,
 .checkout-index-index .opc-block-shipping-address,
 .checkout-index-index .opc-block-shipping-method,
-.checkout-index-index .opc-block-payment,
-.checkout-payment-methods-custom {
+.checkout-index-index .opc-block-payment {
     margin-bottom: 24px;
     padding: 24px;
     border: 1px solid #e0e0e0;
     border-radius: 8px;
     background: #fdfdfd;
 }
+
+.checkout-payment-methods-custom {
+    margin-bottom: 24px;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+}
+
+/* Clean up the core payment title and the default outer border so the payment area matches the rest of the checkout. */
+.checkout-index-index .payment-method-title,
+.checkout-index-index .checkout-payment-method .step-title,
+.checkout-index-index #payment .payment-method-title {
+    display: none !important;
+}
+
+.checkout-index-index .checkout-payment-method .payment-method,
+.checkout-index-index .checkout-payment-method .payment-method-content,
+.checkout-index-index .checkout-payment-method .payment-method-content > .checkout-agreements-block,
+.checkout-index-index .checkout-payment-method .payment-method-content > .actions-toolbar,
+.checkout-index-index .opc-block-payment {
+    border: 0;
+    box-shadow: none;
+    background: transparent;
+}
+
+.checkout-index-index #payment .payment-method-content {
+    padding: 0;
+}
+
+.checkout-index-index .checkout-payment-method .payment-method,
+.checkout-index-index .checkout-payment-method .payment-method-content {
+    margin-bottom: 0;
+}
+
 
 /* ====== Hide Magento Default Payment Methods, Show Custom Form ====== */
 

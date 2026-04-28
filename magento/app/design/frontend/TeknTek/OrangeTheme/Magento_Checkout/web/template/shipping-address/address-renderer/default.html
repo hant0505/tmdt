@@ -2,6 +2,7 @@
 /**
  * Copyright © Magento, Inc. All rights reserved.
  * See COPYING.txt for license details.
+ show in page #shipping
  */
 -->
 <div class="shipping-address-item tekntek-shipping-address-item"
@@ -21,9 +22,8 @@
         <if args="address().company">
             <text args="address().company"></text><br>
         </if>
-        <text args="_.values(_.compact(address().street)).join(', ')" ></text><br>
-        <text args="address().city"></text><br>
-        <text args="address().postcode"></text><br>
+        <text args="(function () { var street = address().street || [], lines = _.isArray(street) ? street : _.values(street); var pick = function (line) { if (!line) { return ''; } if (_.isObject(line)) { return (line.value || line.label || line.text || line.street || line.name || '').toString().trim(); } return (line || '').toString().trim(); }; return _.compact(_.map(lines, pick)).join(', '); })()" ></text><br>
+        <text args="(function () { var city = (address().city || '').toString().trim(), region = (address().region || '').toString().trim(), postcode = (address().postcode || '').toString().trim(), parts = []; if (city) { parts.push(city); } if (region && region.toLowerCase() !== city.toLowerCase()) { parts.push(region); } if (postcode) { parts.push(postcode); } return parts.join(', '); })()"></text><br>
         <text args="getCountryName(address().countryId)"></text><br>
         <if args="address().telephone">
             <a attr="'href': 'tel:' + address().telephone" text="address().telephone"></a><br>

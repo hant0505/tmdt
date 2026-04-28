@@ -1,8 +1,9 @@
 define([
+    'jquery',
     'ko',
     'Magento_Customer/js/model/address-list',
     'Magento_Checkout/js/model/quote'
-], function (ko, addressList, quote) {
+], function ($, ko, addressList, quote) {
     'use strict';
 
     var debugPrefix = '[TeknTek Checkout Debug]';
@@ -51,6 +52,219 @@ define([
 
     function isNewCustomerAddress(address) {
         return address && typeof address.getType === 'function' && address.getType() === 'new-customer-address';
+    }
+
+    function extractAddressValue(value) {
+        var candidateKeys = ['value', 'label', 'text', 'street', 'name'],
+            index,
+            extracted;
+
+        if (value === null || value === undefined) {
+            return '';
+        }
+
+        if (typeof value === 'function') {
+            try {
+                return extractAddressValue(value());
+            } catch (e) {
+                return '';
+            }
+        }
+
+        if (typeof value === 'string' || typeof value === 'number' || typeof value === 'boolean') {
+            return value.toString().trim();
+        }
+
+        if (Array.isArray(value)) {
+            return value.map(function (entry) {
+                return extractAddressValue(entry);
+            }).join(' ').trim();
+        }
+
+        if (typeof value === 'object') {
+            for (index = 0; index < candidateKeys.length; index++) {
+                if (Object.prototype.hasOwnProperty.call(value, candidateKeys[index])) {
+                    extracted = extractAddressValue(value[candidateKeys[index]]);
+                    if (extracted) {
+                        return extracted;
+                    }
+                }
+            }
+        }
+
+        return '';
+    }
+
+    function normalizeStreetLines(street) {
+        var lines;
+
+        function normalizeAndLimit(inputLines) {
+            var normalized = (inputLines || []).map(function (line) {
+                return extractAddressValue(line);
+            });
+
+            return normalized.slice(0, 2);
+        }
+
+        if (!street) {
+            return ['', ''];
+        }
+
+        if (!Array.isArray(street) && typeof street === 'object') {
+            lines = normalizeAndLimit(Object.keys(street)
+                .sort(function (a, b) {
+                    var aNum = parseInt(a, 10),
+                        bNum = parseInt(b, 10),
+                        aIsNum = !isNaN(aNum),
+                        bIsNum = !isNaN(bNum);
+
+                    if (aIsNum && bIsNum) {
+                        return aNum - bNum;
+                    }
+
+                    if (aIsNum) {
+                        return -1;
+                    }
+
+                    if (bIsNum) {
+                        return 1;
+                    }
+
+                    return a.localeCompare(b);
+                })
+                .map(function (key) {
+                    return extractAddressValue(street[key]);
+                }));
+
+            while (lines.length < 2) {
+                lines.push('');
+            }
+
+            return lines;
+        }
+
+        if (!Array.isArray(street)) {
+            return [extractAddressValue(street), ''];
+        }
+
+        lines = normalizeAndLimit(street);
+
+        while (lines.length < 2) {
+            lines.push('');
+        }
+
+        return lines;
+    }
+
+    function resolveRegionAsCity(addressData, source) {
+        var regionValue = addressData && addressData.region,
+            sourceRegion = source && source.get ? source.get('shippingAddress.region') : null;
+
+        if (regionValue && typeof regionValue === 'object') {
+            regionValue = regionValue.region || regionValue.label || regionValue.regionCode || '';
+        }
+
+        if ((!regionValue || !regionValue.toString().trim().length) && sourceRegion) {
+            regionValue = sourceRegion;
+        }
+
+        if (regionValue && typeof regionValue === 'object') {
+            regionValue = regionValue.region || regionValue.label || regionValue.regionCode || '';
+        }
+
+        return (regionValue || '').toString().trim();
+    }
+
+    function getSourceValue(source, path) {
+        var value;
+
+        if (!source || typeof source.get !== 'function') {
+            return '';
+        }
+
+        value = source.get(path);
+
+        if (typeof value === 'function') {
+            try {
+                value = value();
+            } catch (e) {
+                value = '';
+            }
+        }
+
+        return extractAddressValue(value);
+    }
+
+    function resolveStreetFromSource(addressData, source) {
+        var streetData = addressData && addressData.street,
+            line0,
+            line1,
+            lines;
+
+        line0 = getSourceValue(source, 'shippingAddress.street.0');
+        line1 = getSourceValue(source, 'shippingAddress.street.1');
+
+        if ((line0 || line1)) {
+            return [line0, line1];
+        }
+
+        if (streetData && typeof streetData === 'object' && !Array.isArray(streetData)) {
+            line0 = extractAddressValue(streetData[0] || streetData['0']);
+            line1 = extractAddressValue(streetData[1] || streetData['1']);
+
+            if (line0 || line1) {
+                return [line0, line1];
+            }
+        }
+
+        lines = normalizeStreetLines(streetData);
+
+        return [lines[0] || '', lines[1] || ''];
+    }
+
+    function getStreetLineFromDom(formElement, index) {
+        var selectors = [
+                "input[name='street[" + index + "]']",
+                "input[name='street." + index + "']",
+                "input[name='shippingAddress.street." + index + "']",
+                "input[name$='street[" + index + "]']",
+                "input[name$='street." + index + "']"
+            ],
+            input,
+            selector = selectors.join(',');
+
+        if (formElement) {
+            input = $(formElement).find(selector);
+        }
+
+        if (!input || !input.length) {
+            input = $(selector);
+        }
+
+        if (!input.length) {
+            return '';
+        }
+
+        return extractAddressValue(input.first().val());
+    }
+
+    function resolveStreetFromDom(addressData, source, context) {
+        var formElement = context && context.popUpForm ? context.popUpForm.element : null,
+            line0 = getStreetLineFromDom(formElement, 0),
+            line1 = getStreetLineFromDom(formElement, 1),
+            sourceStreet = addressData && addressData.street,
+            sourceLines;
+
+        if (line0 || line1) {
+            return [line0, line1];
+        }
+
+        if (sourceStreet && Array.isArray(sourceStreet)) {
+            sourceLines = normalizeStreetLines(sourceStreet);
+            return [sourceLines[0] || '', sourceLines[1] || ''];
+        }
+
+        return resolveStreetFromSource(addressData, source);
     }
 
     return function (Target) {
