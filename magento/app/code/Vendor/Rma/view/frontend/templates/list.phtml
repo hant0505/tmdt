@@ -4,38 +4,43 @@ $rmaCollection = $block->getRmaCollection();
 ?>
 <div class="rma-list-container">
     <?php if ($rmaCollection && $rmaCollection->getSize()): ?>
-        <div class="table-wrapper">
-            <table class="data table table-rma-items" id="my-rma-table">
-                <caption class="table-caption"><?= $escaper->escapeHtml(__('My Return Requests')) ?></caption>
-                <thead>
-                    <tr>
-                        <th scope="col" class="col id"><?= $escaper->escapeHtml(__('RMA #')) ?></th>
-                        <th scope="col" class="col order"><?= $escaper->escapeHtml(__('Order ID')) ?></th>
-                        <th scope="col" class="col date"><?= $escaper->escapeHtml(__('Date')) ?></th>
-                        <th scope="col" class="col status"><?= $escaper->escapeHtml(__('Status')) ?></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <?php foreach ($rmaCollection as $rma): ?>
-                        <tr>
-                            <td data-th="<?= $escaper->escapeHtmlAttr(__('RMA #')) ?>" class="col id">
-                                <?= $escaper->escapeHtml($rma->getIncrementId()) ?>
-                            </td>
-                            <td data-th="<?= $escaper->escapeHtmlAttr(__('Order ID')) ?>" class="col order">
-                                <?= $escaper->escapeHtml($rma->getOrderId()) ?>
-                            </td>
-                            <td data-th="<?= $escaper->escapeHtmlAttr(__('Date')) ?>" class="col date">
-                                <?= $escaper->escapeHtml(date('Y-m-d', strtotime($rma->getCreatedAt()))) ?>
-                            </td>
-                            <td data-th="<?= $escaper->escapeHtmlAttr(__('Status')) ?>" class="col status">
-                                <?= $escaper->escapeHtml(ucfirst($rma->getStatus())) ?>
-                            </td>
-                        </tr>
-                    <?php endforeach; ?>
-                </tbody>
-            </table>
+        <div class="ttk-account-list ttk-rma-list">
+            <?php foreach ($rmaCollection as $rma): ?>
+                <?php
+                $statusLabel = ucfirst((string) $rma->getStatus());
+                $statusKey = strtolower(preg_replace('/[^a-z0-9]+/', '-', $statusLabel) ?: 'status');
+                ?>
+                <article class="ttk-account-row-card ttk-rma-card">
+                    <div class="ttk-account-row-card__main">
+                        <div>
+                            <span class="ttk-account-row-card__eyebrow"><?= $escaper->escapeHtml(__('RMA #')) ?></span>
+                            <strong class="ttk-account-row-card__title"><?= $escaper->escapeHtml($rma->getIncrementId()) ?></strong>
+                        </div>
+                        <span class="ttk-status-badge ttk-status-badge--<?= $escaper->escapeHtmlAttr($statusKey) ?>">
+                            <?= $escaper->escapeHtml($statusLabel) ?>
+                        </span>
+                    </div>
+                    <div class="ttk-account-row-card__meta">
+                        <div>
+                            <span><?= $escaper->escapeHtml(__('Order ID')) ?></span>
+                            <strong><?= $escaper->escapeHtml($rma->getOrderId()) ?></strong>
+                        </div>
+                        <div>
+                            <span><?= $escaper->escapeHtml(__('Date')) ?></span>
+                            <strong><?= $escaper->escapeHtml(date('Y-m-d', strtotime($rma->getCreatedAt()))) ?></strong>
+                        </div>
+                    </div>
+                </article>
+            <?php endforeach; ?>
         </div>
     <?php else: ?>
-        <div class="message info empty"><span><?= $escaper->escapeHtml(__('You have submitted no return requests.')) ?></span></div>
+        <div class="ttk-account-empty">
+            <div class="ttk-account-empty__illustration" aria-hidden="true">↩</div>
+            <h2><?= $escaper->escapeHtml(__('No return requests yet.')) ?></h2>
+            <p><?= $escaper->escapeHtml(__('You have submitted no return requests.')) ?></p>
+            <a class="ttk-account-empty__cta" href="<?= $block->escapeUrl($block->getUrl('')) ?>">
+                <?= $escaper->escapeHtml(__('Back to Shopping')) ?>
+            </a>
+        </div>
     <?php endif; ?>
 </div>

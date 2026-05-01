@@ -1,0 +1,97 @@
+<?php
+/**
+ * Quick search form with rich autocomplete rows.
+ *
+ * @var $block \Magento\Framework\View\Element\Template
+ * @var $escaper \Magento\Framework\Escaper
+ */
+
+/** @var $configProvider \Magento\Search\ViewModel\ConfigProvider */
+$configProvider = $block->getData('configProvider');
+/** @var $additionalSearchFormData \Magento\Search\ViewModel\AdditionalSearchFormData */
+$additionalSearchFormData = $block->getData('additionalSearchFormData');
+/** @var $helper \Magento\Search\Helper\Data */
+$helper = $configProvider->getSearchHelperData();
+$quickSearchUrl = $escaper->escapeUrl($helper->getSuggestUrl());
+$template = <<<'HTML'
+<li class="<%- data.row_class %> flex items-center gap-4 p-3 border-b border-gray-100 hover:bg-gray-50" id="qs-option-<%- data.index %>" role="option">
+    <% if (data.product_url) { %>
+        <a class="flex items-center gap-4 w-full min-w-0 no-underline" href="<%- data.product_url %>">
+    <% } %>
+            <% if (data.product_image) { %>
+                <span class="flex items-center justify-center w-12 h-12 flex-shrink-0 bg-white">
+                    <img class="w-12 h-12 object-contain" src="<%- data.product_image %>" alt="<%- data.title %>" loading="lazy"/>
+                </span>
+            <% } %>
+            <span class="flex flex-col min-w-0 flex-1">
+                <span class="qs-option-name text-sm font-medium text-gray-900 line-clamp-2"><%- data.title %></span>
+                <% if (data.final_price) { %>
+                    <span class="flex items-center gap-2">
+                        <span class="text-red-600 font-bold"><%- data.final_price %></span>
+                        <% if (data.has_discount || Number(data.regular_price_amount || 0) > Number(data.final_price_amount || 0)) { %>
+                            <span class="text-gray-400 text-xs line-through"><%- data.regular_price %></span>
+                        <% } %>
+                    </span>
+                <% } else if (data.num_results) { %>
+                    <span aria-hidden="true" class="amount"><%- data.num_results %></span>
+                <% } %>
+            </span>
+    <% if (data.product_url) { %>
+        </a>
+    <% } %>
+</li>
+HTML;
+$quickSearchConfig = [
+    'quickSearch' => [
+        'formSelector' => '#search_mini_form',
+        'url' => $quickSearchUrl,
+        'destinationSelector' => '#search_autocomplete',
+        'minSearchLength' => (string) $helper->getMinQueryLength(),
+        'template' => $template,
+    ],
+];
+?>
+<div class="block block-search">
+    <div class="block block-title"><strong><?= $escaper->escapeHtml(__('Search')) ?></strong></div>
+    <div class="block block-content">
+        <form class="form minisearch" id="search_mini_form"
+              action="<?= $escaper->escapeUrl($helper->getResultUrl()) ?>" method="get">
+            <?php if (!empty($queryParams = $additionalSearchFormData->getFormData())): ?>
+                <?php foreach ($queryParams as $param): ?>
+                    <input type="hidden" name="<?= $escaper->escapeHtmlAttr($param['name']) ?>"
+                           value="<?= $escaper->escapeHtmlAttr($param['value']) ?>"/>
+                <?php endforeach; ?>
+            <?php endif; ?>
+            <div class="field search">
+                <label class="label" for="search" data-role="minisearch-label">
+                    <span><?= $escaper->escapeHtml(__('Search')) ?></span>
+                </label>
+                <div class="control">
+                    <input id="search"
+                           data-mage-init='<?= $escaper->escapeHtmlAttr(json_encode($quickSearchConfig, JSON_UNESCAPED_SLASHES)) ?>'
+                           type="text"
+                           name="<?= $escaper->escapeHtmlAttr($helper->getQueryParamName()) ?>"
+                           value="<?= /* @noEscape */ $helper->getEscapedQueryText() ?>"
+                           placeholder="<?= $escaper->escapeHtmlAttr(__('Search entire store here...')) ?>"
+                           class="input-text"
+                           maxlength="<?= $escaper->escapeHtmlAttr($helper->getMaxQueryLength()) ?>"
+                           role="combobox"
+                           aria-haspopup="false"
+                           aria-autocomplete="both"
+                           autocomplete="off"
+                           aria-expanded="false"/>
+                    <div id="search_autocomplete" class="search-autocomplete"></div>
+                    <?= $block->getChildHtml() ?>
+                </div>
+            </div>
+            <div class="actions">
+                <button type="submit"
+                        title="<?= $escaper->escapeHtmlAttr(__('Search')) ?>"
+                        class="action search"
+                        aria-label="<?= $escaper->escapeHtmlAttr(__('Search')) ?>">
+                    <span><?= $escaper->escapeHtml(__('Search')) ?></span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

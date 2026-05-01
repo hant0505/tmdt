@@ -1,0 +1,432 @@
+<?php
+/**
+ * Modern wishlist page layout for OrangeTheme.
+ *
+ * @var \Magento\Wishlist\Block\Customer\Wishlist $block
+ */
+?>
+
+<?php if ($this->helper(\Magento\Wishlist\Helper\Data::class)->isAllow()) : ?>
+    <style>
+    body.wishlist-index-index .page-title-wrapper {
+        margin-bottom: 18px;
+    }
+
+    body.wishlist-index-index .page-title-wrapper .page-title,
+    body.wishlist-index-index .page-title-wrapper .base {
+        color: #0f172a;
+        font-size: clamp(28px, 3vw, 42px);
+        font-weight: 800;
+        letter-spacing: 0;
+        line-height: 1.1;
+    }
+
+    body.wishlist-index-index .wishlist-modern-shell {
+        margin-top: 10px;
+    }
+
+    body.wishlist-index-index .wishlist-modern-toolbar {
+        display: grid;
+        grid-template-columns: minmax(280px, 1fr) auto;
+        align-items: center;
+        justify-content: space-between;
+        gap: 24px;
+        margin: 0 0 18px;
+        padding: 20px 16px;
+        border: 1px solid #e5e7eb;
+        border-radius: 16px;
+        background: #ffffff;
+        box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+    }
+
+    body.wishlist-index-index .wishlist-modern-toolbar__copy {
+        min-width: 0;
+        max-width: 420px;
+    }
+
+    body.wishlist-index-index .wishlist-modern-toolbar__title {
+        margin: 0;
+        color: #111827;
+        font-size: 18px;
+        font-weight: 800;
+        line-height: 1.25;
+    }
+
+    body.wishlist-index-index .wishlist-modern-toolbar__subtitle {
+        margin: 6px 0 0;
+        color: #64748b;
+        font-size: 13px;
+        line-height: 1.5;
+    }
+
+    body.wishlist-index-index .wishlist-modern-toolbar .primary {
+        display: grid;
+        justify-content: flex-end;
+        gap: 12px;
+    }
+
+    body.wishlist-index-index .wishlist-modern-toolbar__actions {
+        display: grid;
+        justify-items: end;
+        gap: 12px;
+        flex: 0 0 auto;
+    }
+
+    body.wishlist-index-index .wishlist-modern-toolbar__actions > .primary,
+    body.wishlist-index-index .wishlist-modern-toolbar__actions > .secondary {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: flex-end !important;
+        flex-wrap: wrap !important;
+        gap: 10px !important;
+        margin: 0 !important;
+    }
+
+    body.wishlist-index-index .wishlist-modern-toolbar .action.tocart,
+    body.wishlist-index-index .wishlist-modern-toolbar [data-role="all-tocart"] {
+        min-height: 42px;
+        padding: 0 18px;
+        border: 1px solid #1d4ed8;
+        border-radius: 999px;
+        background: #2563eb;
+        color: #ffffff;
+        font-size: 14px;
+        font-weight: 800;
+        box-shadow: 0 10px 18px rgba(37, 99, 235, 0.18);
+    }
+
+    body.wishlist-index-index .wishlist-modern-toolbar .action.update,
+    body.wishlist-index-index .wishlist-modern-toolbar .action.share {
+        min-height: 40px;
+        padding: 0 14px;
+        border: 1px solid #dbe3ef;
+        border-radius: 999px;
+        background: #ffffff;
+        color: #1d4ed8;
+        font-size: 13px;
+        font-weight: 800;
+        box-shadow: none;
+    }
+
+    body.wishlist-index-index .wishlist-modern-bottom {
+        display: flex;
+        justify-content: space-between;
+        gap: 12px;
+        margin-top: 18px;
+    }
+
+    body.wishlist-index-index .wishlist-modern-empty {
+        display: grid;
+        justify-items: center;
+        gap: 10px;
+        padding: 46px 24px;
+        border: 1px dashed #cbd5e1;
+        border-radius: 18px;
+        background: linear-gradient(135deg, #f8fafc 0%, #eff6ff 100%);
+        text-align: center;
+        color: #64748b;
+    }
+
+    body.wishlist-index-index .wishlist-modern-empty strong {
+        color: #111827;
+        font-size: 20px;
+        font-weight: 800;
+    }
+
+    @media (max-width: 767px) {
+        body.wishlist-index-index .wishlist-modern-toolbar {
+            align-items: stretch;
+            grid-template-columns: 1fr;
+            gap: 18px;
+        }
+
+        body.wishlist-index-index .wishlist-modern-toolbar .primary {
+            justify-content: flex-start;
+        }
+
+        body.wishlist-index-index .wishlist-modern-toolbar__actions,
+        body.wishlist-index-index .wishlist-modern-toolbar__actions > .primary,
+        body.wishlist-index-index .wishlist-modern-toolbar__actions > .secondary {
+            justify-items: start;
+            justify-content: flex-start !important;
+        }
+    }
+
+    /* Pager control sizing and alignment */
+    body.wishlist-index-index .wishlist-modern-toolbar__pager {
+        display: flex;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 12px;
+        margin: 0;
+        position: relative;
+        z-index: 1;
+    }
+
+    body.wishlist-index-index .wishlist-modern-toolbar__pager .limiter {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin: 0 !important;
+        white-space: nowrap;
+    }
+
+    body.wishlist-index-index .wishlist-modern-toolbar__pager .limiter-label,
+    body.wishlist-index-index .wishlist-modern-toolbar__pager .limiter-text,
+    body.wishlist-index-index .wishlist-modern-toolbar__pager .toolbar-amount {
+        color: #0f172a !important;
+        font-size: 13px !important;
+        line-height: 1.2 !important;
+        white-space: nowrap !important;
+        margin: 0 !important;
+    }
+
+    body.wishlist-index-index .wishlist-modern-toolbar__pager .toolbar-amount {
+        min-width: 70px;
+        text-align: right;
+    }
+
+    body.wishlist-index-index .wishlist-modern-toolbar__pager select,
+    body.wishlist-index-index .wishlist-modern-toolbar__pager input[type="text"] {
+        height: 34px !important;
+        min-width: 56px !important;
+        width: auto !important;
+        padding: 6px 8px !important;
+        border-radius: 10px !important;
+        font-size: 13px !important;
+        box-shadow: none !important;
+        border: 1px solid #e5e7eb !important;
+        background: #ffffff !important;
+    }
+
+    /* Final toolbar layout: keep copy, pager, and actions in separate readable lanes. */
+    body.wishlist-index-index .wishlist-modern-toolbar {
+        grid-template-columns: 1fr !important;
+        align-items: stretch !important;
+        gap: 16px !important;
+    }
+
+    body.wishlist-index-index .wishlist-modern-toolbar__copy {
+        max-width: 560px !important;
+    }
+
+    body.wishlist-index-index .wishlist-modern-toolbar__actions {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        justify-items: stretch !important;
+        gap: 16px !important;
+        width: 100% !important;
+    }
+
+    body.wishlist-index-index .wishlist-modern-toolbar__pager {
+        flex: 0 0 auto !important;
+        justify-content: flex-start !important;
+    }
+
+    /* Hard normalize Magento pager markup so labels cannot touch each other. */
+    body.wishlist-index-index .wishlist-modern-toolbar__pager,
+    body.wishlist-index-index .wishlist-modern-toolbar__pager .pager,
+    body.wishlist-index-index .wishlist-modern-toolbar__pager .limiter {
+        display: flex !important;
+        align-items: center !important;
+        flex-wrap: nowrap !important;
+    }
+
+    body.wishlist-index-index .wishlist-modern-toolbar__pager {
+        gap: 18px !important;
+        min-width: 320px !important;
+    }
+
+    body.wishlist-index-index .wishlist-modern-toolbar__pager .toolbar-amount {
+        display: inline-flex !important;
+        align-items: center !important;
+        min-width: 82px !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        text-align: left !important;
+        white-space: nowrap !important;
+    }
+
+    body.wishlist-index-index .wishlist-modern-toolbar__pager .limiter {
+        gap: 10px !important;
+        margin: 0 !important;
+        white-space: nowrap !important;
+    }
+
+    body.wishlist-index-index .wishlist-modern-toolbar__pager .limiter-label,
+    body.wishlist-index-index .wishlist-modern-toolbar__pager .limiter-text {
+        display: inline-flex !important;
+        align-items: center !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        white-space: nowrap !important;
+    }
+
+    body.wishlist-index-index .wishlist-modern-toolbar__pager .limiter-options,
+    body.wishlist-index-index .wishlist-modern-toolbar__pager select {
+        width: 64px !important;
+        min-width: 64px !important;
+        height: 44px !important;
+        min-height: 44px !important;
+        padding: 0 14px !important;
+        border-radius: 12px !important;
+        line-height: 44px !important;
+        text-align: center !important;
+    }
+
+    body.wishlist-index-index .wishlist-modern-toolbar__actions > button,
+    body.wishlist-index-index .wishlist-modern-toolbar__actions > a,
+    body.wishlist-index-index .wishlist-modern-toolbar__actions > .action {
+        flex: 0 0 auto !important;
+    }
+
+    body.wishlist-index-index .wishlist-modern-toolbar__actions > .action.update {
+        margin-left: auto !important;
+    }
+
+    body.wishlist-index-index .wishlist-modern-controls {
+        position: relative !important;
+        z-index: 2 !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        gap: 18px !important;
+        width: 100% !important;
+        margin: 0 0 22px !important;
+        padding: 14px 16px !important;
+        border: 1px solid #e5e7eb !important;
+        border-radius: 14px !important;
+        background: #ffffff !important;
+        box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08) !important;
+        box-sizing: border-box !important;
+    }
+
+    body.wishlist-index-index .wishlist-modern-controls__buttons {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: flex-end !important;
+        flex-wrap: wrap !important;
+        gap: 10px !important;
+        margin: 0 !important;
+    }
+
+    body.wishlist-index-index .wishlist-modern-controls .action.tocart,
+    body.wishlist-index-index .wishlist-modern-controls [data-role="all-tocart"] {
+        min-height: 42px !important;
+        padding: 0 18px !important;
+        border: 1px solid #1d4ed8 !important;
+        border-radius: 999px !important;
+        background: #2563eb !important;
+        color: #ffffff !important;
+        font-size: 14px !important;
+        font-weight: 800 !important;
+        box-shadow: 0 10px 18px rgba(37, 99, 235, 0.18) !important;
+    }
+
+    body.wishlist-index-index .wishlist-modern-controls .action.update,
+    body.wishlist-index-index .wishlist-modern-controls .action.share {
+        min-height: 40px !important;
+        padding: 0 14px !important;
+        border: 1px solid #dbe3ef !important;
+        border-radius: 999px !important;
+        background: #ffffff !important;
+        color: #1d4ed8 !important;
+        font-size: 13px !important;
+        font-weight: 800 !important;
+        box-shadow: none !important;
+    }
+
+    @media (max-width: 900px) {
+        body.wishlist-index-index .wishlist-modern-toolbar__actions {
+            align-items: flex-start !important;
+            flex-direction: column !important;
+        }
+
+        body.wishlist-index-index .wishlist-modern-toolbar__actions > .action.update {
+            margin-left: 0 !important;
+        }
+
+        body.wishlist-index-index .wishlist-modern-controls {
+            align-items: flex-start !important;
+            flex-direction: column !important;
+        }
+
+        body.wishlist-index-index .wishlist-modern-controls__buttons {
+            justify-content: flex-start !important;
+        }
+
+        body.wishlist-index-index .wishlist-modern-toolbar__pager {
+            min-width: 0 !important;
+        }
+    }
+
+    @media (max-width: 480px) {
+        body.wishlist-index-index .wishlist-modern-toolbar__pager {
+            justify-content: flex-start;
+            margin-bottom: 12px;
+        }
+    }
+    </style>
+
+    <?= $block->getChildHtml('wishlist.rss.link') ?>
+    <form class="form-wishlist-items wishlist-modern-shell" id="wishlist-view-form"
+          data-mage-init='{"wishlist":{
+          "addToCartUrl":<?= /* @noEscape */ $block->getItemAddToCartParams("%item%") ?>,
+          "addAllToCartUrl":<?= /* @noEscape */ $block->getAddAllToCartParams() ?>,
+          "commentString":""},
+          "validation": {}}'
+          action="<?= $block->escapeUrl($block->getUrl('wishlist/index/update', ['wishlist_id' => $block->getWishlistInstance()->getId()])) ?>"
+          method="post">
+        <?= $block->getChildHtml('top') ?>
+        <?php if ($block->hasWishlistItems()) : ?>
+            <?= $block->getBlockHtml('formkey') ?>
+            <div class="wishlist-modern-toolbar bg-white rounded-2xl p-4 shadow-sm">
+                <div class="wishlist-modern-toolbar__copy">
+                    <p class="wishlist-modern-toolbar__title"><?= $block->escapeHtml(__('Saved products')) ?></p>
+                    <p class="wishlist-modern-toolbar__subtitle"><?= $block->escapeHtml(__('Review your favourites and move everything to cart when you are ready.')) ?></p>
+                </div>
+            </div>
+            <div class="wishlist-modern-controls bg-white rounded-xl shadow-sm">
+                <div class="wishlist-modern-toolbar__pager">
+                    <?= $block->getChildHtml('wishlist_item_pager'); ?>
+                </div>
+                <div class="primary wishlist-modern-controls__buttons">
+                    <?= $block->getChildHtml('control_buttons') ?>
+                </div>
+            </div>
+            <?php $block->getChildBlock('items')->setItems($block->getWishlistItems()); ?>
+            <?= $block->getChildHtml('items') ?>
+        <?php else : ?>
+        <div class="wishlist-modern-empty rounded-2xl">
+                <strong><?= $block->escapeHtml(__('Your wishlist is empty.')) ?></strong>
+                <span><?= $block->escapeHtml(__('Save products you love and come back when you are ready to buy.')) ?></span>
+            </div>
+        <?php endif ?>
+        <?= $block->getChildHtml('bottom') ?>
+        <div class="actions-toolbar wishlist-modern-bottom">
+            <div class="primary"></div>
+            <div class="secondary">
+                <a href="<?= $block->escapeUrl($block->getBackUrl()) ?>" class="action back">
+                    <span><?= $block->escapeHtml(__('Back')) ?></span>
+                </a>
+            </div>
+        </div>
+    </form>
+    <script id="form-tmpl" type="text/x-magento-template">
+      <form id="wishlist-hidden-form" method="post" action="<%- data.url %>" class="no-display">
+          <% if (data.qty) { %>
+          <input name="qty" value="<%- data.qty %>">
+          <% } %>
+
+          <% if (data.item) { %>
+          <input name="item" value="<%- data.item %>">
+          <% } %>
+
+          <% if (data.entity) { %>
+          <input name="entity" value="<%- data.entity %>">
+          <% } %>
+      </form>
+    </script>
+        <!-- Pager removed: duplicate pager removed to avoid duplicate 'Show per page' controls -->
+<?php endif ?>

@@ -516,3 +516,465 @@ body.customer-account .column.main .box-actions .action::after {
         border-radius: 12px;
     }
 }
+
+/* Match Magento's actual account dashboard body classes. */
+body.account.customer-account-index .column.main .block,
+.customer-account-index .column.main .block {
+    margin-bottom: 28px !important;
+}
+
+body.account.customer-account-index .column.main .block .block-title,
+.customer-account-index .column.main .block .block-title {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 16px !important;
+    margin: 0 0 16px !important;
+    padding: 0 !important;
+    border: 0 !important;
+}
+
+body.account.customer-account-index .column.main .block .block-title strong,
+.customer-account-index .column.main .block .block-title strong {
+    color: #111827 !important;
+    font-size: 22px !important;
+    font-weight: 750 !important;
+    line-height: 1.25 !important;
+}
+
+body.account.customer-account-index .column.main .block-dashboard-info .block-content,
+body.account.customer-account-index .column.main .block-dashboard-addresses .block-content,
+.customer-account-index .column.main .block-dashboard-info .block-content,
+.customer-account-index .column.main .block-dashboard-addresses .block-content {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 20px !important;
+}
+
+body.account.customer-account-index .column.main .block-dashboard-info .block-content::before,
+body.account.customer-account-index .column.main .block-dashboard-info .block-content::after,
+body.account.customer-account-index .column.main .block-dashboard-addresses .block-content::before,
+body.account.customer-account-index .column.main .block-dashboard-addresses .block-content::after,
+.customer-account-index .column.main .block-dashboard-info .block-content::before,
+.customer-account-index .column.main .block-dashboard-info .block-content::after,
+.customer-account-index .column.main .block-dashboard-addresses .block-content::before,
+.customer-account-index .column.main .block-dashboard-addresses .block-content::after {
+    display: none !important;
+    content: none !important;
+}
+
+body.account.customer-account-index .column.main .block .block-content > .box,
+body.account.customer-account-index .column.main .block-dashboard-addresses .box,
+body.account.customer-account-index .column.main .block-dashboard-info .box,
+.customer-account-index .column.main .block .block-content > .box,
+.customer-account-index .column.main .block-dashboard-addresses .box,
+.customer-account-index .column.main .block-dashboard-info .box {
+    display: flex !important;
+    min-height: 190px !important;
+    flex-direction: column !important;
+    width: auto !important;
+    border: 1px solid #e5e7eb !important;
+    border-radius: 12px !important;
+    background: #ffffff !important;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08) !important;
+    padding: 22px !important;
+}
+
+body.account.customer-account-index .column.main .box .box-title,
+.customer-account-index .column.main .box .box-title {
+    display: block !important;
+    margin: 0 0 14px !important;
+    padding-bottom: 12px !important;
+    border-bottom: 1px solid #f3f4f6 !important;
+}
+
+body.account.customer-account-index .column.main .box .box-content,
+.customer-account-index .column.main .box .box-content {
+    flex: 1 1 auto !important;
+}
+
+body.account.customer-account-index .column.main .box .box-content,
+body.account.customer-account-index .column.main .box .box-content p,
+body.account.customer-account-index .column.main .box .box-content address,
+.customer-account-index .column.main .box .box-content,
+.customer-account-index .column.main .box .box-content p,
+.customer-account-index .column.main .box .box-content address {
+    color: #4b5563 !important;
+    font-style: normal !important;
+    line-height: 1.75 !important;
+}
+
+body.account.customer-account-index .column.main .box-actions,
+.customer-account-index .column.main .box-actions {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    gap: 10px !important;
+    margin-top: 18px !important;
+}
+
+body.account.customer-account-index .column.main .block-title > .action,
+body.account.customer-account-index .column.main .box-actions .action,
+.customer-account-index .column.main .block-title > .action,
+.customer-account-index .column.main .box-actions .action {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-height: 36px !important;
+    padding: 0 14px !important;
+    border: 1px solid #bfdbfe !important;
+    border-radius: 8px !important;
+    background: #ffffff !important;
+    color: #1d4ed8 !important;
+    font-size: 13px !important;
+    font-weight: 700 !important;
+    line-height: 1 !important;
+    text-decoration: none !important;
+}
+
+body.account.customer-account-index .column.main .block-title > .action:hover,
+body.account.customer-account-index .column.main .block-title > .action:focus-visible,
+body.account.customer-account-index .column.main .box-actions .action:hover,
+body.account.customer-account-index .column.main .box-actions .action:focus-visible,
+.customer-account-index .column.main .block-title > .action:hover,
+.customer-account-index .column.main .block-title > .action:focus-visible,
+.customer-account-index .column.main .box-actions .action:hover,
+.customer-account-index .column.main .box-actions .action:focus-visible {
+    border-color: #93c5fd !important;
+    background: #eff6ff !important;
+    color: #1e40af !important;
+}
+
+@media (max-width: 1023px) {
+    body.account.customer-account-index .column.main .block-dashboard-info .block-content,
+    body.account.customer-account-index .column.main .block-dashboard-addresses .block-content,
+    .customer-account-index .column.main .block-dashboard-info .block-content,
+    .customer-account-index .column.main .block-dashboard-addresses .block-content {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+@media (max-width: 767px) {
+    body.account.customer-account-index .column.main .block .block-content > .box,
+    body.account.customer-account-index .column.main .block-dashboard-addresses .box,
+    body.account.customer-account-index .column.main .block-dashboard-info .box,
+    .customer-account-index .column.main .block .block-content > .box,
+    .customer-account-index .column.main .block-dashboard-addresses .box,
+    .customer-account-index .column.main .block-dashboard-info .box {
+        min-height: 0 !important;
+        padding: 18px !important;
+    }
+}
+
+/* Modern account dashboard polish */
+body.account,
+body.customer-account {
+    background: #f9fafb;
+    color: #111827;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+}
+
+body.account .page-main,
+body.customer-account .page-main {
+    padding-top: 32px;
+    padding-bottom: 48px;
+}
+
+body.account .columns,
+body.customer-account .columns {
+    align-items: flex-start;
+    gap: 32px;
+}
+
+body.account .page-title-wrapper,
+body.customer-account .page-title-wrapper {
+    margin-bottom: 24px;
+}
+
+body.account .page-title-wrapper .page-title,
+body.customer-account .page-title-wrapper .page-title {
+    color: #111827;
+    font-size: 34px;
+    font-weight: 750;
+    letter-spacing: 0;
+}
+
+body.account .sidebar .block,
+body.customer-account .sidebar .block {
+    border: 1px solid #e5e7eb !important;
+    border-radius: 12px !important;
+    background: #ffffff !important;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08) !important;
+}
+
+body.account .sidebar .block.account-nav,
+body.account .sidebar .block-collapsible-nav,
+body.customer-account .sidebar .block.account-nav,
+body.customer-account .sidebar .block-collapsible-nav {
+    padding: 10px !important;
+}
+
+body.account .sidebar .block > .title,
+body.customer-account .sidebar .block > .title {
+    display: block !important;
+    margin: 0 !important;
+    padding: 14px 14px 10px !important;
+    border: 0 !important;
+}
+
+body.account .sidebar .block > .title strong,
+body.customer-account .sidebar .block > .title strong {
+    color: #111827 !important;
+    font-size: 14px !important;
+    font-weight: 700 !important;
+    line-height: 1.3 !important;
+}
+
+body.account .sidebar .block.account-nav > .title strong,
+body.account .sidebar .block-collapsible-nav > .title strong,
+body.customer-account .sidebar .block.account-nav > .title strong,
+body.customer-account .sidebar .block-collapsible-nav > .title strong {
+    color: #6b7280 !important;
+    font-size: 12px !important;
+    letter-spacing: .08em !important;
+    text-transform: uppercase !important;
+}
+
+body.account .sidebar .block > .content,
+body.customer-account .sidebar .block > .content {
+    padding: 0 14px 14px !important;
+}
+
+body.account .sidebar .block.account-nav > .content,
+body.account .sidebar .block-collapsible-nav > .content,
+body.customer-account .sidebar .block.account-nav > .content,
+body.customer-account .sidebar .block-collapsible-nav > .content {
+    padding: 0 !important;
+}
+
+body.account .sidebar .nav.item a,
+body.account .sidebar .nav.item > strong,
+body.account .sidebar nav.account-nav .item a,
+body.account .sidebar nav.account-nav .item > strong,
+body.customer-account .sidebar .nav.item a,
+body.customer-account .sidebar .nav.item > strong,
+body.customer-account .sidebar nav.account-nav .item a,
+body.customer-account .sidebar nav.account-nav .item > strong {
+    min-height: 44px !important;
+    padding: 11px 14px 11px 16px !important;
+    border: 0 !important;
+    border-left: 3px solid transparent !important;
+    border-radius: 8px !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    color: #4b5563 !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    letter-spacing: 0 !important;
+    transform: none !important;
+    transition: background-color .18s ease, border-color .18s ease, color .18s ease !important;
+}
+
+body.account .sidebar .nav.item a:hover,
+body.account .sidebar .nav.item a:focus-visible,
+body.account .sidebar nav.account-nav .item a:hover,
+body.account .sidebar nav.account-nav .item a:focus-visible,
+body.customer-account .sidebar .nav.item a:hover,
+body.customer-account .sidebar .nav.item a:focus-visible,
+body.customer-account .sidebar nav.account-nav .item a:hover,
+body.customer-account .sidebar nav.account-nav .item a:focus-visible {
+    border-left-color: #93c5fd !important;
+    background: #eff6ff !important;
+    color: #1d4ed8 !important;
+    transform: none !important;
+}
+
+body.account .sidebar .nav.item.current > a,
+body.account .sidebar .nav.item.current > strong,
+body.account .sidebar nav.account-nav .item.current > a,
+body.account .sidebar nav.account-nav .item.current > strong,
+body.customer-account .sidebar .nav.item.current > a,
+body.customer-account .sidebar .nav.item.current > strong,
+body.customer-account .sidebar nav.account-nav .item.current > a,
+body.customer-account .sidebar nav.account-nav .item.current > strong {
+    border-left-color: #2563eb !important;
+    background: #dbeafe !important;
+    color: #1d4ed8 !important;
+    font-weight: 700 !important;
+    box-shadow: none !important;
+}
+
+body.account .sidebar .nav.item a::before,
+body.account .sidebar .nav.item > strong::before,
+body.account .sidebar nav.account-nav .item a::before,
+body.account .sidebar nav.account-nav .item > strong::before,
+body.customer-account .sidebar .nav.item a::before,
+body.customer-account .sidebar .nav.item > strong::before,
+body.customer-account .sidebar nav.account-nav .item a::before,
+body.customer-account .sidebar nav.account-nav .item > strong::before {
+    display: none !important;
+}
+
+body.account .sidebar-additional .block,
+body.customer-account .sidebar-additional .block {
+    margin-top: 18px;
+    padding: 0;
+}
+
+body.account .sidebar-additional,
+body.customer-account .sidebar-additional,
+body.customer-account-index .sidebar-additional {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+body.account .sidebar-additional .block,
+body.customer-account .sidebar-additional .block,
+body.customer-account-index .sidebar-additional .block {
+    margin: 0 !important;
+    padding: 16px !important;
+}
+
+body.account .sidebar-additional .block > .title,
+body.customer-account .sidebar-additional .block > .title,
+body.customer-account-index .sidebar-additional .block > .title {
+    margin: 0 0 10px !important;
+    padding: 0 0 10px !important;
+    border-bottom: 1px solid #eef2f7 !important;
+}
+
+body.account .sidebar-additional .block > .title strong,
+body.customer-account .sidebar-additional .block > .title strong,
+body.customer-account-index .sidebar-additional .block > .title strong {
+    display: block !important;
+    color: #111827 !important;
+    font-size: 15px !important;
+    font-weight: 800 !important;
+    line-height: 1.3 !important;
+}
+
+body.account .sidebar-additional .block > .content,
+body.customer-account .sidebar-additional .block > .content,
+body.customer-account-index .sidebar-additional .block > .content {
+    padding: 0 !important;
+}
+
+body.account .sidebar-additional .block .empty,
+body.account .sidebar-additional .block .subtitle,
+body.customer-account .sidebar-additional .block .empty,
+body.customer-account .sidebar-additional .block .subtitle,
+body.customer-account-index .sidebar-additional .block .empty,
+body.customer-account-index .sidebar-additional .block .subtitle {
+    margin: 0 !important;
+    color: #64748b !important;
+    font-size: 13px !important;
+    line-height: 1.6 !important;
+}
+
+body.customer-account .column.main .block {
+    margin-bottom: 28px;
+}
+
+body.customer-account .column.main .block .block-title {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin: 0 0 16px;
+}
+
+body.customer-account .column.main .block .block-title strong {
+    color: #111827;
+    font-size: 22px;
+    font-weight: 750;
+}
+
+body.customer-account .column.main .block-dashboard-info .block-content,
+body.customer-account .column.main .block-dashboard-addresses .block-content {
+    gap: 20px;
+}
+
+body.customer-account .column.main .block .block-content > .box,
+body.customer-account .column.main .block-dashboard-addresses .box,
+body.customer-account .column.main .block-dashboard-info .box {
+    display: flex;
+    min-height: 190px;
+    flex-direction: column;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    background: #ffffff;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, 0.08);
+    padding: 22px;
+}
+
+body.customer-account .column.main .box .box-title {
+    margin: 0 0 14px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #f3f4f6;
+}
+
+body.customer-account .column.main .box .box-content {
+    flex: 1 1 auto;
+}
+
+body.customer-account .column.main .box .box-content,
+body.customer-account .column.main .box .box-content p,
+body.customer-account .column.main .box .box-content address {
+    color: #4b5563;
+    font-style: normal;
+    line-height: 1.75;
+}
+
+body.customer-account .column.main .box .box-content p {
+    margin: 0;
+}
+
+body.customer-account .column.main .block-title > .action,
+body.customer-account .column.main .box-actions .action,
+body.customer-account .sidebar-additional .actions-toolbar .action {
+    min-height: 36px;
+    padding: 0 14px;
+    border: 1px solid #bfdbfe;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #1d4ed8;
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+body.customer-account .column.main .block-title > .action:hover,
+body.customer-account .column.main .block-title > .action:focus-visible,
+body.customer-account .column.main .box-actions .action:hover,
+body.customer-account .column.main .box-actions .action:focus-visible,
+body.customer-account .sidebar-additional .actions-toolbar .action:hover,
+body.customer-account .sidebar-additional .actions-toolbar .action:focus-visible {
+    border-color: #93c5fd;
+    background: #eff6ff;
+    color: #1e40af;
+}
+
+@media (max-width: 767px) {
+    body.account .page-main,
+    body.customer-account .page-main {
+        padding-top: 22px;
+        padding-bottom: 34px;
+    }
+
+    body.account .page-title-wrapper .page-title,
+    body.customer-account .page-title-wrapper .page-title {
+        font-size: 28px;
+    }
+
+    body.customer-account .column.main .block .block-title {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    body.customer-account .column.main .block .block-content > .box,
+    body.customer-account .column.main .block-dashboard-addresses .box,
+    body.customer-account .column.main .block-dashboard-info .box {
+        min-height: 0;
+        padding: 18px;
+    }
+}

@@ -873,6 +873,246 @@ body.customer-account-index {
     display: none;
 }
 
+/* Global product-card Add to Cart style, matching wishlist cards. */
+.products-grid .product-item .action.tocart.primary,
+.products-list .product-item .action.tocart.primary,
+.products-grid .product-item .actions-primary .tocart,
+.products-list .product-item .actions-primary .tocart,
+#tekntek-home-v2 .ttk-card-cart {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-height: 42px !important;
+    padding: 0 14px !important;
+    border: 1px solid #1d4ed8 !important;
+    border-radius: 12px !important;
+    background: #1d4ed8 !important;
+    color: #ffffff !important;
+    font-size: 14px !important;
+    font-weight: 800 !important;
+    line-height: 1 !important;
+    white-space: nowrap !important;
+    box-shadow: 0 10px 18px rgba(37, 99, 235, 0.18) !important;
+    transition: background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease !important;
+}
+
+.products-grid .product-item .action.tocart.primary::before,
+.products-list .product-item .action.tocart.primary::before,
+.products-grid .product-item .actions-primary .tocart::before,
+.products-list .product-item .actions-primary .tocart::before,
+#tekntek-home-v2 .ttk-card-cart::before {
+    content: "" !important;
+    width: 15px !important;
+    height: 15px !important;
+    margin-right: 8px !important;
+    background: currentColor !important;
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='8' cy='21' r='1'/%3E%3Ccircle cx='19' cy='21' r='1'/%3E%3Cpath d='M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h8.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12'/%3E%3C/svg%3E") center / contain no-repeat !important;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='8' cy='21' r='1'/%3E%3Ccircle cx='19' cy='21' r='1'/%3E%3Cpath d='M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h8.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12'/%3E%3C/svg%3E") center / contain no-repeat !important;
+}
+
+.products-grid .product-item .action.tocart.primary:hover,
+.products-grid .product-item .action.tocart.primary:focus,
+.products-list .product-item .action.tocart.primary:hover,
+.products-list .product-item .action.tocart.primary:focus,
+.products-grid .product-item .actions-primary .tocart:hover,
+.products-grid .product-item .actions-primary .tocart:focus,
+.products-list .product-item .actions-primary .tocart:hover,
+.products-list .product-item .actions-primary .tocart:focus,
+#tekntek-home-v2 .ttk-card-cart:hover,
+#tekntek-home-v2 .ttk-card-cart:focus {
+    background: #1d4ed8 !important;
+    border-color: #1e40af !important;
+    box-shadow: 0 14px 22px rgba(37, 99, 235, 0.22) !important;
+    transform: translateY(-1px) !important;
+}
+
+// Modern category/search listing cards.
+.catalog-category-view,
+.catalogsearch-result-index {
+    .products-grid,
+    .products-list {
+        .product-item-info {
+            position: relative;
+            overflow: hidden;
+            border-radius: 12px;
+            transition: box-shadow 180ms ease, transform 180ms ease, border-color 180ms ease;
+
+            &:hover,
+            &:focus-within {
+                transform: translateY(-2px);
+                box-shadow: 0 16px 34px rgba(15, 23, 42, 0.12);
+            }
+        }
+
+        .product-item-photo {
+            position: relative;
+            display: block;
+        }
+
+        .product-item-name,
+        .product-item-link {
+            display: -webkit-box;
+            min-height: 40px;
+            overflow: hidden;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 2;
+            line-height: 20px;
+            text-overflow: ellipsis;
+        }
+
+        .product-item-inner,
+        .product-item-actions,
+        .actions-primary {
+            width: 100%;
+        }
+
+        .product-item-inner {
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(8px);
+            transition: opacity 180ms ease, transform 180ms ease, visibility 180ms ease;
+        }
+
+        .product-item-info:hover .product-item-inner,
+        .product-item-info:focus-within .product-item-inner {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .product-reviews-summary.empty {
+            display: block;
+            margin: 8px 0 4px;
+        }
+
+        .product-reviews-summary.empty .rating-result::before {
+            color: #d1d5db;
+        }
+    }
+
+    .tekntek-product-badges {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        z-index: 3;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        pointer-events: none;
+    }
+
+    .tekntek-product-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 22px;
+        padding: 0 9px;
+        border-radius: 999px;
+        color: #ffffff;
+        font-size: 11px;
+        font-weight: 800;
+        line-height: 1;
+        box-shadow: 0 8px 18px rgba(15, 23, 42, 0.12);
+    }
+
+    .tekntek-product-badge--new {
+        background: #0f766e;
+    }
+
+    .tekntek-product-badge--sale {
+        background: #dc2626;
+    }
+
+    .sidebar.sidebar-main {
+        .block,
+        .filter {
+            border-radius: 14px;
+            background: #ffffff;
+            box-shadow: 0 10px 28px rgba(15, 23, 42, 0.08);
+        }
+
+        .filter-options-content a {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            min-height: 34px;
+            padding: 7px 10px 7px 34px;
+            border-radius: 10px;
+            color: #334155;
+            font-weight: 600;
+            text-decoration: none;
+            transition: background-color 160ms ease, color 160ms ease;
+
+            &::before {
+                content: "";
+                position: absolute;
+                left: 10px;
+                width: 15px;
+                height: 15px;
+                border: 1px solid #cbd5e1;
+                border-radius: 4px;
+                background: #ffffff;
+                box-shadow: inset 0 0 0 2px #ffffff;
+            }
+
+            &:hover,
+            &:focus {
+                background: #f0f4f8;
+                color: #0056b3;
+
+                &::before {
+                    border-color: #0056b3;
+                    background: #0056b3;
+                }
+            }
+        }
+
+        [data-role="tekntek-wishlist-sidebar"].ttk-is-empty,
+        .block-wishlist.empty {
+            display: none;
+        }
+    }
+}
+
+.catalogsearch-result-index {
+    .tekntek-search-heading .page-title {
+        margin: 0 0 18px;
+        color: #0f172a;
+        font-size: 28px;
+        font-weight: 700;
+
+        strong {
+            color: #0056b3;
+            font-weight: 800;
+        }
+    }
+
+    .tekntek-search-suggestions,
+    .message.notice {
+        a,
+        .tekntek-search-suggestion a {
+            display: inline-flex;
+            align-items: center;
+            margin: 4px 6px 4px 0;
+            padding: 5px 12px;
+            border-radius: 20px;
+            background: #f0f4f8;
+            color: #0056b3;
+            font-weight: 700;
+            text-decoration: none;
+            transition: background-color 160ms ease, color 160ms ease, box-shadow 160ms ease;
+
+            &:hover,
+            &:focus {
+                background: #dbeafe;
+                color: #003f88;
+                box-shadow: 0 8px 18px rgba(0, 86, 179, 0.14);
+            }
+        }
+    }
+}
+
 @media (max-width: 1023px) {
     .customer-account-index .columns {
         gap: 18px;
