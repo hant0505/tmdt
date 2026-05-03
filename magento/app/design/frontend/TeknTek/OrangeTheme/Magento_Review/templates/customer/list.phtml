@@ -1,0 +1,217 @@
+<?php
+/**
+ * Customer product reviews list.
+ *
+ * @var \Magento\Review\Block\Customer\ListCustomer $block
+ * @var \Magento\Framework\Escaper $escaper
+ * @var \Magento\Framework\View\Helper\SecureHtmlRenderer $secureRenderer
+ */
+
+$reviewHelper = $block->getData('reviewHelper');
+$reviews = $block->getReviews();
+$ratingPercentByReview = [];
+$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+$resource = $objectManager->get(\Magento\Framework\App\ResourceConnection::class);
+$connection = $resource->getConnection();
+$productRepository = $objectManager->get(\Magento\Catalog\Api\ProductRepositoryInterface::class);
+$storeManager = $objectManager->get(\Magento\Store\Model\StoreManagerInterface::class);
+$imageHelper = $objectManager->get(\Magento\Catalog\Helper\Image::class);
+$formKey = $objectManager->get(\Magento\Framework\Data\Form\FormKey::class)->getFormKey();
+$storeId = (int) $storeManager->getStore()->getId();
+$deleteReviewUrl = $block->getUrl('tekntek_suggest/review/delete', ['_secure' => $block->getRequest()->isSecure()]);
+
+$getReviewId = static function ($review): int {
+    return (int) ($review->getReviewId() ?: $review->getId());
+};
+
+$getProductImageUrl = static function ($review) use ($productRepository, $imageHelper, $storeId): string {
+    try {
+        $productId = (int) $review->getEntityPkValue();
+        if ($productId <= 0) {
+            return (string) $imageHelper->getDefaultPlaceholderUrl('small_image');
+        }
+
+        $product = $productRepository->getById($productId, false, $storeId);
+        $smallImage = (string) $product->getSmallImage();
+        if ($smallImage === '' || $smallImage === 'no_selection') {
+            return (string) $imageHelper->getDefaultPlaceholderUrl('small_image');
+        }
+
+        return (string) $imageHelper->init($product, 'product_small_image')->resize(160)->getUrl();
+    } catch (\Throwable $exception) {
+        return (string) $imageHelper->getDefaultPlaceholderUrl('small_image');
+    }
+};
+
+if ($reviews && count($reviews)) {
+    $reviewIds = [];
+    foreach ($reviews as $review) {
+        $reviewId = $getReviewId($review);
+        if ($reviewId > 0) {
+            $reviewIds[] = $reviewId;
+        }
+    }
+
+    if ($reviewIds) {
+        $select = $connection->select()
+            ->from($resource->getTableName('rating_option_vote'), [
+                'review_id',
+                'percent' => new \Zend_Db_Expr('ROUND(AVG(percent))')
+            ])
+            ->where('review_id IN (?)', $reviewIds)
+            ->group('review_id');
+
+        foreach ($connection->fetchAll($select) as $ratingRow) {
+            $ratingPercentByReview[(int) $ratingRow['review_id']] = (int) $ratingRow['percent'];
+        }
+    }
+}
+?>
+<?php if ($reviews && count($reviews)): ?>
+    <div class="table-wrapper reviews ttk-review-table-wrapper">
+        <table class="data table table-reviews ttk-review-table" id="my-reviews-table">
+            <caption class="table-caption"><?= $escaper->escapeHtml(__('Product Reviews')) ?></caption>
+            <thead>
+                <tr>
+                    <th scope="col" class="col media"><?= $escaper->escapeHtml(__('Product')) ?></th>
+                    <th scope="col" class="col date"><?= $escaper->escapeHtml(__('Created')) ?></th>
+                    <th scope="col" class="col item"><?= $escaper->escapeHtml(__('Product Name')) ?></th>
+                    <th scope="col" class="col summary"><?= $escaper->escapeHtml(__('Rating')) ?></th>
+                    <th scope="col" class="col description"><?= $escaper->escapeHtml(__('Review')) ?></th>
+                    <th scope="col" class="col actions"><?= $escaper->escapeHtml(__('Actions')) ?></th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($reviews as $review): ?>
+                    <?php
+                    $reviewId = $getReviewId($review);
+                    $ratingPercent = $ratingPercentByReview[$reviewId] ?? 0;
+                    if ((int) $review->getCount() > 0) {
+                        $ratingPercent = (int) round((int) $review->getSum() / (int) $review->getCount());
+                    }
+                    $ratingStars = max(0, min(5, (int) round($ratingPercent / 20)));
+                    $productImageUrl = $getProductImageUrl($review);
+                    ?>
+                    <tr>
+                        <td data-th="<?= $escaper->escapeHtmlAttr(__('Product')) ?>" class="col media">
+                            <a class="ttk-review-product-thumb" href="<?= $escaper->escapeUrl($block->getProductUrl($review)) ?>">
+                                <img src="<?= $escaper->escapeUrl($productImageUrl) ?>"
+                                     alt="<?= $escaper->escapeHtmlAttr($review->getName()) ?>"
+                                     loading="lazy" />
+                            </a>
+                        </td>
+                        <td data-th="<?= $escaper->escapeHtmlAttr(__('Created')) ?>" class="col date">
+                            <?= $escaper->escapeHtml($block->dateFormat($review->getReviewCreatedAt())) ?>
+                        </td>
+                        <td data-th="<?= $escaper->escapeHtmlAttr(__('Product Name')) ?>" class="col item">
+                            <strong class="product-name">
+                                <a class="product-name-link" href="<?= $escaper->escapeUrl($block->getProductUrl($review)) ?>">
+                                    <?= $escaper->escapeHtml($review->getName()) ?>
+                                </a>
+                            </strong>
+                        </td>
+                        <td data-th="<?= $escaper->escapeHtmlAttr(__('Rating')) ?>" class="col summary">
+                            <div class="ttk-review-stars" aria-label="<?= $escaper->escapeHtmlAttr(__('%1 out of 5 stars', $ratingStars)) ?>">
+                                <?php for ($star = 1; $star <= 5; $star++): ?>
+                                    <span class="<?= $star <= $ratingStars ? 'is-active' : '' ?>" aria-hidden="true">★</span>
+                                <?php endfor; ?>
+                                <span class="ttk-review-stars__text"><?= $escaper->escapeHtml(__('%1/5', $ratingStars)) ?></span>
+                            </div>
+                        </td>
+                        <td data-th="<?= $escaper->escapeHtmlAttr(__('Review')) ?>" class="col description">
+                            <span class="ttk-review-detail"><?= /* @noEscape */ $reviewHelper->getDetailHtml($review->getDetail()) ?></span>
+                        </td>
+                        <td data-th="<?= $escaper->escapeHtmlAttr(__('Actions')) ?>" class="col actions">
+                            <button type="button"
+                                    class="action delete ttk-delete-review"
+                                    data-review-id="<?= (int) $reviewId ?>">
+                                <span><?= $escaper->escapeHtml(__('Delete')) ?></span>
+                            </button>
+                        </td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+    <?php
+    $deleteFormKeyJs = $escaper->escapeJs($formKey);
+    $deleteReviewUrlJs = $escaper->escapeJs($deleteReviewUrl);
+    $deleteScript = <<<JS
+(function () {
+    var table = document.getElementById('my-reviews-table');
+    if (!table) {
+        return;
+    }
+
+    table.addEventListener('click', function (event) {
+        var button = event.target.closest('.ttk-delete-review');
+        if (!button) {
+            return;
+        }
+
+        var reviewId = button.getAttribute('data-review-id');
+        if (!reviewId || !confirm('Delete this review? This action cannot be undone.')) {
+            return;
+        }
+
+        button.disabled = true;
+
+        var body = new URLSearchParams();
+        body.append('form_key', '{$deleteFormKeyJs}');
+        body.append('review_id', reviewId);
+
+        fetch('{$deleteReviewUrlJs}', {
+            method: 'POST',
+            credentials: 'same-origin',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: body.toString()
+        }).then(function (response) {
+            return response.json().then(function (data) {
+                if (!response.ok || !data.success) {
+                    var error = new Error(data.message || 'Delete failed');
+                    error.payload = data;
+                    throw error;
+                }
+                return data;
+            });
+        }).then(function () {
+            var row = button.closest('tr');
+            if (row) {
+                row.remove();
+            }
+            if (!table.querySelector('tbody tr')) {
+                window.location.reload();
+            }
+        }).catch(function (error) {
+            var payload = error && error.payload ? error.payload : {};
+            if (payload.login_url) {
+                window.location.href = payload.login_url;
+                return;
+            }
+            alert(payload.message || error.message || 'Delete failed');
+        }).finally(function () {
+            button.disabled = false;
+        });
+    });
+})();
+JS;
+    ?>
+    <?= /* @noEscape */ $secureRenderer->renderTag('script', [], $deleteScript, false) ?>
+    <?php if ($block->getToolbarHtml()): ?>
+        <div class="toolbar products-reviews-toolbar bottom">
+            <?= $block->getToolbarHtml() ?>
+        </div>
+    <?php endif; ?>
+<?php else: ?>
+    <div class="message info empty"><span><?= $escaper->escapeHtml(__('You have submitted no reviews.')) ?></span></div>
+<?php endif; ?>
+<div class="actions-toolbar">
+    <div class="secondary">
+        <a class="action back" href="<?= $escaper->escapeUrl($block->getBackUrl()) ?>">
+            <span><?= $escaper->escapeHtml(__('Back')) ?></span>
+        </a>
+    </div>
+</div>

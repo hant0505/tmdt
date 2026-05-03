@@ -15,8 +15,10 @@ $outputHelper = $om->get(\Magento\Catalog\Helper\Output::class);
 $priceHelper = $om->get(\Magento\Framework\Pricing\Helper\Data::class);
 $storeManager = $om->get(\Magento\Store\Model\StoreManagerInterface::class);
 $reviewFactory = $om->get(\Magento\Review\Model\ReviewFactory::class);
+$ratingFactory = $om->get(\Magento\Review\Model\RatingFactory::class);
 $formKey = $om->get(\Magento\Framework\Data\Form\FormKey::class)->getFormKey();
 $urlEncoder = $om->get(\Magento\Framework\Url\EncoderInterface::class);
+$customerSession = $om->get(\Magento\Customer\Model\Session::class);
 
 $name = (string) $product->getName();
 $shortDesc = trim((string) $product->getShortDescription());
@@ -37,11 +39,46 @@ $wishlistUrl = $block->getUrl('wishlist/index/add', ['product' => (int) $product
 $compareIndexUrl = $block->getUrl('catalog/product_compare/index');
 $compareAddBaseUrl = $block->getUrl('catalog/product_compare/add');
 $compareClearUrl = $block->getUrl('catalog/product_compare/clear');
-$httpContext = $om->get(\Magento\Framework\App\Http\Context::class);
-$isLoggedIn = (bool) $httpContext->getValue(\Magento\Customer\Model\Context::CONTEXT_AUTH);
+$isLoggedIn = (bool) $customerSession->isLoggedIn();
+$currentCustomerId = $isLoggedIn ? (int) $customerSession->getCustomerId() : 0;
+$reviewNickname = 'Customer';
 $currentUrl = $block->getUrl('*/*/*', ['_current' => true, '_use_rewrite' => true]);
 $loginUrl = $block->getUrl('customer/account/login', ['referer' => base64_encode($currentUrl)]);
 $wishlistUenc = $urlEncoder->encode($currentUrl);
+$reviewPostUrl = $block->getUrl('review/product/post', [
+    '_secure' => $block->getRequest()->isSecure(),
+    'id' => (int) $product->getId(),
+]);
+$reviewAjaxUrl = $block->getUrl('tekntek_suggest/review/submit', ['_secure' => $block->getRequest()->isSecure()]);
+$reviewVoteUrl = $block->getUrl('tekntek_suggest/review/vote', ['_secure' => $block->getRequest()->isSecure()]);
+$reviewDeleteUrl = $block->getUrl('tekntek_suggest/review/delete', ['_secure' => $block->getRequest()->isSecure()]);
+
+$reviewRatingOptions = [];
+$ratings = $ratingFactory->create()->getResourceCollection()
+    ->addEntityFilter('product')
+    ->setPositionOrder()
+    ->addRatingPerStoreName((int) $storeManager->getStore()->getId())
+    ->setStoreFilter((int) $storeManager->getStore()->getId())
+    ->setActiveFilter(true)
+    ->load()
+    ->addOptionToItems();
+
+if (!$ratings->getSize()) {
+    $ratings = $ratingFactory->create()->getResourceCollection()
+        ->addEntityFilter('product')
+        ->setPositionOrder()
+        ->setActiveFilter(true)
+        ->load()
+        ->addOptionToItems();
+}
+
+foreach ($ratings as $rating) {
+    $ratingId = (int) $rating->getId();
+    $reviewRatingOptions[$ratingId] = [];
+    foreach ($rating->getOptions() as $option) {
+        $reviewRatingOptions[$ratingId][(int) $option->getValue()] = (int) $option->getId();
+    }
+}
 
 $reviewFactory->create()->getEntitySummary($product, (int) $storeManager->getStore()->getId());
 $reviewsCountRaw = $product->getReviewsCount();
@@ -553,71 +590,114 @@ if (empty($accessoryData)) {
     ];
 }
 
-$reviewData = [
-    [
-        'stars' => 5,
-        'date' => '12/04/2026',
-        'user' => 'Nguyen A',
-        'title' => 'Amazing performance for work and study',
-        'content' => 'Runs smooth with many browser tabs and office apps. Battery is good and fan noise is low.',
-        'pros' => ['Fast startup', 'Good keyboard'],
-        'cons' => ['Speaker could be louder'],
-        'up' => 12,
-        'down' => 1
-    ],
-    [
-        'stars' => 4,
-        'date' => '11/04/2026',
-        'user' => 'Tran B',
-        'title' => 'Great value with solid build quality',
-        'content' => 'Display is clear and bright. Compact charger and easy to carry all day.',
-        'pros' => ['Lightweight', 'Nice screen'],
-        'cons' => ['More ports would be better'],
-        'up' => 8,
-        'down' => 0
-    ],
-    [
-        'stars' => 5,
-        'date' => '10/04/2026',
-        'user' => 'Le C',
-        'title' => 'Battery life is exactly what I needed',
-        'content' => 'I can use it through a full workday without charging. Thermals are stable.',
-        'pros' => ['Long battery', 'Cool temperature'],
-        'cons' => ['Webcam quality average'],
-        'up' => 6,
-        'down' => 0
-    ],
-    [
-        'stars' => 3,
-        'date' => '09/04/2026',
-        'user' => 'Pham D',
-        'title' => 'Good for basics, not for heavy editing',
-        'content' => 'For office work it is fine, but video exporting is slower than expected.',
-        'pros' => ['Decent battery', 'Good value'],
-        'cons' => ['Average performance under heavy load'],
-        'up' => 4,
-        'down' => 2
-    ],
-    [
-        'stars' => 4,
-        'date' => '08/04/2026',
-        'user' => 'Hoang E',
-        'title' => 'Comfortable keyboard and stable wifi',
-        'content' => 'Typing feels comfortable and connection is stable for meetings.',
-        'pros' => ['Comfortable keyboard'],
-        'cons' => ['Trackpad is just okay'],
-        'up' => 5,
-        'down' => 0
-    ]
-];
+$reviewData = [];
+$resource = $om->get(\Magento\Framework\App\ResourceConnection::class);
+$connection = $resource->getConnection();
+$reviewCollectionFactory = $om->get(\Magento\Review\Model\ResourceModel\Review\Product\CollectionFactory::class);
+$reviewCollection = $reviewCollectionFactory->create()
+    ->addEntityFilter((int) $product->getId())
+    ->setDateOrder('DESC')
+    ->setPageSize(12)
+    ->setCurPage(1);
+$reviewCollection->load();
 
-if ($ratingCount === 0 && !empty($reviewData)) {
+$reviewIds = [];
+foreach ($reviewCollection as $reviewItem) {
+    $reviewId = (int) ($reviewItem->getReviewId() ?: $reviewItem->getId());
+    if ($reviewId > 0) {
+        $reviewIds[] = $reviewId;
+    }
+}
+
+$ratingPercentByReview = [];
+$helpfulByReview = [];
+$notHelpfulByReview = [];
+$customerVoteByReview = [];
+$reviewOwnerByReview = [];
+if ($reviewIds) {
+    $select = $connection->select()
+        ->from($resource->getTableName('rating_option_vote'), [
+            'review_id',
+            'percent' => new \Zend_Db_Expr('ROUND(AVG(percent))')
+        ])
+        ->where('review_id IN (?)', $reviewIds)
+        ->group('review_id');
+
+    foreach ($connection->fetchAll($select) as $ratingRow) {
+        $ratingPercentByReview[(int) $ratingRow['review_id']] = (int) $ratingRow['percent'];
+    }
+
+    $ownerSelect = $connection->select()
+        ->from($resource->getTableName('review_detail'), ['review_id', 'customer_id'])
+        ->where('review_id IN (?)', $reviewIds);
+
+    foreach ($connection->fetchAll($ownerSelect) as $ownerRow) {
+        $reviewOwnerByReview[(int) $ownerRow['review_id']] = (int) $ownerRow['customer_id'];
+    }
+
+    $helpfulnessTable = $resource->getTableName('tekntek_review_helpfulness');
+    if ($connection->isTableExists($helpfulnessTable)) {
+        $voteSelect = $connection->select()
+            ->from($helpfulnessTable, [
+                'review_id',
+                'helpful_count' => new \Zend_Db_Expr('SUM(CASE WHEN vote_type = 1 THEN 1 ELSE 0 END)'),
+                'not_helpful_count' => new \Zend_Db_Expr('SUM(CASE WHEN vote_type = -1 THEN 1 ELSE 0 END)')
+            ])
+            ->where('review_id IN (?)', $reviewIds)
+            ->group('review_id');
+
+        foreach ($connection->fetchAll($voteSelect) as $voteRow) {
+            $reviewId = (int) $voteRow['review_id'];
+            $helpfulByReview[$reviewId] = (int) $voteRow['helpful_count'];
+            $notHelpfulByReview[$reviewId] = (int) $voteRow['not_helpful_count'];
+        }
+
+        if ($currentCustomerId > 0) {
+            $customerVoteSelect = $connection->select()
+                ->from($helpfulnessTable, ['review_id', 'vote_type'])
+                ->where('review_id IN (?)', $reviewIds)
+                ->where('customer_id = ?', $currentCustomerId);
+
+            foreach ($connection->fetchAll($customerVoteSelect) as $voteRow) {
+                $customerVoteByReview[(int) $voteRow['review_id']] = (int) $voteRow['vote_type'] === 1 ? 'up' : 'down';
+            }
+        }
+    }
+}
+
+foreach ($reviewCollection as $reviewItem) {
+    $reviewId = (int) ($reviewItem->getReviewId() ?: $reviewItem->getId());
+    $ratingPercent = $ratingPercentByReview[$reviewId] ?? 0;
+    $stars = $ratingPercent > 0 ? max(1, min(5, (int) round($ratingPercent / 20))) : 0;
+
+    $reviewData[] = [
+        'stars' => $stars,
+        'date' => date('d/m/Y', strtotime((string) $reviewItem->getReviewCreatedAt())),
+        'user' => (string) ($reviewItem->getNickname() ?: __('Customer')),
+        'title' => (string) $reviewItem->getTitle(),
+        'content' => (string) $reviewItem->getDetail(),
+        'pros' => [],
+        'cons' => [],
+        'id' => $reviewId,
+        'up' => $helpfulByReview[$reviewId] ?? 0,
+        'down' => $notHelpfulByReview[$reviewId] ?? 0,
+        'user_vote' => $customerVoteByReview[$reviewId] ?? '',
+        'can_delete' => $currentCustomerId > 0 && ($reviewOwnerByReview[$reviewId] ?? 0) === $currentCustomerId
+    ];
+}
+
+if (!empty($reviewData)) {
     $ratingCount = count($reviewData);
     $ratingTotal = 0;
+    $ratedCount = 0;
     foreach ($reviewData as $reviewItem) {
-        $ratingTotal += max(0, min(5, (int) ($reviewItem['stars'] ?? 0)));
+        $reviewStars = max(0, min(5, (int) ($reviewItem['stars'] ?? 0)));
+        if ($reviewStars > 0) {
+            $ratingTotal += $reviewStars;
+            $ratedCount++;
+        }
     }
-    $ratingValue = $ratingCount > 0 ? (int) round($ratingTotal / $ratingCount) : 0;
+    $ratingValue = $ratedCount > 0 ? (int) round($ratingTotal / $ratedCount) : 0;
 }
 
 $compareSeed = [];
@@ -632,11 +712,18 @@ $mainCompareItem = [
 ?>
 
 <style>
+.tekntek-pdp-wrap,
+.tekntek-pdp-wrap button,
+.tekntek-pdp-wrap input,
+.tekntek-pdp-wrap textarea,
+.tekntek-pdp-wrap select { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; }
 .tekntek-pdp-wrap { width: min(1240px, calc(100vw - 32px)); margin: 20px auto 110px; color: #121212; }
 .tekntek-hero { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
 .tekntek-buy h1 { margin: 0; font-size: 34px; line-height: 1.2; font-weight: 800; }
 .tekntek-rating { margin-top: 10px; display: inline-flex; align-items: center; gap: 10px; font-size: 14px; }
-.tekntek-rating-stars { color: #111; letter-spacing: 1px; }
+.tekntek-rating-stars { letter-spacing: 1px; white-space: nowrap; }
+.tekntek-rating-stars .is-active { color: #ffc107; }
+.tekntek-rating-stars .is-empty { color: #d1d5db; }
 .tekntek-price { margin-top: 18px; display: flex; align-items: baseline; gap: 10px; }
 .tekntek-price-old { color: #9ca3af; text-decoration: line-through; font-size: 14px; }
 .tekntek-price-new { color: #dc2626; font-size: 34px; font-weight: 800; }
@@ -722,7 +809,9 @@ $mainCompareItem = [
 .tekntek-review-form-actions { display: flex; gap: 8px; }
 .tekntek-review-item { border: 1px solid #e5e7eb; border-radius: 10px; padding: 12px; margin-bottom: 10px; font-size: 12px; }
 .tekntek-review-meta { color: #6b7280; margin: 4px 0 8px; }
-.tekntek-review-vote { text-align: right; color: #1f5fbf; font-size: 12px; }
+.tekntek-review-vote { display: flex; justify-content: flex-end; gap: 10px; color: #1f5fbf; font-size: 12px; }
+.tekntek-vote-btn[disabled] { color: #64748b; cursor: default; font-weight: 700; }
+.tekntek-delete-review { border: 0; background: transparent; color: #dc2626; cursor: pointer; font-size: 12px; font-weight: 700; }
 .tekntek-review-more-wrap { text-align: center; margin-top: 6px; }
 .tekntek-btn-view-more { height: 34px; padding: 0 14px; border: 1px solid #1f5fbf; border-radius: 6px; background: #fff; color: #1f5fbf; font-size: 12px; cursor: pointer; }
 .tekntek-grid { margin-top: 10px; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }
@@ -799,8 +888,12 @@ $mainCompareItem = [
         <div class="tekntek-buy">
             <h1><?= $escaper->escapeHtml($name) ?></h1>
             <div class="tekntek-rating">
-                <span class="tekntek-rating-stars"><?= str_repeat('★', $ratingValue) . str_repeat('☆', 5 - $ratingValue) ?></span>
-                <span>(<?= (int) $ratingCount ?>)</span>
+                <span class="tekntek-rating-stars" id="tekntek-top-rating-stars">
+                    <?php for ($star = 1; $star <= 5; $star++): ?>
+                        <span class="<?= $star <= $ratingValue ? 'is-active' : 'is-empty' ?>">★</span>
+                    <?php endfor; ?>
+                </span>
+                <span id="tekntek-top-rating-count">(<?= (int) $ratingCount ?>)</span>
             </div>
 
             <div class="tekntek-price">
@@ -874,7 +967,58 @@ $mainCompareItem = [
         <div class="tekntek-reviews">
             <div class="tekntek-rev-card" id="tekntek-review-summary"></div>
             <div>
-                <div id="tekntek-review-list"></div>
+                <div id="tekntek-review-list">
+                    <?php foreach (array_slice($reviewData, 0, 2) as $index => $reviewItem): ?>
+                        <?php
+                        $reviewId = (int) ($reviewItem['id'] ?? 0);
+                        $userVote = (string) ($reviewItem['user_vote'] ?? '');
+                        $upCount = (int) ($reviewItem['up'] ?? 0);
+                        $downCount = (int) ($reviewItem['down'] ?? 0);
+                        ?>
+                        <article class="tekntek-review-item">
+                            <div class="tekntek-rating-stars">
+                                <?php for ($star = 1; $star <= 5; $star++): ?>
+                                    <span class="<?= $star <= (int) ($reviewItem['stars'] ?? 0) ? 'is-active' : 'is-empty' ?>">★</span>
+                                <?php endfor; ?>
+                            </div>
+                            <div class="tekntek-review-meta">
+                                <?= $escaper->escapeHtml((string) ($reviewItem['date'] ?? '')) ?>
+                                •
+                                <?= $escaper->escapeHtml((string) ($reviewItem['user'] ?? __('Customer'))) ?>
+                            </div>
+                            <strong><?= $escaper->escapeHtml((string) ($reviewItem['title'] ?? '')) ?></strong>
+                            <p><?= $escaper->escapeHtml((string) ($reviewItem['content'] ?? '')) ?></p>
+                            <div class="tekntek-review-vote">
+                                <button type="button"
+                                        class="tekntek-vote-btn"
+                                        data-role="vote"
+                                        data-type="up"
+                                        data-index="<?= (int) $index ?>"
+                                        data-review-id="<?= (int) $reviewId ?>"
+                                        <?= $userVote === 'up' ? 'disabled' : '' ?>>
+                                    <?= $escaper->escapeHtml(__('Helpful (%1)', $upCount)) ?>
+                                </button>
+                                <button type="button"
+                                        class="tekntek-vote-btn"
+                                        data-role="vote"
+                                        data-type="down"
+                                        data-index="<?= (int) $index ?>"
+                                        data-review-id="<?= (int) $reviewId ?>"
+                                        <?= $userVote === 'down' ? 'disabled' : '' ?>>
+                                    <?= $escaper->escapeHtml(__('Not helpful (%1)', $downCount)) ?>
+                                </button>
+                                <?php if ($reviewId > 0): ?>
+                                    <button type="button"
+                                            class="tekntek-delete-review"
+                                            data-role="delete"
+                                            data-review-id="<?= (int) $reviewId ?>">
+                                        <?= $escaper->escapeHtml(__('Delete')) ?>
+                                    </button>
+                                <?php endif; ?>
+                            </div>
+                        </article>
+                    <?php endforeach; ?>
+                </div>
                 <div class="tekntek-review-more-wrap">
                     <button type="button" class="tekntek-btn-view-more" id="tekntek-view-more">View more</button>
                 </div>
@@ -904,6 +1048,16 @@ $mainCompareItem = [
     'auth' => [
         'isLoggedIn' => $isLoggedIn,
         'loginUrl' => $loginUrl
+    ],
+    'reviewSubmit' => [
+        'action' => $reviewPostUrl,
+        'ajaxAction' => $reviewAjaxUrl,
+        'formKey' => $formKey,
+        'voteUrl' => $reviewVoteUrl,
+        'deleteUrl' => $reviewDeleteUrl,
+        'nickname' => $reviewNickname,
+        'productId' => (int) $product->getId(),
+        'ratingOptions' => $reviewRatingOptions
     ]
 ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?></script>
 
@@ -947,9 +1101,61 @@ $mainCompareItem = [
     var auth = payload.auth || {};
     var isLoggedIn = !!auth.isLoggedIn;
     var loginUrl = auth.loginUrl || '/customer/account/login';
+    var reviewSubmit = payload.reviewSubmit || {};
     var compareState = [];
     var visibleReviews = 2;
     var reviewStep = 2;
+    var pendingReviewKey = 'tekntek_pending_reviews_' + Number(reviewSubmit.productId || (mainProduct && mainProduct.id) || 0);
+
+    function readPendingReviews() {
+        try {
+            var raw = window.sessionStorage.getItem(pendingReviewKey);
+            var parsed = raw ? JSON.parse(raw) : [];
+            if (!Array.isArray(parsed)) {
+                return [];
+            }
+            return parsed.filter(function (review) {
+                return Number(review && (review.id || review.review_id) || 0) > 0;
+            });
+        } catch (error) {
+            return [];
+        }
+    }
+
+    function writePendingReview(review) {
+        try {
+            var pending = readPendingReviews();
+            pending.unshift(review);
+            window.sessionStorage.setItem(pendingReviewKey, JSON.stringify(pending.slice(0, 5)));
+        } catch (error) {
+            // sessionStorage can be disabled; Magento submit should still continue.
+        }
+    }
+
+    function removePendingReview(reviewId) {
+        try {
+            var pending = readPendingReviews().filter(function (review) {
+                return String(getReviewId(review) || '') !== String(reviewId);
+            });
+            window.sessionStorage.setItem(pendingReviewKey, JSON.stringify(pending));
+        } catch (error) {
+            // sessionStorage can be disabled; the server delete has already completed.
+        }
+    }
+
+    function mergePendingReviews(baseReviews) {
+        var pending = readPendingReviews();
+        if (!pending.length) {
+            return baseReviews;
+        }
+        return pending.concat(baseReviews);
+    }
+
+    function getReviewId(review) {
+        return Number(review && (review.id || review.review_id) || 0);
+    }
+
+    reviews = mergePendingReviews(reviews);
 
     function price(value) {
         var num = Number(value || 0);
@@ -957,8 +1163,44 @@ $mainCompareItem = [
     }
 
     function stars(n) {
-        var rating = Math.max(0, Math.min(5, Number(n || 0)));
-        return '★★★★★'.slice(0, rating) + '☆☆☆☆☆'.slice(0, 5 - rating);
+        var rating = Math.max(0, Math.min(5, Math.round(Number(n || 0))));
+        var html = '';
+        for (var i = 1; i <= 5; i += 1) {
+            html += '<span class="' + (i <= rating ? 'is-active' : 'is-empty') + '">★</span>';
+        }
+        return html;
+    }
+
+    function getReviewStats() {
+        var ratedReviews = reviews.filter(function (review) {
+            return Number(review.stars || 0) > 0;
+        });
+        var counts = [5, 4, 3, 2, 1].map(function (star) {
+            return ratedReviews.filter(function (review) {
+                return Number(review.stars) === star;
+            }).length;
+        });
+        var total = ratedReviews.length;
+        var sum = ratedReviews.reduce(function (carry, review) {
+            return carry + Math.max(0, Math.min(5, Number(review.stars || 0)));
+        }, 0);
+
+        return {
+            counts: counts,
+            total: total,
+            average: total > 0 ? Math.round(sum / total) : 0
+        };
+    }
+
+    function updateTopRating(stats) {
+        var starNode = document.getElementById('tekntek-top-rating-stars');
+        var countNode = document.getElementById('tekntek-top-rating-count');
+        if (starNode) {
+            starNode.innerHTML = stars(stats.average);
+        }
+        if (countNode) {
+            countNode.textContent = '(' + stats.total + ')';
+        }
     }
 
     function esc(value) {
@@ -980,14 +1222,36 @@ $mainCompareItem = [
     }
 
     function getFormKey() {
-        var node = document.querySelector('input[name="form_key"]');
-        if (node && node.value) {
-            return node.value;
+        var match = document.cookie.match(/(?:^|;\s*)form_key=([^;]+)/);
+        if (match) {
+            return decodeURIComponent(match[1]);
         }
         if (window.FORM_KEY) {
             return window.FORM_KEY;
         }
+        var node = document.querySelector('input[name="form_key"]');
+        if (node && node.value) {
+            return node.value;
+        }
         return '';
+    }
+
+    function submitNativePost(url, fields) {
+        var nativeForm = document.createElement('form');
+        nativeForm.method = 'post';
+        nativeForm.action = url;
+        nativeForm.style.display = 'none';
+
+        Object.keys(fields).forEach(function (name) {
+            var input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = name;
+            input.value = fields[name];
+            nativeForm.appendChild(input);
+        });
+
+        document.body.appendChild(nativeForm);
+        nativeForm.submit();
     }
 
     function postForm(url, data) {
@@ -1231,23 +1495,28 @@ $mainCompareItem = [
     }
 
     function renderReviewSummary() {
-        var counts = [5, 4, 3, 2, 1].map(function (star) {
-            return reviews.filter(function (r) { return Number(r.stars) === star; }).length;
-        });
-        var total = reviews.length || 1;
+        var stats = getReviewStats();
+        var total = stats.total || 1;
+        var reviewAction = esc(reviewSubmit.action || window.location.href);
+        updateTopRating(stats);
         reviewSummary.innerHTML = '<strong>Customer reviews</strong>' +
-            '<div class="tekntek-overall-stars">★★★★★</div>' +
-            '<div class="tekntek-bars">' + counts.map(function (count, idx) {
+            '<div class="tekntek-overall-stars tekntek-rating-stars">' + stars(stats.average) + '</div>' +
+            '<div class="tekntek-bars">' + stats.counts.map(function (count, idx) {
                 var width = Math.round((count / total) * 100);
                 var starLabel = 5 - idx;
                 return '<div class="tekntek-bar-row"><span>' + starLabel + ' star</span><div class="tekntek-bar"><span style="width:' + width + '%"></span></div><span>' + width + '%</span></div>';
             }).join('') + '</div>' +
             '<p class="tekntek-review-note">Share your feedback and create a better shopping experience for everyone. Thank you for taking the time to share your opinion.</p>' +
             '<button class="tekntek-btn tekntek-btn-buy" id="tekntek-add-review" style="width:100%">Write a review</button>' +
-            '<form id="tekntek-review-form" class="tekntek-review-form" novalidate>' +
+            '<form id="tekntek-review-form" class="tekntek-review-form" action="' + reviewAction + '" method="post" novalidate>' +
+                '<div class="tekntek-review-form-row" id="tekntek-review-message" style="display:none"></div>' +
+                '<input type="hidden" name="form_key" id="tekntek-review-form-key" value="">' +
+                '<input type="hidden" name="nickname" value="' + esc(reviewSubmit.nickname || 'Customer') + '">' +
+                '<input type="hidden" name="validate_rating" value="">' +
+                '<div id="tekntek-review-rating-fields"></div>' +
                 '<div class="tekntek-review-form-row"><label for="tekntek-review-stars">Rating</label><select id="tekntek-review-stars"><option value="5">5 stars</option><option value="4">4 stars</option><option value="3">3 stars</option><option value="2">2 stars</option><option value="1">1 star</option></select></div>' +
-                '<div class="tekntek-review-form-row"><label for="tekntek-review-title">Title</label><input id="tekntek-review-title" type="text" maxlength="120" placeholder="Review title"></div>' +
-                '<div class="tekntek-review-form-row"><label for="tekntek-review-content">Comment</label><textarea id="tekntek-review-content" maxlength="800" placeholder="Share your experience"></textarea></div>' +
+                '<div class="tekntek-review-form-row"><label for="tekntek-review-title">Title</label><input id="tekntek-review-title" name="title" type="text" maxlength="120" placeholder="Review title"></div>' +
+                '<div class="tekntek-review-form-row"><label for="tekntek-review-content">Comment</label><textarea id="tekntek-review-content" name="detail" maxlength="800" placeholder="Share your experience"></textarea></div>' +
                 '<div class="tekntek-review-form-actions"><button type="submit" class="tekntek-btn tekntek-btn-buy">Submit review</button><button type="button" id="tekntek-review-cancel" class="tekntek-btn tekntek-btn-cart">Cancel</button></div>' +
             '</form>';
     }
@@ -1255,40 +1524,179 @@ $mainCompareItem = [
     function renderReviews() {
         var current = reviews.slice(0, visibleReviews);
         reviewList.innerHTML = current.map(function (review, idx) {
+            var pros = (review.pros || []).filter(function (item) { return String(item || '').trim() !== ''; });
+            var cons = (review.cons || []).filter(function (item) { return String(item || '').trim() !== ''; });
+            var prosConsHtml = '';
+            if (pros.length || cons.length) {
+                prosConsHtml = '<p>' +
+                    (pros.length ? '+ ' + pros.map(esc).join('<br>+ ') : '') +
+                    (pros.length && cons.length ? '<br>' : '') +
+                    (cons.length ? '- ' + cons.map(esc).join('<br>- ') : '') +
+                    '</p>';
+            }
+            var upCount = Number(review.up || 0);
+            var downCount = Number(review.down || 0);
+            var userVote = String(review.user_vote || '');
+            var upDisabled = userVote === 'up' ? ' disabled' : '';
+            var downDisabled = userVote === 'down' ? ' disabled' : '';
+            var upLabel = 'Helpful (' + upCount + ')';
+            var downLabel = 'Not helpful (' + downCount + ')';
+
+            var reviewIdValue = getReviewId(review);
+            var deleteHtml = reviewIdValue
+                ? '<button type="button" class="tekntek-delete-review" data-role="delete" data-review-id="' + reviewIdValue + '">Delete</button>'
+                : '';
+
             return '<article class="tekntek-review-item">' +
                 '<div class="tekntek-rating-stars">' + stars(review.stars) + '</div>' +
                 '<div class="tekntek-review-meta">' + esc(review.date) + ' • ' + esc(review.user) + '</div>' +
                 '<strong>' + esc(review.title) + '</strong>' +
                 '<p>' + esc(review.content) + '</p>' +
-                '<p>+ ' + (review.pros || []).map(esc).join('<br>+ ') + '<br>- ' + (review.cons || []).map(esc).join('<br>- ') + '</p>' +
+                prosConsHtml +
                 '<div class="tekntek-review-vote">' +
-                    '<button class="tekntek-vote-btn" data-role="vote" data-type="up" data-index="' + idx + '">Helpful (' + Number(review.up || 0) + ')</button> ' +
-                    '<button class="tekntek-vote-btn" data-role="vote" data-type="down" data-index="' + idx + '">Not helpful (' + Number(review.down || 0) + ')</button>' +
+                    '<button type="button" class="tekntek-vote-btn" data-role="vote" data-type="up" data-index="' + idx + '" data-review-id="' + (reviewIdValue || '') + '"' + upDisabled + '>' + esc(upLabel) + '</button> ' +
+                    '<button type="button" class="tekntek-vote-btn" data-role="vote" data-type="down" data-index="' + idx + '" data-review-id="' + (reviewIdValue || '') + '"' + downDisabled + '>' + esc(downLabel) + '</button>' +
+                    deleteHtml +
                 '</div>' +
             '</article>';
         }).join('');
 
         viewMoreBtn.style.display = reviews.length > visibleReviews ? 'inline-flex' : 'none';
 
+        // Vote button handler: POST to vote endpoint and update UI
         reviewList.querySelectorAll('[data-role="vote"]').forEach(function (btn) {
             btn.addEventListener('click', function () {
-                if (!isLoggedIn) {
-                    window.location.href = loginUrl;
-                    return;
-                }
                 var index = Number(btn.getAttribute('data-index'));
                 var type = btn.getAttribute('data-type');
-                if (!reviews[index]) {
+                var reviewId = btn.getAttribute('data-review-id');
+                if (!reviews[index] || !reviewId) {
                     return;
                 }
-                if (type === 'up') {
-                    reviews[index].up += 1;
-                } else {
-                    reviews[index].down += 1;
+                if (String(reviews[index].user_vote || '') === type) {
+                    return;
                 }
-                renderReviews();
-                renderReviewSummary();
-                bindAddReview();
+
+                btn.disabled = true;
+
+                var body = new URLSearchParams();
+                body.append('form_key', getFormKey() || reviewSubmit.formKey || '');
+                body.append('review_id', reviewId);
+                body.append('type', type === 'down' ? 'down' : 'up');
+
+                fetch((reviewSubmit.voteUrl || ''), {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: body.toString()
+                }).then(function (resp) {
+                    return resp.json().then(function (data) {
+                        if (!resp.ok || !data.success) {
+                            var err = new Error(data.message || 'Vote failed');
+                            err.payload = data;
+                            throw err;
+                        }
+                        return data;
+                    });
+                }).then(function (data) {
+                    // Update local model from response
+                    var idx = index;
+                    if (typeof data.up === 'number') {
+                        reviews[idx].up = data.up;
+                    }
+                    if (typeof data.down === 'number') {
+                        reviews[idx].down = data.down;
+                    }
+                    if (data.user_vote) {
+                        reviews[idx].user_vote = data.user_vote;
+                    }
+                    renderReviews();
+                    renderReviewSummary();
+                    bindAddReview();
+                }).catch(function (err) {
+                    var payload = err && err.payload ? err.payload : {};
+                    if (payload.login_url) {
+                        window.location.href = payload.login_url;
+                        return;
+                    }
+                    if (payload.has_voted && reviews[index]) {
+                        if (typeof payload.up === 'number') {
+                            reviews[index].up = payload.up;
+                        }
+                        if (typeof payload.down === 'number') {
+                            reviews[index].down = payload.down;
+                        }
+                        if (payload.user_vote) {
+                            reviews[index].user_vote = payload.user_vote;
+                        }
+                        renderReviews();
+                        renderReviewSummary();
+                        bindAddReview();
+                        return;
+                    }
+                    console.warn('Vote error', err);
+                    alert(payload.message || err.message || 'Vote failed');
+                }).finally(function () {
+                    btn.disabled = false;
+                });
+            });
+        });
+
+        // Delete button handler: POST to delete endpoint and remove review on success
+        reviewList.querySelectorAll('[data-role="delete"]').forEach(function (btn) {
+            btn.addEventListener('click', function () {
+                var reviewId = btn.getAttribute('data-review-id');
+                if (!reviewId) {
+                    return;
+                }
+                if (!confirm('Delete this review? This action cannot be undone.')) {
+                    return;
+                }
+
+                btn.disabled = true;
+
+                var body = new URLSearchParams();
+                body.append('form_key', getFormKey() || reviewSubmit.formKey || '');
+                body.append('review_id', reviewId);
+
+                fetch((reviewSubmit.deleteUrl || ''), {
+                    method: 'POST',
+                    credentials: 'same-origin',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: body.toString()
+                }).then(function (resp) {
+                    return resp.json().then(function (data) {
+                        if (!resp.ok || !data.success) {
+                            var err = new Error(data.message || 'Delete failed');
+                            err.payload = data;
+                            throw err;
+                        }
+                        return data;
+                    });
+                }).then(function (data) {
+                    // remove review from local list
+                    removePendingReview(reviewId);
+                    reviews = reviews.filter(function (r) {
+                        return String(getReviewId(r) || '') !== String(reviewId);
+                    });
+                    renderReviews();
+                    renderReviewSummary();
+                }).catch(function (err) {
+                    var payload = err && err.payload ? err.payload : {};
+                    if (payload.login_url) {
+                        window.location.href = payload.login_url;
+                        return;
+                    }
+                    console.warn('Delete error', err);
+                    alert(payload.message || err.message || 'Delete failed');
+                }).finally(function () {
+                    btn.disabled = false;
+                });
             });
         });
     }
@@ -1301,10 +1709,6 @@ $mainCompareItem = [
             return;
         }
         btn.addEventListener('click', function () {
-            if (!isLoggedIn) {
-                window.location.href = loginUrl;
-                return;
-            }
             if (!form) {
                 return;
             }
@@ -1320,35 +1724,134 @@ $mainCompareItem = [
             var starNode = document.getElementById('tekntek-review-stars');
             var titleNode = document.getElementById('tekntek-review-title');
             var contentNode = document.getElementById('tekntek-review-content');
+            var messageNode = document.getElementById('tekntek-review-message');
+            var submitButton = form.querySelector('button[type="submit"]');
             var starsValue = Number(starNode && starNode.value ? starNode.value : 5);
             var titleValue = titleNode ? titleNode.value.trim() : '';
             var contentValue = contentNode ? contentNode.value.trim() : '';
+            var ratingOptions = reviewSubmit.ratingOptions || {};
+            var formKeyNode = document.getElementById('tekntek-review-form-key');
+            var ratingFields = document.getElementById('tekntek-review-rating-fields');
+            var hasRating = false;
+            var formKey = getFormKey();
+
+            function showReviewMessage(message, isError) {
+                if (!messageNode) {
+                    return;
+                }
+                messageNode.style.display = 'block';
+                messageNode.style.color = isError ? '#b91c1c' : '#166534';
+                messageNode.style.fontWeight = '700';
+                messageNode.textContent = message || '';
+            }
 
             if (contentValue === '') {
+                showReviewMessage('Please enter your review comment.', true);
                 return;
             }
 
-            reviews.unshift({
-                stars: Math.max(1, Math.min(5, starsValue)),
-                date: new Date().toLocaleDateString('en-GB'),
-                user: 'You',
-                title: titleValue !== '' ? titleValue : 'New review',
-                content: contentValue,
-                pros: ['Posted by logged-in customer'],
-                cons: ['No cons yet'],
-                up: 0,
-                down: 0
+            if (!reviewSubmit.ajaxAction || !formKey) {
+                showReviewMessage('Please refresh the page and try again.', true);
+                return;
+            }
+
+            form.action = reviewSubmit.action;
+            if (formKeyNode) {
+                formKeyNode.value = formKey;
+            }
+            if (ratingFields) {
+                ratingFields.innerHTML = '';
+            }
+
+            Object.keys(ratingOptions).forEach(function (ratingId) {
+                var options = ratingOptions[ratingId] || {};
+                var optionId = options[String(starsValue)] || options[starsValue];
+                if (optionId) {
+                    if (ratingFields) {
+                        var input = document.createElement('input');
+                        input.type = 'hidden';
+                        input.name = 'ratings[' + ratingId + ']';
+                        input.value = optionId;
+                        ratingFields.appendChild(input);
+                    }
+                    hasRating = true;
+                }
             });
-            visibleReviews = Math.max(visibleReviews, 2);
-            if (titleNode) {
-                titleNode.value = '';
+
+            if (submitButton) {
+                submitButton.disabled = true;
             }
-            if (contentNode) {
-                contentNode.value = '';
-            }
-            renderReviews();
-            renderReviewSummary();
-            bindAddReview();
+            showReviewMessage('Submitting review...', false);
+
+            var reviewBody = new URLSearchParams();
+            reviewBody.append('form_key', formKey);
+            reviewBody.append('product_id', Number(reviewSubmit.productId || (mainProduct && mainProduct.id) || 0));
+            reviewBody.append('stars', starsValue);
+            reviewBody.append('title', titleValue !== '' ? titleValue : 'New review');
+            reviewBody.append('detail', contentValue);
+            Object.keys(ratingOptions).forEach(function (ratingId) {
+                var options = ratingOptions[ratingId] || {};
+                var optionId = options[String(starsValue)] || options[starsValue];
+                if (optionId) {
+                    reviewBody.append('ratings[' + ratingId + ']', optionId);
+                }
+            });
+
+            fetch(reviewSubmit.ajaxAction, {
+                method: 'POST',
+                credentials: 'same-origin',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: reviewBody.toString()
+            }).then(function (response) {
+                return response.json().then(function (data) {
+                    if (!response.ok || !data.success) {
+                        var error = new Error(data.message || 'Review submit failed');
+                        error.payload = data;
+                        throw error;
+                    }
+                    return data;
+                });
+            }).then(function (data) {
+                var submittedReview = data.review || {
+                    stars: Math.max(1, Math.min(5, starsValue)),
+                    date: new Date().toLocaleDateString('en-GB'),
+                    user: 'You',
+                    title: titleValue !== '' ? titleValue : 'New review',
+                    content: contentValue,
+                    pros: [],
+                    cons: [],
+                    up: 0,
+                    down: 0
+                };
+
+                writePendingReview(submittedReview);
+                reviews.unshift(submittedReview);
+                visibleReviews = Math.max(visibleReviews, 2);
+                if (titleNode) {
+                    titleNode.value = '';
+                }
+                if (contentNode) {
+                    contentNode.value = '';
+                }
+                form.classList.remove('is-open');
+                renderReviews();
+                renderReviewSummary();
+                bindAddReview();
+            }).catch(function (error) {
+                var payload = error && error.payload ? error.payload : {};
+                if (payload.login_url) {
+                    window.location.href = payload.login_url;
+                    return;
+                }
+                showReviewMessage(payload.message || error.message || 'Review submit failed.', true);
+            }).finally(function () {
+                if (submitButton) {
+                    submitButton.disabled = false;
+                }
+            });
         });
 
         if (cancel) {

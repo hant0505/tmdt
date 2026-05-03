@@ -1,0 +1,20 @@
+{
+    "tekntek_review_helpfulness": {
+        "column": {
+            "vote_id": true,
+            "review_id": true,
+            "customer_id": true,
+            "vote_type": true,
+            "created_at": true
+        },
+        "constraint": {
+            "PRIMARY": true,
+            "TEKNTEK_REVIEW_HELPFULNESS_REVIEW_CUSTOMER_UNQ": true,
+            "TEKNTEK_REVIEW_HELPFULNESS_REVIEW_ID_REVIEW_REVIEW_ID": true,
+            "TEKNTEK_REVIEW_HELPFULNESS_CUSTOMER_ID_CUSTOMER_ENTITY_ID": true
+        },
+        "index": {
+            "TEKNTEK_REVIEW_HELPFULNESS_REVIEW_ID": true
+        }
+    }
+}
