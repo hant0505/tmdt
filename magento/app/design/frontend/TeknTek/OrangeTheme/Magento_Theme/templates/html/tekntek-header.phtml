@@ -12,7 +12,7 @@ $ttkUrlKeyMap = [
     'laptops' => 'laptops',
     'smartphones' => 'smartphones',
     'cameras' => 'cameras',
-    'smartwatches' => 'smart-watches',
+    'smartwatches' => 'smartwatches',
     'headphones' => 'headphones',
     'tablets' => 'tablets',
     // Legacy aliases kept for safety while the theme is being normalized.
@@ -20,7 +20,7 @@ $ttkUrlKeyMap = [
     'laptop' => 'laptops',
     'smartphone' => 'smartphones',
     'camera' => 'cameras',
-    'smart_watch' => 'smart-watches',
+    'smart_watch' => 'smartwatches',
     'audio_headphones' => 'headphones',
     'tablet' => 'tablets'
 ];
@@ -60,9 +60,19 @@ try {
 }
 
 $httpContext = $objectManager->get(\Magento\Framework\App\Http\Context::class);
+$searchHelper = $objectManager->get(\Magento\Search\Helper\Data::class);
 $isLoggedIn = (bool) $httpContext->getValue(\Magento\Customer\Model\Context::CONTEXT_AUTH);
 $accountUrl = $isLoggedIn ? $block->getUrl('customer/account') : $block->getUrl('customer/account/create');
 $wishlistUrl = $isLoggedIn ? $block->getUrl('wishlist') : $block->getUrl('customer/account/create');
+$quickSearchConfig = [
+    'quickSearch' => [
+        'formSelector' => '#search_mini_form',
+        'url' => $searchHelper->getSuggestUrl(),
+        'destinationSelector' => '#search_autocomplete',
+        'minSearchLength' => (string) $searchHelper->getMinQueryLength(),
+        'submitBtn' => '#ttk-search-submit',
+    ],
+];
 ?>
 
 <style>
@@ -190,17 +200,26 @@ nav.navigation,
     color: #9ca3af;
 }
 
+.tekntek-isolated-header .ttk-search-submit {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+}
+
 .tekntek-isolated-header .ttk-search-preview {
     position: absolute;
-    top: calc(100% + 8px);
+    top: calc(100% + 6px);
     left: 0;
     right: 0;
     z-index: 95;
-    background: #efefef;
-    border: 1px solid #cfd4da;
-    border-radius: 3px;
-    box-shadow: 0 8px 22px rgba(15, 23, 42, 0.18);
-    max-height: 360px;
+    background: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 0;
+    box-shadow: 0 10px 24px rgba(15, 23, 42, 0.16);
+    max-height: 430px;
     overflow-y: auto;
 }
 
@@ -208,37 +227,46 @@ nav.navigation,
     display: none !important;
 }
 
+.tekntek-isolated-header .ttk-search-preview:not([hidden]) {
+    display: block !important;
+}
+
 .tekntek-isolated-header .ttk-search-preview a {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 14px;
     text-decoration: none;
-    padding: 7px 8px;
-    border-bottom: 1px solid #d8dbe0;
+    padding: 9px 12px;
+    border-bottom: 1px solid #f3f4f6;
     color: #1f2937;
-    background: #f3f3f3;
+    background: #ffffff;
 }
 
 .tekntek-isolated-header .ttk-search-preview a:last-child {
     border-bottom: 0;
 }
 
-.tekntek-isolated-header .ttk-search-preview a:nth-child(even) {
-    background: #ececec;
+.tekntek-isolated-header .ttk-search-preview a:hover {
+    background: #f9fafb;
 }
 
-.tekntek-isolated-header .ttk-search-preview a:hover {
-    background: #e2e8f0;
+.tekntek-isolated-header .ttk-search-preview .ttk-search-preview-image {
+    width: 54px;
+    height: 54px;
+    flex: 0 0 54px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #ffffff;
 }
 
 .tekntek-isolated-header .ttk-search-preview img {
-    width: 46px;
-    height: 46px;
-    border-radius: 2px;
-    object-fit: cover;
-    background: #f3f4f6;
-    border: 1px solid #d1d5db;
-    flex: 0 0 46px;
+    display: block;
+    max-width: 54px;
+    max-height: 54px;
+    width: auto;
+    height: auto;
+    object-fit: contain;
 }
 
 .tekntek-isolated-header .ttk-search-preview .ttk-search-preview-meta {
@@ -248,23 +276,47 @@ nav.navigation,
 
 .tekntek-isolated-header .ttk-search-preview .ttk-search-preview-name {
     display: block;
-    font-size: 16px;
-    font-weight: 500;
-    line-height: 1.25;
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.3;
     color: #111827;
-    text-decoration: underline;
-    white-space: nowrap;
+    white-space: normal;
     overflow: hidden;
-    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
 }
 
-.tekntek-isolated-header .ttk-search-preview .ttk-search-preview-price {
-    display: inline-block;
+.tekntek-isolated-header .ttk-search-preview .ttk-search-preview-prices {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 3px;
+}
+
+.tekntek-isolated-header .ttk-search-preview .ttk-search-preview-final {
     font-size: 14px;
     line-height: 1.3;
-    font-weight: 700;
+    font-weight: 800;
     color: #dc2626;
-    margin-top: 3px;
+}
+
+.tekntek-isolated-header .ttk-search-preview .ttk-search-preview-regular {
+    font-size: 12px;
+    line-height: 1.3;
+    color: #9ca3af;
+    text-decoration: line-through;
+}
+
+.tekntek-isolated-header .ttk-search-preview .ttk-search-related {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 12px;
+    background: #f3f4f6;
+    color: #374151;
+    font-size: 14px;
+    font-weight: 600;
 }
 
 .tekntek-isolated-header .ttk-right-links {
@@ -607,12 +659,26 @@ body.catalog-category-view .tekntek-isolated-header .ttk-icon-nav a:hover .ttk-i
 
             <form class="form minisearch ttk-search-form" id="search_mini_form" action="<?= $block->escapeUrl($block->getUrl('catalogsearch/result')) ?>" method="get">
                 <button class="ttk-all-products-btn" id="ttk-all-products-toggle" type="button" aria-expanded="false" aria-controls="ttk-icon-layer">All products</button>
-                <input class="ttk-search-input" id="search" type="text" name="q" placeholder="I'm searching for..." aria-label="Search entire store here..." autocomplete="off" />
-                <div class="ttk-search-preview" id="ttk-search-preview-home" hidden></div>
+                <input class="ttk-search-input"
+                       id="search"
+                       type="text"
+                       name="<?= $block->escapeHtmlAttr($searchHelper->getQueryParamName()) ?>"
+                       placeholder="I'm searching for..."
+                       aria-label="Search entire store here..."
+                       autocomplete="off"
+                       maxlength="<?= $block->escapeHtmlAttr($searchHelper->getMaxQueryLength()) ?>"
+                       role="combobox"
+                       aria-haspopup="false"
+                       aria-autocomplete="both"
+                       aria-expanded="false" />
+                <button class="ttk-search-submit" id="ttk-search-submit" type="submit">
+                    <span><?= $block->escapeHtml(__('Search')) ?></span>
+                </button>
+                <div class="ttk-search-preview" id="search_autocomplete" hidden></div>
             </form>
 
             <div class="ttk-right-links">
-                <a href="<?= $block->escapeUrl($wishlistUrl) ?>"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.4 4.8 13.6a4.9 4.9 0 0 1 0-7 4.9 4.9 0 0 1 7 0L12 7l.2-.4a4.9 4.9 0 0 1 7 7L12 20.4z"/></svg>Favourite</a>
+                <a href="<?= $block->escapeUrl($wishlistUrl) ?>"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 20.4 4.8 13.6a4.9 4.9 0 0 1 0-7 4.9 4.9 0 0 1 7 0L12 7l.2-.4a4.9 4.9 0 0 1 7 7L12 20.4z"/></svg><?= $block->escapeHtml(__('Wish List')) ?></a>
                 <a href="<?= $block->escapeUrl($accountUrl) ?>"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="3.5"/><path d="M4.5 19a7.5 7.5 0 0 1 15 0"/></svg>Account</a>
                 <?php if ($isLoggedIn): ?>
                     <a href="<?= $block->escapeUrl($block->getUrl('customer/account/logout')) ?>"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h4"/><path d="M14 17l5-5-5-5"/><path d="M19 12H7"/></svg>Logout</a>
@@ -695,6 +761,138 @@ body.catalog-category-view .tekntek-isolated-header .ttk-icon-nav a:hover .ttk-i
         var clickOnToggle = allProductsToggle.contains(event.target);
         if (!clickInsideLayer && !clickOnToggle && categoryLayer.classList.contains('is-open')) {
             closeLayer();
+        }
+    });
+})();
+
+(function () {
+    var searchForm = document.getElementById('search_mini_form');
+    var searchInput = document.getElementById('search');
+    var searchPreview = document.getElementById('search_autocomplete');
+    var resultUrl = '<?= $block->escapeJs(parse_url($searchHelper->getResultUrl(), PHP_URL_PATH) ?: '/catalogsearch/result/') ?>';
+    var suggestUrl = '<?= $block->escapeJs($block->getUrl('tekntek_suggest/ajax/suggest')) ?>';
+    var activeRequest = null;
+    var debounceTimer = null;
+
+    if (!searchForm || !searchInput || !searchPreview) {
+        return;
+    }
+
+    function escapeHtml(value) {
+        return String(value || '')
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
+    function hidePreview() {
+        searchPreview.innerHTML = '';
+        searchPreview.hidden = true;
+        searchInput.setAttribute('aria-expanded', 'false');
+    }
+
+    function shouldShowRegular(item) {
+        return Boolean(item && (item.has_discount || Number(item.regular_price_amount || 0) > Number(item.final_price_amount || 0)));
+    }
+
+    function renderItems(items) {
+        if (!Array.isArray(items) || !items.length) {
+            hidePreview();
+            return;
+        }
+
+        searchPreview.innerHTML = items.map(function (item) {
+            var image = item.product_image || item.image || '';
+            var imageMarkup = image
+                ? '<span class="ttk-search-preview-image"><img src="' + escapeHtml(image) + '" alt="' + escapeHtml(item.title || item.name || '') + '" loading="eager" /></span>'
+                : '<span class="ttk-search-preview-image ttk-search-preview-image--empty"></span>';
+            var regular = shouldShowRegular(item)
+                ? '<span class="ttk-search-preview-regular">' + escapeHtml(item.regular_price) + '</span>'
+                : '';
+
+            return '' +
+                '<a href="' + escapeHtml(item.product_url || '#') + '">' +
+                    imageMarkup +
+                    '<span class="ttk-search-preview-meta">' +
+                        '<span class="ttk-search-preview-name">' + escapeHtml(item.title || '') + '</span>' +
+                        '<span class="ttk-search-preview-prices">' +
+                            '<span class="ttk-search-preview-final">' + escapeHtml(item.final_price || '') + '</span>' +
+                            regular +
+                        '</span>' +
+                    '</span>' +
+                '</a>';
+        }).join('') +
+        '<div class="ttk-search-related">▦ Thông tin liên quan</div>';
+
+        searchPreview.hidden = false;
+        searchInput.setAttribute('aria-expanded', 'true');
+    }
+
+    function fetchSuggestions(query) {
+        if (activeRequest && typeof activeRequest.abort === 'function') {
+            activeRequest.abort();
+        }
+
+        activeRequest = new XMLHttpRequest();
+        activeRequest.open('GET', suggestUrl + (suggestUrl.indexOf('?') === -1 ? '?' : '&') + 'q=' + encodeURIComponent(query), true);
+        activeRequest.onreadystatechange = function () {
+            if (activeRequest.readyState !== 4 || activeRequest.status === 0) {
+                return;
+            }
+
+            if (activeRequest.status < 200 || activeRequest.status >= 300) {
+                hidePreview();
+                return;
+            }
+
+            try {
+                renderItems(JSON.parse(activeRequest.responseText));
+            } catch (error) {
+                hidePreview();
+            }
+        };
+        activeRequest.send();
+    }
+
+    searchInput.addEventListener('input', function () {
+        var query = (searchInput.value || '').trim();
+
+        window.clearTimeout(debounceTimer);
+        if (query.length < 1) {
+            hidePreview();
+            return;
+        }
+
+        debounceTimer = window.setTimeout(function () {
+            fetchSuggestions(query);
+        }, 120);
+    });
+
+    searchInput.addEventListener('focus', function () {
+        var query = (searchInput.value || '').trim();
+        if (query.length >= 1) {
+            fetchSuggestions(query);
+        }
+    });
+
+    searchForm.addEventListener('submit', function (event) {
+        var query = (searchInput.value || '').trim();
+
+        if (!query) {
+            event.preventDefault();
+            return;
+        }
+
+        event.preventDefault();
+        hidePreview();
+        window.location.href = resultUrl + (resultUrl.indexOf('?') === -1 ? '?' : '&') + 'q=' + encodeURIComponent(query);
+    });
+
+    document.addEventListener('click', function (event) {
+        if (!searchForm.contains(event.target)) {
+            hidePreview();
         }
     });
 })();

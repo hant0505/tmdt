@@ -1,0 +1,635 @@
+<?php
+/**
+ * Wishlist sidebar.
+ *
+ * @var \Magento\Wishlist\Block\Customer\Sidebar $block
+ */
+$wishlstViewModel = $block->getData('wishlistDataViewModel');
+
+if (!$wishlstViewModel || !$wishlstViewModel->isAllow()) {
+    return;
+}
+
+$tekntekWishlistItems = [];
+foreach ($block->getWishlistItems() as $item) {
+    $product = $item->getProduct();
+    if ($product && $product->getId() && $product->isVisibleInCatalog()) {
+        $tekntekWishlistItems[] = $item;
+    }
+}
+
+if (!$tekntekWishlistItems) {
+    return;
+}
+
+$tekntekWishlistCount = count($tekntekWishlistItems);
+$tekntekVisibleWishlistItems = array_slice($tekntekWishlistItems, 0, 3);
+?>
+<style>
+[data-role="tekntek-wishlist-sidebar"] .ttk-sidebar-products {
+    display: grid !important;
+    gap: 8px !important;
+    margin: 0 0 10px !important;
+    padding: 0 !important;
+    list-style: none !important;
+}
+
+[data-role="tekntek-wishlist-sidebar"] .ttk-sidebar-products .product-item {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: transparent !important;
+    overflow: hidden !important;
+}
+
+[data-role="tekntek-wishlist-sidebar"] .product-item-info {
+    position: relative !important;
+    display: flex !important;
+    gap: 9px !important;
+    align-items: center !important;
+    min-height: 52px !important;
+    padding: 7px 0 !important;
+    border: 0 !important;
+    border-bottom: 1px solid #eef2f7 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
+}
+
+[data-role="tekntek-wishlist-sidebar"] .ttk-sidebar-products .product-item:last-child .product-item-info {
+    border-bottom: 0 !important;
+}
+
+[data-role="tekntek-wishlist-sidebar"] .product-item-photo {
+    flex: 0 0 44px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 44px !important;
+    height: 44px !important;
+    margin: 0 !important;
+    border-radius: 8px !important;
+    background: #f8fafc !important;
+    overflow: hidden !important;
+}
+
+[data-role="tekntek-wishlist-sidebar"] .product-item-photo .product-image-container,
+[data-role="tekntek-wishlist-sidebar"] .product-item-photo .product-image-wrapper,
+[data-role="tekntek-wishlist-sidebar"] .product-item-photo .product-image-photo,
+[data-role="tekntek-wishlist-sidebar"] .product-item-photo img {
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100% !important;
+    object-fit: contain !important;
+}
+
+[data-role="tekntek-wishlist-sidebar"] .product-item-details {
+    flex: 1 1 0% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    padding: 0 !important;
+    overflow: hidden !important;
+}
+
+[data-role="tekntek-wishlist-sidebar"] .product-item-name {
+    display: block !important;
+    margin: 0 0 3px !important;
+    padding: 0 !important;
+    color: #111827 !important;
+    font-size: 12px !important;
+    font-weight: 800 !important;
+    line-height: 1.25 !important;
+}
+
+[data-role="tekntek-wishlist-sidebar"] .product-item-link {
+    display: -webkit-box !important;
+    max-width: 100% !important;
+    color: #111827 !important;
+    overflow: hidden !important;
+    text-decoration: none !important;
+    text-overflow: ellipsis !important;
+    -webkit-box-orient: vertical !important;
+    -webkit-line-clamp: 2 !important;
+}
+
+[data-role="tekntek-wishlist-sidebar"] .ttk-sidebar-price,
+[data-role="tekntek-wishlist-sidebar"] .price-box,
+[data-role="tekntek-wishlist-sidebar"] .price {
+    display: block !important;
+    max-width: 100% !important;
+    color: #2563eb !important;
+    font-size: 12px !important;
+    font-weight: 800 !important;
+    line-height: 1.2 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+
+[data-role="tekntek-wishlist-sidebar"] .product-item-actions {
+    flex: 0 0 22px !important;
+    flex-shrink: 0 !important;
+    align-self: center !important;
+    margin: 0 !important;
+    margin-left: auto !important;
+    padding: 0 !important;
+}
+
+[data-role="tekntek-wishlist-sidebar"] .actions-secondary {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+[data-role="tekntek-wishlist-sidebar"] .ttk-sidebar-remove {
+    position: static !important;
+    display: inline-grid !important;
+    place-items: center !important;
+    width: 22px !important;
+    height: 22px !important;
+    border-radius: 999px !important;
+    background: #f1f5f9 !important;
+    color: #64748b !important;
+    text-decoration: none !important;
+    box-shadow: none !important;
+}
+
+[data-role="tekntek-wishlist-sidebar"] .ttk-sidebar-remove::before {
+    content: "×" !important;
+    font-size: 14px !important;
+    font-weight: 800 !important;
+    line-height: 1 !important;
+}
+
+[data-role="tekntek-wishlist-sidebar"] .ttk-sidebar-remove span {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+}
+
+[data-role="tekntek-wishlist-sidebar"] .ttk-sidebar-actions {
+    margin: 4px 0 0 !important;
+}
+
+[data-role="tekntek-wishlist-sidebar"] .ttk-sidebar-actions .action {
+    display: inline-flex !important;
+    align-items: center !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: transparent !important;
+    color: #1d4ed8 !important;
+    font-size: 12px !important;
+    font-weight: 800 !important;
+    text-decoration: none !important;
+}
+</style>
+<div class="block block-wishlist ttk-sidebar-card ttk-has-wishlist" data-role="tekntek-wishlist-sidebar">
+    <div class="block-title ttk-sidebar-card__title">
+        <strong role="heading" aria-level="2"><?= $block->escapeHtml($block->getTitle()) ?></strong>
+        <span class="counter">(<?= $block->escapeHtml((string) $tekntekWishlistCount) ?>)</span>
+    </div>
+    <div class="block-content">
+        <ol class="product-items ttk-sidebar-products" id="wishlist-sidebar">
+            <?php foreach ($tekntekVisibleWishlistItems as $item): ?>
+                <?php $product = $item->getProduct(); ?>
+                <li class="product-item">
+                    <div class="product-item-info">
+                        <a class="product-item-photo"
+                           href="<?= $block->escapeUrl($block->getProductUrl($product)) ?>"
+                           title="<?= $block->escapeHtmlAttr($product->getName()) ?>">
+                            <?= /* @noEscape */ $block->getImage($product, 'wishlist_sidebar_block')->toHtml() ?>
+                        </a>
+                        <div class="product-item-details">
+                            <strong class="product-item-name">
+                                <a class="product-item-link"
+                                   href="<?= $block->escapeUrl($block->getProductUrl($product)) ?>">
+                                    <?= $block->escapeHtml($product->getName()) ?>
+                                </a>
+                            </strong>
+                            <div class="ttk-sidebar-price">
+                                <?= /* @noEscape */ $block->getProductPrice($product) ?>
+                            </div>
+                        </div>
+                        <div class="product-item-actions">
+                            <div class="actions-secondary">
+                                <a href="#"
+                                   data-post='<?= /* @noEscape */ $block->getItemRemoveParams($item) ?>'
+                                   title="<?= $block->escapeHtmlAttr(__('Remove This Item')) ?>"
+                                   class="btn-remove action delete ttk-sidebar-remove">
+                                    <span><?= $block->escapeHtml(__('Remove This Item')) ?></span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </li>
+            <?php endforeach; ?>
+        </ol>
+        <div class="actions-toolbar ttk-sidebar-actions">
+            <div class="primary">
+                <a class="action details"
+                   href="<?= $block->escapeUrl($wishlstViewModel->getListUrl()) ?>"
+                   title="<?= $block->escapeHtmlAttr(__('Go to Wish List')) ?>">
+                    <span><?= $block->escapeHtml(__('Go to Wishlist')) ?></span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+<?php return; ?>
+<?php if ($wishlstViewModel->isAllow()): ?>
+    <style>
+    [data-role="tekntek-wishlist-sidebar"] .ttk-sidebar-products {
+        display: grid !important;
+        gap: 8px !important;
+        margin: 0 0 10px !important;
+        padding: 0 !important;
+        list-style: none !important;
+    }
+
+    [data-role="tekntek-wishlist-sidebar"] .ttk-sidebar-products .product-item {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: 0 !important;
+        background: transparent !important;
+        overflow: hidden !important;
+    }
+
+    [data-role="tekntek-wishlist-sidebar"] .product-item-info {
+        position: relative !important;
+        display: flex !important;
+        gap: 9px !important;
+        align-items: center !important;
+        min-height: 52px !important;
+        padding: 6px 0 !important;
+        border: 0 !important;
+        border-bottom: 1px solid #eef2f7 !important;
+        border-radius: 0 !important;
+        background: transparent !important;
+        box-sizing: border-box !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        overflow: hidden !important;
+    }
+
+    [data-role="tekntek-wishlist-sidebar"] .ttk-sidebar-products .product-item:last-child .product-item-info {
+        border-bottom: 0 !important;
+    }
+
+    [data-role="tekntek-wishlist-sidebar"] .product-item-photo {
+        flex: 0 0 40px !important;
+        flex-shrink: 0 !important;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 40px !important;
+        height: 40px !important;
+        margin: 0 !important;
+        border-radius: 7px !important;
+        background: #f8fafc !important;
+        overflow: hidden !important;
+    }
+
+    [data-role="tekntek-wishlist-sidebar"] .product-item-photo img {
+        width: 100% !important;
+        height: 100% !important;
+        object-fit: contain !important;
+    }
+
+    [data-role="tekntek-wishlist-sidebar"] .product-item-details {
+        flex: 1 1 0% !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+        width: auto !important;
+        padding: 0 !important;
+        overflow: hidden !important;
+    }
+
+    [data-role="tekntek-wishlist-sidebar"] .product-item-name {
+        display: block !important;
+        margin: 0 0 3px !important;
+        padding: 0 !important;
+        color: #111827 !important;
+        font-size: 12px !important;
+        font-weight: 800 !important;
+        line-height: 1.25 !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+    }
+
+    [data-role="tekntek-wishlist-sidebar"] .product-item-link {
+        display: block !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+        color: #111827 !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        text-decoration: none !important;
+    }
+
+    [data-role="tekntek-wishlist-sidebar"] .product-item-link span {
+        display: block !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+        color: #111827 !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+    }
+
+    [data-role="tekntek-wishlist-sidebar"] .ttk-sidebar-price,
+    [data-role="tekntek-wishlist-sidebar"] .price-box,
+    [data-role="tekntek-wishlist-sidebar"] .price {
+        display: block !important;
+        max-width: 100% !important;
+        color: #64748b !important;
+        font-size: 11px !important;
+        font-weight: 700 !important;
+        line-height: 1.2 !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+    }
+
+    [data-role="tekntek-wishlist-sidebar"] .product-item-actions {
+        flex: 0 0 20px !important;
+        flex-shrink: 0 !important;
+        align-self: center !important;
+        justify-self: end !important;
+        margin: 0 !important;
+        margin-left: auto !important;
+        padding: 0 !important;
+    }
+
+    [data-role="tekntek-wishlist-sidebar"] .actions-secondary {
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    [data-role="tekntek-wishlist-sidebar"] .ttk-sidebar-remove {
+        position: static !important;
+        display: inline-grid !important;
+        place-items: center !important;
+        width: 20px !important;
+        height: 20px !important;
+        border-radius: 999px !important;
+        background: #f1f5f9 !important;
+        color: #64748b !important;
+        text-decoration: none !important;
+        box-shadow: none !important;
+    }
+
+    [data-role="tekntek-wishlist-sidebar"] .ttk-sidebar-remove::before {
+        content: "×" !important;
+        font-size: 14px !important;
+        font-weight: 800 !important;
+        line-height: 1 !important;
+    }
+
+    [data-role="tekntek-wishlist-sidebar"] .ttk-sidebar-remove span {
+        position: absolute !important;
+        width: 1px !important;
+        height: 1px !important;
+        overflow: hidden !important;
+        clip: rect(0, 0, 0, 0) !important;
+        white-space: nowrap !important;
+    }
+
+    [data-role="tekntek-wishlist-sidebar"] .ttk-sidebar-actions {
+        margin: 2px 0 0 !important;
+    }
+
+    [data-role="tekntek-wishlist-sidebar"] .ttk-sidebar-actions .action {
+        min-height: 0 !important;
+        padding: 0 !important;
+        border: 0 !important;
+        background: transparent !important;
+        color: #1d4ed8 !important;
+        font-size: 12px !important;
+        font-weight: 800 !important;
+        text-decoration: none !important;
+    }
+
+    [data-role="tekntek-wishlist-sidebar"] .ttk-sidebar-products,
+    [data-role="tekntek-wishlist-sidebar"] .ttk-sidebar-actions,
+    [data-role="tekntek-wishlist-sidebar"] .subtitle {
+        display: none !important;
+    }
+
+    [data-role="tekntek-wishlist-sidebar"].ttk-has-wishlist .ttk-sidebar-products {
+        display: grid !important;
+    }
+
+    [data-role="tekntek-wishlist-sidebar"].ttk-has-wishlist .ttk-sidebar-actions {
+        display: block !important;
+    }
+
+    [data-role="tekntek-wishlist-sidebar"].ttk-has-wishlist .subtitle {
+        display: block !important;
+    }
+
+    [data-role="tekntek-wishlist-sidebar"] .ttk-sidebar-product--invalid {
+        display: none !important;
+    }
+
+    [data-role="tekntek-wishlist-sidebar"].ttk-has-wishlist .ttk-sidebar-empty,
+    [data-role="tekntek-wishlist-sidebar"].ttk-is-empty .ttk-sidebar-products,
+    [data-role="tekntek-wishlist-sidebar"].ttk-is-empty .ttk-sidebar-actions,
+    [data-role="tekntek-wishlist-sidebar"].ttk-is-empty .subtitle {
+        display: none !important;
+    }
+
+    [data-role="tekntek-wishlist-sidebar"].ttk-is-empty .ttk-sidebar-empty {
+        display: grid !important;
+    }
+
+    body.account .sidebar-additional [data-role="tekntek-wishlist-sidebar"] .product-item-info,
+    body.customer-account-index .sidebar-additional [data-role="tekntek-wishlist-sidebar"] .product-item-info {
+        display: flex !important;
+        gap: 9px !important;
+        align-items: center !important;
+        padding: 6px 0 !important;
+        border: 0 !important;
+        border-bottom: 1px solid #eef2f7 !important;
+        background: transparent !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        overflow: hidden !important;
+    }
+
+    body.account .sidebar-additional [data-role="tekntek-wishlist-sidebar"] .product-item-details,
+    body.customer-account-index .sidebar-additional [data-role="tekntek-wishlist-sidebar"] .product-item-details,
+    body.account .sidebar-additional [data-role="tekntek-wishlist-sidebar"] .product-item-name,
+    body.customer-account-index .sidebar-additional [data-role="tekntek-wishlist-sidebar"] .product-item-name,
+    body.account .sidebar-additional [data-role="tekntek-wishlist-sidebar"] .product-item-link,
+    body.customer-account-index .sidebar-additional [data-role="tekntek-wishlist-sidebar"] .product-item-link,
+    body.account .sidebar-additional [data-role="tekntek-wishlist-sidebar"] .product-item-link span,
+    body.customer-account-index .sidebar-additional [data-role="tekntek-wishlist-sidebar"] .product-item-link span {
+        display: block !important;
+        flex: 1 1 0% !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+    }
+
+    body.account .sidebar-additional [data-role="tekntek-wishlist-sidebar"] .product-item-photo,
+    body.customer-account-index .sidebar-additional [data-role="tekntek-wishlist-sidebar"] .product-item-photo,
+    body.account .sidebar-additional [data-role="tekntek-wishlist-sidebar"] .product-item-actions,
+    body.customer-account-index .sidebar-additional [data-role="tekntek-wishlist-sidebar"] .product-item-actions {
+        flex-shrink: 0 !important;
+        margin-left: auto !important;
+    }
+
+    body.account .sidebar-additional [data-role="tekntek-wishlist-sidebar"] .product-item-details,
+    body.customer-account-index .sidebar-additional [data-role="tekntek-wishlist-sidebar"] .product-item-details {
+        flex: 1 1 0% !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+        overflow: hidden !important;
+    }
+
+    body.account .sidebar-additional [data-role="tekntek-wishlist-sidebar"] .ttk-sidebar-remove,
+    body.customer-account-index .sidebar-additional [data-role="tekntek-wishlist-sidebar"] .ttk-sidebar-remove {
+        position: static !important;
+        flex-shrink: 0 !important;
+        width: 20px !important;
+        height: 20px !important;
+        background: #f1f5f9 !important;
+        color: #64748b !important;
+    }
+    </style>
+    <div class="block block-wishlist ttk-sidebar-card ttk-is-empty" data-bind="scope: 'wishlist'" data-role="tekntek-wishlist-sidebar">
+        <div class="block-title ttk-sidebar-card__title">
+            <strong role="heading" aria-level="2"><?= $block->escapeHtml($block->getTitle()) ?></strong>
+            <!-- ko if: wishlist().counter && wishlist().counter !== '()' && wishlist().counter !== '(0)' -->
+            <span data-bind="text: wishlist().counter" class="counter"></span>
+            <!-- /ko -->
+        </div>
+        <div class="block-content">
+            <!-- ko if: wishlist().items && wishlist().items.length -->
+                <strong class="subtitle"><?= $block->escapeHtml(__('Last Added Items')) ?></strong>
+                <ol class="product-items ttk-sidebar-products"
+                    id="wishlist-sidebar"
+                    data-bind="foreach: wishlist().items">
+                    <li class="product-item" data-bind="css: {'ttk-sidebar-product--invalid': !(product_url && (product_name || name || product_sku || (image && image.alt)))}">
+                        <div class="product-item-info">
+                            <a class="product-item-photo" data-bind="attr: { href: product_url, title: product_name || name || product_sku || (image && image.alt) || 'Product' }">
+                                <!-- ko if: image && image.template -->
+                                <!-- ko template: {name: $data.image.template, data: $data.image} --><!-- /ko -->
+                                <!-- /ko -->
+                            </a>
+                            <div class="product-item-details">
+                                <strong class="product-item-name">
+                                    <a data-bind="attr: { href: product_url }" class="product-item-link">
+                                        <span data-bind="text: product_name || name || product_sku || (image && image.alt) || 'Product'"></span>
+                                    </a>
+                                </strong>
+                                <div class="ttk-sidebar-price" data-bind="html: product_price || price || ''"></div>
+                            </div>
+                            <div class="product-item-actions">
+                                <div class="actions-secondary">
+                                    <a href="#" data-bind="attr: {'data-post': delete_item_params}"
+                                       title="<?= $block->escapeHtmlAttr(__('Remove This Item')) ?>"
+                                       class="btn-remove action delete ttk-sidebar-remove">
+                                        <span><?= $block->escapeHtml(__('Remove This Item')) ?></span>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                </ol>
+                <div class="actions-toolbar ttk-sidebar-actions">
+                    <div class="primary">
+                        <a class="action details"
+                           href="<?= $block->escapeUrl($wishlstViewModel->getListUrl()) ?>"
+                           title="<?= $block->escapeHtmlAttr(__('Go to Wish List')) ?>">
+                            <span><?= $block->escapeHtml(__('Go to Wishlist')) ?></span>
+                        </a>
+                    </div>
+                </div>
+            <!-- /ko -->
+            <div class="empty ttk-sidebar-empty">
+                <span class="ttk-sidebar-empty__icon" aria-hidden="true">♡</span>
+                <strong><?= $block->escapeHtml(__('Your wish list is empty')) ?></strong>
+                <span><?= $block->escapeHtml(__('Save products you love and come back to them anytime.')) ?></span>
+                <a class="ttk-sidebar-empty__link" href="<?= $block->escapeUrl($block->getUrl('')) ?>">
+                    <?= $block->escapeHtml(__('Discover Products')) ?>
+                </a>
+            </div>
+        </div>
+    </div>
+<script type="text/x-magento-init">
+    {
+        "*": {
+            "Magento_Ui/js/core/app": {
+                "components": {
+                    "wishlist": {
+                        "component": "Magento_Wishlist/js/view/wishlist"
+                    }
+                }
+            }
+        }
+    }
+</script>
+<script>
+require(['jquery', 'Magento_Customer/js/customer-data'], function ($, customerData) {
+    'use strict';
+
+    var sidebar = $('[data-role="tekntek-wishlist-sidebar"]');
+    var uiVersionKey = 'tekntek_wishlist_sidebar_ui_version';
+    var uiVersion = '20260430-wishlist-sidebar-empty-v4';
+
+    function isValidItem(item) {
+        return !!(item && item.product_url && (
+            item.product_name ||
+            item.name ||
+            item.product_sku ||
+            (item.image && item.image.alt)
+        ));
+    }
+
+    function clearStalePrivateContentOnce() {
+        try {
+            if (window.localStorage.getItem(uiVersionKey) === uiVersion) {
+                return;
+            }
+
+            window.localStorage.removeItem('mage-cache-storage');
+            window.localStorage.removeItem('mage-cache-storage-section-invalidation');
+            window.localStorage.removeItem('mage-cache-timeout');
+            window.localStorage.setItem(uiVersionKey, uiVersion);
+        } catch (error) {
+            // Storage can be unavailable in private browsing; rendering should continue.
+        }
+    }
+
+    function updateWishlistState() {
+        var section = customerData.get('wishlist')() || {};
+        var items = Array.isArray(section.items) ? section.items : [];
+        var hasItems = items.filter(isValidItem).length > 0;
+
+        sidebar.toggleClass('ttk-has-wishlist', hasItems);
+        sidebar.toggleClass('ttk-is-empty', !hasItems);
+    }
+
+    clearStalePrivateContentOnce();
+    updateWishlistState();
+    customerData.get('wishlist').subscribe(updateWishlistState);
+    customerData.reload(['wishlist'], true).done(updateWishlistState);
+});
+</script>
+<?php endif ?>

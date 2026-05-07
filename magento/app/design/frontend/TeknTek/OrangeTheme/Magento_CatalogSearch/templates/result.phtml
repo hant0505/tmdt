@@ -1,0 +1,45 @@
+<?php
+/**
+ * Modern search result shell.
+ *
+ * @var $block \Magento\CatalogSearch\Block\Result
+ * @var \Magento\Framework\Escaper $escaper
+ */
+$productList = $block->getProductListHtml();
+$queryText = (string) $block->getRequest()->getParam('q');
+?>
+
+<div class="tekntek-search-heading">
+    <h1 class="page-title">
+        <span><?= $escaper->escapeHtml(__('Search results for:')) ?></span>
+        <strong><?= $escaper->escapeHtml($queryText) ?></strong>
+    </h1>
+</div>
+
+<?php if ($block->getResultCount()) : ?>
+    <?= /* @noEscape */ $block->getChildHtml('tagged_product_list_rss_link') ?>
+    <div class="search results">
+        <?php if ($messages = $block->getNoteMessages()) : ?>
+            <div class="message notice tekntek-search-suggestions">
+                <div>
+                    <?php foreach ($messages as $message) : ?>
+                        <span class="tekntek-search-suggestion"><?= /* @noEscape */ $message ?></span>
+                    <?php endforeach; ?>
+                </div>
+            </div>
+        <?php endif; ?>
+        <?= /* @noEscape */ $productList ?>
+    </div>
+<?php else : ?>
+    <div class="message notice tekntek-search-suggestions">
+        <div>
+            <?= $escaper->escapeHtml($block->getNoResultText() ? $block->getNoResultText() : __('Your search returned no results.')) ?>
+            <?= /* @noEscape */ $block->getAdditionalHtml() ?>
+            <?php if ($messages = $block->getNoteMessages()) : ?>
+                <?php foreach ($messages as $message) : ?>
+                    <span class="tekntek-search-suggestion"><?= /* @noEscape */ $message ?></span>
+                <?php endforeach; ?>
+            <?php endif; ?>
+        </div>
+    </div>
+<?php endif; ?>

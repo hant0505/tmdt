@@ -1,0 +1,81 @@
+<?php
+/**
+ * Modern card-based additional addresses.
+ *
+ * @var \Magento\Customer\Block\Address\Grid $block
+ * @var \Magento\Framework\Escaper $escaper
+ */
+?>
+
+<div class="block block-addresses-list ttk-address-list-block">
+    <div class="block-title"><strong><?= $escaper->escapeHtml(__('Additional Address Entries')) ?></strong></div>
+    <div class="block-content">
+        <?php if ($additionalAddresses = $block->getAdditionalAddresses()): ?>
+            <div class="ttk-address-grid">
+                <?php foreach ($additionalAddresses as $address): ?>
+                    <article class="ttk-address-card">
+                        <div class="ttk-address-card__head">
+                            <strong><?= $escaper->escapeHtml(trim($address->getFirstname() . ' ' . $address->getLastname())) ?></strong>
+                            <span><?= $escaper->escapeHtml(__('Address')) ?></span>
+                        </div>
+                        <address class="ttk-address-card__body">
+                            <?= $escaper->escapeHtml($block->getStreetAddress($address)) ?><br>
+                            <?= $escaper->escapeHtml($address->getCity()) ?>,
+                            <?= $escaper->escapeHtml($address->getRegion()->getRegion()) ?>
+                            <?= $escaper->escapeHtml($address->getPostcode()) ?><br>
+                            <?= $escaper->escapeHtml($block->getCountryByCode($address->getCountryId())) ?><br>
+                            <span><?= $escaper->escapeHtml(__('T: %1', $address->getTelephone())) ?></span>
+                        </address>
+                        <div class="ttk-address-card__actions">
+                            <a class="action edit ttk-action-chip"
+                               href="<?= $escaper->escapeUrl($block->getUrl('customer/address/edit', ['id' => $address->getId()])) ?>">
+                                <span><?= $escaper->escapeHtml(__('Edit')) ?></span>
+                            </a>
+                            <a class="action delete ttk-action-chip ttk-action-chip--danger"
+                               href="#"
+                               role="delete-address"
+                               data-address="<?= $escaper->escapeHtmlAttr($address->getId()) ?>">
+                                <span><?= $escaper->escapeHtml(__('Delete')) ?></span>
+                            </a>
+                        </div>
+                    </article>
+                <?php endforeach; ?>
+            </div>
+            <?php if ($block->getChildHtml('pager')): ?>
+                <div class="customer-addresses-toolbar toolbar bottom"><?= $block->getChildHtml('pager') ?></div>
+            <?php endif ?>
+        <?php else: ?>
+            <div class="ttk-account-empty ttk-account-empty--compact">
+                <div class="ttk-account-empty__illustration" aria-hidden="true">⌂</div>
+                <h2><?= $escaper->escapeHtml(__('No additional addresses yet.')) ?></h2>
+                <p><?= $escaper->escapeHtml(__('You have no other address entries in your address book.')) ?></p>
+            </div>
+        <?php endif ?>
+    </div>
+</div>
+
+<div class="actions-toolbar">
+    <div class="primary">
+        <button type="button" role="add-address" title="<?= $escaper->escapeHtmlAttr(__('Add New Address')) ?>"
+                class="action primary add">
+            <span><?= $escaper->escapeHtml(__('Add New Address')) ?></span>
+        </button>
+    </div>
+    <div class="secondary">
+        <a class="action back" href="<?= $escaper->escapeUrl($block->getUrl('customer/account')) ?>">
+            <span><?= $escaper->escapeHtml(__('Back')) ?></span>
+        </a>
+    </div>
+</div>
+<script type="text/x-magento-init">
+    {
+        ".page-main": {
+            "address": {
+                "deleteAddress": "a[role='delete-address']",
+                "deleteUrlPrefix": "<?= $escaper->escapeJs($escaper->escapeUrl($block->getDeleteUrl())) ?>id/",
+                "addAddress": "button[role='add-address']",
+                "addAddressLocation": "<?= $escaper->escapeJs($escaper->escapeUrl($block->getAddAddressUrl())) ?>"
+            }
+        }
+    }
+</script>

@@ -1,0 +1,1500 @@
+<?php
+/**
+ * Compare products sidebar.
+ *
+ * @var $block \Magento\Framework\View\Element\Template
+ */
+$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+$compareHelper = $this->helper(\Magento\Catalog\Helper\Product\Compare::class);
+$imageHelper = $objectManager->get(\Magento\Catalog\Helper\Image::class);
+$priceCurrency = $objectManager->get(\Magento\Framework\Pricing\PriceCurrencyInterface::class);
+$compareSeedItems = [];
+
+try {
+    foreach ($compareHelper->getItemCollection() as $product) {
+        $productId = (int) $product->getId();
+        if ($productId <= 0) {
+            continue;
+        }
+
+        $imageUrl = (string) $imageHelper->init($product, 'wishlist_sidebar_block')->getUrl();
+
+        $compareSeedItems[] = [
+            'id' => $productId,
+            'name' => (string) $product->getName(),
+            'url' => (string) $product->getProductUrl(),
+            'image' => $imageUrl,
+            'price' => (string) $priceCurrency->format((float) $product->getFinalPrice(), false),
+            'remove_url' => (string) $compareHelper->getPostDataRemove($product),
+        ];
+    }
+} catch (\Throwable $exception) {
+    $compareSeedItems = [];
+}
+?>
+<?php
+$compareCount = count($compareSeedItems);
+$clearPostData = (string) $compareHelper->getPostDataClearList();
+?>
+<style>
+[data-role="compare-products-sidebar"] .ttk-sidebar-products {
+    display: grid !important;
+    gap: 0 !important;
+    margin: 0 0 10px !important;
+    padding: 0 !important;
+    list-style: none !important;
+}
+
+[data-role="compare-products-sidebar"] .ttk-compare-row {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    padding: 8px 0 !important;
+    border-bottom: 1px solid #f8fafc !important;
+    overflow: hidden !important;
+}
+
+[data-role="compare-products-sidebar"] .ttk-compare-row:last-child {
+    border-bottom: 0 !important;
+}
+
+[data-role="compare-products-sidebar"] .ttk-sidebar-thumb {
+    flex: 0 0 42px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 42px !important;
+    height: 42px !important;
+    border-radius: 7px !important;
+    background: #f8fafc !important;
+    overflow: hidden !important;
+    text-decoration: none !important;
+}
+
+[data-role="compare-products-sidebar"] .ttk-sidebar-thumb img {
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain !important;
+}
+
+[data-role="compare-products-sidebar"] .ttk-sidebar-product-copy {
+    flex: 1 1 0% !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+}
+
+[data-role="compare-products-sidebar"] .product-item-name,
+[data-role="compare-products-sidebar"] .product-item-link,
+[data-role="compare-products-sidebar"] .ttk-sidebar-price {
+    display: block !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+
+[data-role="compare-products-sidebar"] .product-item-name {
+    margin: 0 0 3px !important;
+    color: #111827 !important;
+    font-size: 12px !important;
+    font-weight: 800 !important;
+    line-height: 1.25 !important;
+}
+
+[data-role="compare-products-sidebar"] .product-item-link {
+    color: #111827 !important;
+    text-decoration: none !important;
+}
+
+[data-role="compare-products-sidebar"] .ttk-sidebar-price {
+    color: #64748b !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    line-height: 1.2 !important;
+}
+
+[data-role="compare-products-sidebar"] .ttk-sidebar-remove {
+    flex: 0 0 20px !important;
+    flex-shrink: 0 !important;
+    display: inline-grid !important;
+    place-items: center !important;
+    width: 20px !important;
+    height: 20px !important;
+    margin-left: auto !important;
+    border-radius: 999px !important;
+    background: #f1f5f9 !important;
+    color: #64748b !important;
+    text-decoration: none !important;
+    box-shadow: none !important;
+}
+
+[data-role="compare-products-sidebar"] .ttk-sidebar-remove::before {
+    content: "x" !important;
+    font-size: 12px !important;
+    font-weight: 800 !important;
+    line-height: 1 !important;
+}
+
+[data-role="compare-products-sidebar"] .ttk-sidebar-remove span {
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+}
+
+[data-role="compare-products-sidebar"] .ttk-sidebar-actions {
+    display: flex !important;
+    align-items: center !important;
+    gap: 14px !important;
+    margin: 4px 0 0 !important;
+    padding-top: 8px !important;
+    border-top: 1px solid #eef2f7 !important;
+}
+
+[data-role="compare-products-sidebar"] .ttk-sidebar-actions .primary,
+[data-role="compare-products-sidebar"] .ttk-sidebar-actions .secondary {
+    float: none !important;
+    margin: 0 !important;
+}
+
+[data-role="compare-products-sidebar"] .ttk-sidebar-actions .action {
+    display: inline-flex !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: transparent !important;
+    color: #1d4ed8 !important;
+    font-size: 12px !important;
+    font-weight: 800 !important;
+    line-height: 1 !important;
+    text-decoration: none !important;
+    box-shadow: none !important;
+}
+
+[data-role="compare-products-sidebar"] .ttk-sidebar-empty {
+    display: grid;
+    justify-items: start;
+    gap: 8px;
+    margin: 0;
+    padding: 14px;
+    border: 1px dashed #cbd5e1;
+    border-radius: 12px;
+    background: #f8fafc;
+    color: #64748b;
+}
+
+[data-role="compare-products-sidebar"].ttk-has-items .ttk-sidebar-empty,
+[data-role="compare-products-sidebar"].ttk-is-empty .ttk-sidebar-list,
+[data-role="compare-products-sidebar"].ttk-is-empty .ttk-sidebar-actions {
+    display: none !important;
+}
+</style>
+
+<div class="block block-compare ttk-sidebar-card <?= $compareCount ? 'ttk-has-items' : 'ttk-is-empty' ?>"
+     data-role="compare-products-sidebar">
+    <div class="block-title ttk-sidebar-card__title">
+        <strong id="block-compare-heading" role="heading" aria-level="2"><?= $block->escapeHtml(__('Compare Products')) ?></strong>
+        <span class="counter qty<?= $compareCount ? '' : ' no-display' ?>" data-role="compare-count">
+            <?= $compareCount ? $block->escapeHtml(__('%1 items', $compareCount)) : '' ?>
+        </span>
+    </div>
+
+    <div class="block-content ttk-sidebar-list" aria-labelledby="block-compare-heading">
+        <ol id="compare-items" class="product-items product-items-names ttk-sidebar-products" data-role="compare-items">
+            <?php foreach ($compareSeedItems as $item): ?>
+                <li class="product-item ttk-compare-row flex items-center gap-3 py-2 border-b border-gray-50 last:border-0" data-id="<?= (int) $item['id'] ?>">
+                    <input type="hidden" class="compare-item-id" value="<?= (int) $item['id'] ?>"/>
+                    <a class="ttk-sidebar-thumb"
+                       href="<?= $block->escapeUrl((string) $item['url']) ?>"
+                       title="<?= $block->escapeHtmlAttr((string) $item['name']) ?>">
+                        <?php if (!empty($item['image'])): ?>
+                            <img src="<?= $block->escapeUrl((string) $item['image']) ?>"
+                                 alt="<?= $block->escapeHtmlAttr((string) $item['name']) ?>"
+                                 loading="lazy"/>
+                        <?php endif; ?>
+                    </a>
+                    <div class="ttk-sidebar-product-copy flex-1 min-w-0">
+                        <strong class="product-item-name truncate">
+                            <a class="product-item-link" href="<?= $block->escapeUrl((string) $item['url']) ?>">
+                                <?= $block->escapeHtml((string) $item['name']) ?>
+                            </a>
+                        </strong>
+                        <span class="ttk-sidebar-price"><?= $block->escapeHtml((string) $item['price']) ?></span>
+                    </div>
+                    <a href="#"
+                       class="action delete ttk-sidebar-remove flex-shrink-0"
+                       data-role="compare-remove"
+                       data-post="<?= $block->escapeHtmlAttr((string) $item['remove_url']) ?>">
+                        <span><?= $block->escapeHtml(__('Remove This Item')) ?></span>
+                    </a>
+                </li>
+            <?php endforeach; ?>
+        </ol>
+        <div class="actions-toolbar ttk-sidebar-actions">
+            <div class="primary">
+                <a class="action compare primary"
+                   data-role="compare-view-all"
+                   href="<?= $block->escapeUrl($block->getUrl('catalog/product_compare/index')) ?>">
+                    <span><?= $block->escapeHtml(__('View All')) ?></span>
+                </a>
+            </div>
+            <div class="secondary">
+                <a id="compare-clear-all"
+                   href="#"
+                   class="action clear"
+                   data-role="compare-clear"
+                   data-post="<?= $block->escapeHtmlAttr($clearPostData) ?>">
+                    <span><?= $block->escapeHtml(__('Clear All')) ?></span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="empty ttk-sidebar-empty" aria-labelledby="block-compare-heading">
+        <strong><?= $block->escapeHtml(__('No products to compare yet')) ?></strong>
+        <span><?= $block->escapeHtml(__('Add products to compare specs, prices, and key features side by side.')) ?></span>
+        <a class="ttk-sidebar-empty__link" href="<?= $block->escapeUrl($block->getUrl('')) ?>">
+            <?= $block->escapeHtml(__('Start Shopping')) ?>
+        </a>
+    </div>
+</div>
+
+<script>
+require(['jquery', 'Magento_Customer/js/customer-data'], function ($, customerData) {
+    'use strict';
+
+    var sidebar = $('[data-role="compare-products-sidebar"]');
+    var itemsNode = sidebar.find('[data-role="compare-items"]');
+    var countNode = sidebar.find('[data-role="compare-count"]');
+    var viewAll = sidebar.find('[data-role="compare-view-all"]');
+    var seedItems = <?= /* @noEscape */ json_encode($compareSeedItems, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?>;
+    var compareUrl = '<?= $block->escapeJs($block->getUrl('catalog/product_compare/index')) ?>';
+
+    function escapeHtml(value) {
+        return String(value || '').replace(/[&<>"']/g, function (match) {
+            return {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            }[match];
+        });
+    }
+
+    function imageUrl(item) {
+        if (!item) {
+            return '';
+        }
+        if (typeof item.image === 'string') {
+            return item.image;
+        }
+        if (item.image && typeof item.image === 'object') {
+            return item.image.src || item.image.url || item.image.image || '';
+        }
+        return item.product_image || item.thumbnail || item.small_image || item.src || '';
+    }
+
+    function normalize(item) {
+        var id = Number(item.id || item.product_id || item.item_id);
+        return {
+            id: id,
+            name: item.name || item.product_name || item.product_sku || (item.image && item.image.alt) || 'Product',
+            url: item.product_url || item.url || item.productUrl || '#',
+            image: imageUrl(item),
+            price: item.price || item.product_price || item.final_price || '',
+            remove_url: item.remove_url || item.delete_item_params || ''
+        };
+    }
+
+    function mergeSeed(items) {
+        var seedById = {};
+        seedItems.forEach(function (item) {
+            seedById[Number(item.id)] = item;
+        });
+
+        return items.map(function (item) {
+            var seed = seedById[Number(item.id)];
+            if (!seed) {
+                return item;
+            }
+            item.image = item.image || seed.image || '';
+            item.price = item.price || seed.price || '';
+            item.url = item.url && item.url !== '#' ? item.url : seed.url;
+            item.remove_url = item.remove_url || seed.remove_url || '';
+            return item;
+        });
+    }
+
+    function readItems() {
+        var section = customerData.get('compare-products')() || {};
+        var rawItems = Array.isArray(section.items) ? section.items : [];
+
+        if (!rawItems.length && section.items && typeof section.items === 'object') {
+            rawItems = Object.keys(section.items).map(function (key) {
+                return section.items[key];
+            });
+        }
+
+        rawItems = rawItems.map(normalize).filter(function (item) {
+            return item.id > 0;
+        });
+
+        return mergeSeed(rawItems.length ? rawItems : seedItems.map(normalize)).slice(0, 4);
+    }
+
+    function countCaption(count) {
+        return count === 1 ? '1 item' : count + ' items';
+    }
+
+    function listUrl(items) {
+        var ids = items.map(function (item) {
+            return Number(item.id);
+        }).filter(function (id) {
+            return id > 0;
+        });
+
+        if (!ids.length) {
+            return compareUrl;
+        }
+
+        return compareUrl + (compareUrl.indexOf('?') === -1 ? '?' : '&') + 'ids=' + encodeURIComponent(ids.join(','));
+    }
+
+    function render(items) {
+        var count = items.length;
+        sidebar.toggleClass('ttk-has-items', count > 0).toggleClass('ttk-is-empty', count === 0);
+        countNode.toggleClass('no-display', count === 0).text(count ? countCaption(count) : '');
+        viewAll.attr('href', listUrl(items));
+
+        itemsNode.html(items.map(function (item) {
+            var image = item.image ?
+                '<img src="' + escapeHtml(item.image) + '" alt="' + escapeHtml(item.name) + '" loading="lazy"/>' :
+                '';
+
+            return '<li class="product-item ttk-compare-row flex items-center gap-3 py-2 border-b border-gray-50 last:border-0" data-id="' + Number(item.id) + '">' +
+                '<input type="hidden" class="compare-item-id" value="' + Number(item.id) + '"/>' +
+                '<a class="ttk-sidebar-thumb" href="' + escapeHtml(item.url) + '" title="' + escapeHtml(item.name) + '">' + image + '</a>' +
+                '<div class="ttk-sidebar-product-copy flex-1 min-w-0">' +
+                    '<strong class="product-item-name truncate">' +
+                        '<a class="product-item-link" href="' + escapeHtml(item.url) + '">' + escapeHtml(item.name) + '</a>' +
+                    '</strong>' +
+                    '<span class="ttk-sidebar-price">' + escapeHtml(item.price) + '</span>' +
+                '</div>' +
+                '<a href="#" class="action delete ttk-sidebar-remove flex-shrink-0" data-role="compare-remove" data-post="' + escapeHtml(item.remove_url) + '">' +
+                    '<span><?= $block->escapeJs(__('Remove This Item')) ?></span>' +
+                '</a>' +
+            '</li>';
+        }).join(''));
+    }
+
+    function postData(raw) {
+        if (!raw) {
+            return $.Deferred().resolve().promise();
+        }
+
+        try {
+            raw = JSON.parse(raw);
+        } catch (error) {
+            return $.Deferred().resolve().promise();
+        }
+
+        return $.ajax({
+            url: raw.action,
+            type: 'POST',
+            data: raw.data || {}
+        });
+    }
+
+    function reload() {
+        customerData.invalidate(['compare-products']);
+        return customerData.reload(['compare-products'], true).always(function () {
+            render(readItems());
+        });
+    }
+
+    sidebar.on('click', '[data-role="compare-remove"]', function (event) {
+        event.preventDefault();
+        postData($(this).attr('data-post')).always(reload);
+    });
+
+    sidebar.on('click', '[data-role="compare-clear"]', function (event) {
+        event.preventDefault();
+        postData($(this).attr('data-post')).always(function () {
+            render([]);
+            reload();
+        });
+    });
+
+    reload();
+    render(readItems());
+    customerData.get('compare-products').subscribe(function () {
+        render(readItems());
+    });
+});
+</script>
+<?php return; ?>
+<style>
+[data-role="compare-products-sidebar"] {
+    position: relative;
+}
+
+[data-role="compare-products-sidebar"] > .ttk-sidebar-empty {
+    display: none !important;
+}
+
+[data-role="compare-products-sidebar"].ttk-has-local-compare > .block-content:not([data-role="tekntek-compare-fallback"]),
+[data-role="compare-products-sidebar"].ttk-is-empty > .block-content:not([data-role="tekntek-compare-fallback"]) {
+    display: none !important;
+}
+
+[data-role="compare-products-sidebar"].ttk-has-local-compare > [data-role="tekntek-compare-fallback"] {
+    display: block !important;
+}
+
+[data-role="compare-products-sidebar"].ttk-is-empty > .ttk-sidebar-empty {
+    display: grid !important;
+}
+
+[data-role="compare-products-sidebar"].ttk-has-native-compare .ttk-sidebar-empty,
+[data-role="compare-products-sidebar"].ttk-has-native-compare [data-role="tekntek-compare-fallback"],
+[data-role="compare-products-sidebar"].ttk-has-local-compare .ttk-sidebar-empty,
+[data-role="compare-products-sidebar"]:not(.ttk-is-empty) .ttk-sidebar-empty {
+    display: none !important;
+}
+
+[data-role="compare-products-sidebar"].ttk-is-empty [data-role="tekntek-compare-fallback"] {
+    display: none !important;
+}
+
+[data-role="compare-products-sidebar"] .ttk-sidebar-empty {
+    display: grid;
+    justify-items: start;
+    gap: 8px;
+    margin: 0;
+    padding: 14px;
+    border: 1px dashed #cbd5e1;
+    border-radius: 12px;
+    background: linear-gradient(135deg, #f8fafc 0%, #eff6ff 100%);
+    color: #64748b;
+}
+
+[data-role="compare-products-sidebar"] .ttk-sidebar-empty[hidden] {
+    display: none !important;
+}
+
+[data-role="compare-products-sidebar"] .ttk-sidebar-products {
+    display: grid !important;
+    gap: 8px !important;
+    margin: 0 0 12px !important;
+    padding: 0 !important;
+    list-style: none !important;
+}
+
+[data-role="compare-products-sidebar"] .ttk-sidebar-products .product-item {
+    position: relative !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 9px !important;
+    margin: 0 !important;
+    min-height: 0 !important;
+    padding: 6px 0 !important;
+    border: 0 !important;
+    border-bottom: 1px solid #eef2f7 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-sizing: border-box !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
+}
+
+[data-role="compare-products-sidebar"] .ttk-sidebar-products .product-item:last-child {
+    border-bottom: 0 !important;
+}
+
+[data-role="compare-products-sidebar"] .ttk-sidebar-thumb {
+    flex: 0 0 40px !important;
+    flex-shrink: 0 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    width: 40px !important;
+    height: 40px !important;
+    border-radius: 7px !important;
+    background: #f8fafc !important;
+    color: #94a3b8 !important;
+    overflow: hidden !important;
+    text-decoration: none !important;
+}
+
+[data-role="compare-products-sidebar"] .ttk-sidebar-thumb::before {
+    content: "";
+    font-size: 17px;
+    line-height: 1;
+}
+
+[data-role="compare-products-sidebar"] .ttk-sidebar-thumb:empty::before {
+    content: "▦";
+}
+
+[data-role="compare-products-sidebar"] .ttk-sidebar-thumb img {
+    position: relative !important;
+    z-index: 1 !important;
+    width: 100% !important;
+    height: 100% !important;
+    background: #ffffff !important;
+    object-fit: contain !important;
+}
+
+[data-role="compare-products-sidebar"] .ttk-sidebar-thumb .product-image-container,
+[data-role="compare-products-sidebar"] .ttk-sidebar-thumb .product-image-wrapper,
+[data-role="compare-products-sidebar"] .ttk-sidebar-thumb .product-image-photo {
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+    padding: 0 !important;
+}
+
+[data-role="compare-products-sidebar"] .ttk-sidebar-thumb:has(img)::before {
+    display: none !important;
+}
+
+[data-role="compare-products-sidebar"] .ttk-sidebar-product-copy {
+    flex: 1 1 0% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
+}
+
+[data-role="compare-products-sidebar"] .ttk-sidebar-products .product-item-name {
+    display: block !important;
+    margin: 0 !important;
+    padding-right: 0 !important;
+    color: #111827 !important;
+    font-size: 12px !important;
+    font-weight: 700 !important;
+    line-height: 1.25 !important;
+    max-height: none !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+
+[data-role="compare-products-sidebar"] .ttk-sidebar-products .product-item-link {
+    display: block !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    color: #111827;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    text-decoration: none;
+}
+
+[data-role="compare-products-sidebar"] .ttk-sidebar-price {
+    display: block !important;
+    margin-top: 3px !important;
+    color: #64748b !important;
+    font-size: 11px !important;
+    font-weight: 700 !important;
+    line-height: 1.2 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+
+[data-role="compare-products-sidebar"] .ttk-sidebar-remove {
+    position: static !important;
+    flex: 0 0 20px !important;
+    flex-shrink: 0 !important;
+    display: inline-grid !important;
+    place-items: center !important;
+    width: 20px !important;
+    height: 20px !important;
+    border-radius: 999px !important;
+    background: #f1f5f9 !important;
+    color: #64748b !important;
+    margin-left: auto !important;
+    text-decoration: none !important;
+    box-shadow: none !important;
+}
+
+[data-role="compare-products-sidebar"] .ttk-sidebar-remove::before {
+    content: "×";
+    font-size: 14px;
+    font-weight: 800;
+    line-height: 1;
+}
+
+[data-role="compare-products-sidebar"] .ttk-sidebar-remove span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+}
+
+[data-role="compare-products-sidebar"] .ttk-sidebar-actions {
+    display: flex !important;
+    align-items: center !important;
+    gap: 14px !important;
+    flex-wrap: wrap !important;
+    margin: 4px 0 0 !important;
+    padding-top: 8px !important;
+    border-top: 1px solid #eef2f7 !important;
+}
+
+[data-role="compare-products-sidebar"] .ttk-sidebar-actions::before,
+[data-role="compare-products-sidebar"] .ttk-sidebar-actions::after {
+    display: none !important;
+    content: none !important;
+}
+
+[data-role="compare-products-sidebar"] .ttk-sidebar-actions .primary,
+[data-role="compare-products-sidebar"] .ttk-sidebar-actions .secondary {
+    float: none !important;
+    margin: 0 !important;
+}
+
+[data-role="compare-products-sidebar"] .ttk-sidebar-actions .action {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    font-size: 12px !important;
+    font-weight: 800 !important;
+    line-height: 1 !important;
+    text-decoration: none !important;
+    box-shadow: none !important;
+}
+
+[data-role="compare-products-sidebar"] .ttk-sidebar-actions .action.compare {
+    border: 0 !important;
+    background: transparent !important;
+    color: #1d4ed8 !important;
+}
+
+[data-role="compare-products-sidebar"] .ttk-sidebar-actions .action.clear {
+    border: 0 !important;
+    background: transparent !important;
+    color: #1d4ed8 !important;
+}
+
+body.account .sidebar-additional [data-role="compare-products-sidebar"] .ttk-sidebar-empty[hidden],
+body.customer-account-index .sidebar-additional [data-role="compare-products-sidebar"] .ttk-sidebar-empty[hidden],
+body.account .sidebar-additional [data-role="compare-products-sidebar"].ttk-has-native-compare .ttk-sidebar-empty,
+body.customer-account-index .sidebar-additional [data-role="compare-products-sidebar"].ttk-has-native-compare .ttk-sidebar-empty,
+body.account .sidebar-additional [data-role="compare-products-sidebar"].ttk-has-local-compare .ttk-sidebar-empty,
+body.customer-account-index .sidebar-additional [data-role="compare-products-sidebar"].ttk-has-local-compare .ttk-sidebar-empty {
+    display: none !important;
+}
+
+body.account .sidebar-additional [data-role="compare-products-sidebar"] .ttk-sidebar-products .product-item,
+body.customer-account-index .sidebar-additional [data-role="compare-products-sidebar"] .ttk-sidebar-products .product-item {
+    display: flex !important;
+    gap: 9px !important;
+    align-items: center !important;
+    padding: 6px 0 !important;
+    border: 0 !important;
+    border-bottom: 1px solid #eef2f7 !important;
+    background: transparent !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
+}
+
+body.account .sidebar-additional [data-role="compare-products-sidebar"] .ttk-sidebar-product-copy,
+body.customer-account-index .sidebar-additional [data-role="compare-products-sidebar"] .ttk-sidebar-product-copy,
+body.account .sidebar-additional [data-role="compare-products-sidebar"] .product-item-name,
+body.customer-account-index .sidebar-additional [data-role="compare-products-sidebar"] .product-item-name,
+body.account .sidebar-additional [data-role="compare-products-sidebar"] .product-item-link,
+body.customer-account-index .sidebar-additional [data-role="compare-products-sidebar"] .product-item-link {
+    display: block !important;
+    flex: 1 1 0% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+
+body.account .sidebar-additional [data-role="compare-products-sidebar"] .ttk-sidebar-thumb,
+body.customer-account-index .sidebar-additional [data-role="compare-products-sidebar"] .ttk-sidebar-thumb,
+body.account .sidebar-additional [data-role="compare-products-sidebar"] .ttk-sidebar-remove,
+body.customer-account-index .sidebar-additional [data-role="compare-products-sidebar"] .ttk-sidebar-remove {
+    flex-shrink: 0 !important;
+}
+
+body.account .sidebar-additional [data-role="compare-products-sidebar"] .ttk-sidebar-product-copy,
+body.customer-account-index .sidebar-additional [data-role="compare-products-sidebar"] .ttk-sidebar-product-copy {
+    flex: 1 1 0% !important;
+    min-width: 0 !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
+}
+
+body.account .sidebar-additional [data-role="compare-products-sidebar"] .ttk-sidebar-remove,
+body.customer-account-index .sidebar-additional [data-role="compare-products-sidebar"] .ttk-sidebar-remove {
+    position: static !important;
+    flex: 0 0 20px !important;
+    margin-left: auto !important;
+    width: 20px !important;
+    height: 20px !important;
+    background: #f1f5f9 !important;
+    color: #64748b !important;
+}
+
+body.account .sidebar-additional [data-role="compare-products-sidebar"] .ttk-sidebar-actions .action,
+body.customer-account-index .sidebar-additional [data-role="compare-products-sidebar"] .ttk-sidebar-actions .action {
+    min-height: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    color: #1d4ed8 !important;
+    box-shadow: none !important;
+}
+</style>
+<div class="block block-compare ttk-sidebar-card<?= $compareSeedItems ? ' ttk-has-local-compare' : '' ?>"
+     data-bind="scope: 'compareProducts'"
+     data-role="compare-products-sidebar">
+    <div class="block-title ttk-sidebar-card__title">
+        <strong id="block-compare-heading" role="heading" aria-level="2"><?= $block->escapeHtml(__('Compare Products')) ?></strong>
+        <span class="counter qty no-display" data-bind="text: compareProducts().countCaption, css: {'no-display': !compareProducts().count}"></span>
+    </div>
+    <!-- ko if: compareProducts().count -->
+    <div class="block-content no-display"
+         aria-labelledby="block-compare-heading"
+         data-bind="css: {'no-display': !compareProducts().count}">
+        <ol id="compare-items" class="product-items product-items-names ttk-sidebar-products" data-bind="foreach: compareProducts().items">
+            <li class="product-item flex items-center gap-3 py-2 border-b border-gray-50 last:border-0">
+                <input type="hidden" class="compare-item-id" data-bind="value: id"/>
+                <a class="ttk-sidebar-thumb" data-bind="attr: {href: product_url, title: name}">
+                    <!-- ko if: $data.image && $data.image.template && $data.image.src -->
+                    <!-- ko template: {name: $data.image.template, data: $data.image} --><!-- /ko -->
+                    <!-- /ko -->
+                    <!-- ko if: $data.image && (!$data.image.template || !$data.image.src) -->
+                    <img data-bind="attr: {src: $data.image.src || $data.image.url || $data.image.image || $data.image, alt: name}" loading="lazy"/>
+                    <!-- /ko -->
+                </a>
+                <div class="ttk-sidebar-product-copy flex-1 min-w-0">
+                    <strong class="product-item-name truncate">
+                        <a data-bind="attr: {href: product_url}, html: name" class="product-item-link"></a>
+                    </strong>
+                    <span class="ttk-sidebar-price" data-bind="html: price"></span>
+                </div>
+                <a href="#"
+                   data-bind="attr: {'data-post': remove_url}"
+                   title="<?= $block->escapeHtmlAttr(__('Remove This Item')) ?>"
+                   class="action delete ttk-sidebar-remove flex-shrink-0">
+                    <span><?= $block->escapeHtml(__('Remove')) ?></span>
+                </a>
+            </li>
+        </ol>
+        <div class="actions-toolbar ttk-sidebar-actions">
+            <div class="primary">
+                <a data-bind="attr: {'href': compareProducts().listUrl}" class="action compare primary">
+                    <span><?= $block->escapeHtml(__('View All')) ?></span>
+                </a>
+            </div>
+            <div class="secondary">
+                <a id="compare-clear-all" href="#" class="action clear" data-post="<?= $block->escapeHtml(
+                    $this->helper(Magento\Catalog\Helper\Product\Compare::class)->getPostDataClearList()
+                ) ?>">
+                    <span><?= $block->escapeHtml(__('Clear All')) ?></span>
+                </a>
+            </div>
+        </div>
+    </div>
+    <!-- /ko -->
+    <div class="block-content ttk-sidebar-compare-fallback"
+         data-role="tekntek-compare-fallback"
+         style="display: none"
+         aria-labelledby="block-compare-heading">
+        <ol class="product-items product-items-names ttk-sidebar-products" data-role="tekntek-compare-fallback-items">
+            <?php foreach ($compareSeedItems as $seedItem): ?>
+                <li class="product-item flex items-center gap-3 py-2 border-b border-gray-50 last:border-0">
+                    <input type="hidden" class="compare-item-id" value="<?= (int) $seedItem['id'] ?>"/>
+                    <a class="ttk-sidebar-thumb"
+                       href="<?= $block->escapeUrl((string) $seedItem['url']) ?>"
+                       title="<?= $block->escapeHtmlAttr((string) $seedItem['name']) ?>">
+                        <?php if (!empty($seedItem['image'])): ?>
+                            <img src="<?= $block->escapeUrl((string) $seedItem['image']) ?>"
+                                 alt="<?= $block->escapeHtmlAttr((string) $seedItem['name']) ?>"
+                                 loading="lazy"/>
+                        <?php endif; ?>
+                    </a>
+                    <div class="ttk-sidebar-product-copy flex-1 min-w-0">
+                        <strong class="product-item-name truncate">
+                            <a class="product-item-link" href="<?= $block->escapeUrl((string) $seedItem['url']) ?>">
+                                <?= $block->escapeHtml((string) $seedItem['name']) ?>
+                            </a>
+                        </strong>
+                        <?php if (!empty($seedItem['price'])): ?>
+                            <span class="ttk-sidebar-price"><?= $block->escapeHtml((string) $seedItem['price']) ?></span>
+                        <?php endif; ?>
+                    </div>
+                    <a href="#"
+                       class="action delete ttk-sidebar-remove flex-shrink-0"
+                       data-role="tekntek-compare-remove"
+                       data-id="<?= (int) $seedItem['id'] ?>"
+                       data-remove-url="<?= $block->escapeHtmlAttr((string) $seedItem['remove_url']) ?>">
+                        <span><?= $block->escapeHtml(__('Remove')) ?></span>
+                    </a>
+                </li>
+            <?php endforeach; ?>
+        </ol>
+        <div class="actions-toolbar ttk-sidebar-actions">
+            <div class="primary">
+                <a data-role="tekntek-compare-fallback-link" class="action compare primary" href="<?= $block->escapeUrl($block->getUrl('catalog/product_compare/index')) ?>">
+                    <span><?= $block->escapeHtml(__('View All')) ?></span>
+                </a>
+            </div>
+            <div class="secondary">
+                <a href="#" class="action clear" data-role="tekntek-compare-fallback-clear">
+                    <span><?= $block->escapeHtml(__('Clear All')) ?></span>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="empty ttk-sidebar-empty"
+         hidden>
+        <span class="ttk-sidebar-empty__icon" aria-hidden="true">▦</span>
+        <strong><?= $block->escapeHtml(__('No products to compare yet')) ?></strong>
+        <span><?= $block->escapeHtml(__('Add products to compare specs, prices, and key features side by side.')) ?></span>
+        <a class="ttk-sidebar-empty__link" href="<?= $block->escapeUrl($block->getUrl('')) ?>">
+            <?= $block->escapeHtml(__('Start Shopping')) ?>
+        </a>
+    </div>
+</div>
+<script type="text/x-magento-init">
+{"[data-role=compare-products-sidebar]": {"Magento_Ui/js/core/app": <?= /* @noEscape */ $block->getJsLayout() ?>}}
+</script>
+<script>
+require(['jquery', 'Magento_Customer/js/customer-data'], function ($, customerData) {
+    'use strict';
+
+    var storageKey = 'tekntek_compare_v2';
+    var sidebar = $('[data-role="compare-products-sidebar"]');
+    var fallback = sidebar.find('[data-role="tekntek-compare-fallback"]');
+    var fallbackItems = sidebar.find('[data-role="tekntek-compare-fallback-items"]');
+    var fallbackLink = sidebar.find('[data-role="tekntek-compare-fallback-link"]');
+    var fallbackClear = sidebar.find('[data-role="tekntek-compare-fallback-clear"]');
+    var emptyState = sidebar.find('.ttk-sidebar-empty');
+    var compareBaseUrl = '<?= $block->escapeJs($block->getUrl('catalog/product_compare/index')) ?>';
+    var uiVersionKey = 'tekntek_compare_sidebar_ui_version';
+    var uiVersion = '20260430-compare-sidebar-image-v21';
+    var seedItems = <?= /* @noEscape */ json_encode($compareSeedItems, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?>;
+
+    function escapeHtml(value) {
+        return String(value || '').replace(/[&<>"']/g, function (match) {
+            return {
+                '&': '&amp;',
+                '<': '&lt;',
+                '>': '&gt;',
+                '"': '&quot;',
+                "'": '&#039;'
+            }[match];
+        });
+    }
+
+    function readLocalCompare() {
+        try {
+            var items = JSON.parse(window.localStorage.getItem(storageKey) || '[]');
+            if (!Array.isArray(items)) {
+                return [];
+            }
+
+            return items.map(function (item) {
+                if (!item || typeof item !== 'object') {
+                    return item;
+                }
+
+                item.image = resolveImage(item);
+                return item;
+            }).filter(function (item) {
+                return item && Number(item.id) > 0;
+            }).slice(0, 4);
+        } catch (error) {
+            return [];
+        }
+    }
+
+    function readSeedCompare() {
+        if (!Array.isArray(seedItems)) {
+            return [];
+        }
+
+        return seedItems.filter(function (item) {
+            return item && Number(item.id) > 0;
+        }).slice(0, 4);
+    }
+
+    function mergeSeedData(items, seedCompareItems) {
+        var seedById = {};
+
+        seedCompareItems.forEach(function (item) {
+            seedById[Number(item.id)] = item;
+        });
+
+        return items.map(function (item) {
+            var seed = seedById[Number(item.id)];
+            if (!seed) {
+                return item;
+            }
+
+            if (isPlaceholderImage(resolveImage(item)) && !isPlaceholderImage(resolveImage(seed))) {
+                item.image = resolveImage(seed);
+            }
+
+            if ((!item.price || item.price === '-') && seed.price) {
+                item.price = seed.price;
+            }
+
+            if ((!item.url || item.url === '#') && seed.url) {
+                item.url = seed.url;
+            }
+
+            if ((!item.remove_url || item.remove_url === '#') && seed.remove_url) {
+                item.remove_url = seed.remove_url;
+            }
+
+            return item;
+        });
+    }
+
+    function readRenderedFallbackItems() {
+        return fallbackItems.find('.product-item').map(function () {
+            var row = $(this);
+            var thumb = row.find('.ttk-sidebar-thumb').first();
+            var image = thumb.find('img').first();
+            var link = row.find('.product-item-link').first();
+            var remove = row.find('[data-role="tekntek-compare-remove"]').first();
+            var id = Number(row.find('.compare-item-id').first().val() || remove.attr('data-id'));
+            var name = $.trim(link.text()) ||
+                thumb.attr('title') ||
+                image.attr('alt') ||
+                'Product';
+
+            return {
+                id: id,
+                name: name,
+                url: link.attr('href') || thumb.attr('href') || '#',
+                image: image.attr('src') || '',
+                price: $.trim(row.find('.ttk-sidebar-price').first().text()),
+                remove_url: remove.attr('data-remove-url') || ''
+            };
+        }).get().filter(function (item) {
+            return item && Number(item.id) > 0;
+        }).slice(0, 4);
+    }
+
+    function resolveImage(item) {
+        if (!item || typeof item !== 'object') {
+            return '';
+        }
+
+        if (typeof item.image === 'string') {
+            return item.image;
+        }
+
+        if (item.image && typeof item.image === 'object') {
+            return item.image.src || item.image.url || item.image.image || '';
+        }
+
+        if (item.thumbnail && typeof item.thumbnail === 'object') {
+            return item.thumbnail.src || item.thumbnail.url || '';
+        }
+
+        return item.product_image || item.thumbnail || item.small_image || item.src || '';
+    }
+
+    function isPlaceholderImage(src) {
+        src = String(src || '').toLowerCase();
+        return !src ||
+            src.indexOf('placeholder') !== -1 ||
+            src.indexOf('/catalog/product/placeholder/') !== -1 ||
+            src.indexOf('/default/placeholder/') !== -1;
+    }
+
+    function parseProductPageImage(html) {
+        var doc = $.parseHTML(html, document, true);
+        var image = $(doc).find('#tekntek-gallery-main').first().attr('src') ||
+            $(doc).find('.tekntek-gallery-thumb img').first().attr('src') ||
+            $(doc).find('meta[property="og:image"]').attr('content') ||
+            '';
+
+        return image;
+    }
+
+    function fetchProductImage(item) {
+        var url = item.product_url || item.url || item.productUrl || '';
+        if (!url || url === '#') {
+            return $.Deferred().resolve('').promise();
+        }
+
+        return $.ajax({
+            url: url,
+            type: 'GET',
+            cache: false
+        }).then(parseProductPageImage, function () {
+            return '';
+        });
+    }
+
+    function mergeComparePageImages(items, pageItems) {
+        var pageById = {};
+
+        pageItems.forEach(function (item) {
+            pageById[Number(item.id)] = item;
+        });
+
+        return items.map(function (item) {
+            var pageItem = pageById[Number(item.id)];
+            if (!pageItem) {
+                return item;
+            }
+
+            if (isPlaceholderImage(resolveImage(item)) && !isPlaceholderImage(resolveImage(pageItem))) {
+                item.image = resolveImage(pageItem);
+            }
+
+            if ((!item.price || item.price === '-') && pageItem.price) {
+                item.price = pageItem.price;
+            }
+
+            if ((!item.url || item.url === '#') && pageItem.url) {
+                item.url = pageItem.url;
+            }
+
+            if ((!item.remove_url || item.remove_url === '#') && pageItem.remove_url) {
+                item.remove_url = pageItem.remove_url;
+            }
+
+            return item;
+        });
+    }
+
+    function fetchComparePageItemsFor(items) {
+        return $.ajax({
+            url: compareUrl(items),
+            type: 'GET',
+            cache: false
+        }).then(parseComparePageItems, function () {
+            return [];
+        });
+    }
+
+    function backfillMissingImages(items) {
+        var missing = items.filter(function (item) {
+            return item &&
+                Number(item.id) > 0 &&
+                isPlaceholderImage(resolveImage(item)) &&
+                Number(item.__imageBackfillAttempts || 0) < 2;
+        });
+
+        if (!missing.length || backfillMissingImages.isRunning) {
+            return;
+        }
+
+        backfillMissingImages.isRunning = true;
+        $.when.apply($, missing.map(function (item) {
+            return fetchProductImage(item).then(function (image) {
+                item.__imageBackfillAttempts = Number(item.__imageBackfillAttempts || 0) + 1;
+                if (image && !isPlaceholderImage(image)) {
+                    item.image = image;
+                    item.__imageBackfilled = true;
+                }
+                return item;
+            });
+        })).always(function () {
+            backfillMissingImages.isRunning = false;
+            if (items.some(function (item) {
+                return isPlaceholderImage(resolveImage(item));
+            }) && !backfillMissingImages.isFetchingComparePage) {
+                backfillMissingImages.isFetchingComparePage = true;
+                fetchComparePageItemsFor(items).done(function (pageItems) {
+                    if (pageItems.length) {
+                        items = mergeComparePageImages(items, pageItems);
+                    }
+                    saveItems(items);
+                    renderItems(items, true);
+                }).always(function () {
+                    backfillMissingImages.isFetchingComparePage = false;
+                });
+                return;
+            }
+
+            saveItems(items);
+            renderItems(items, true);
+        });
+    }
+
+    function readMagentoCompareItems() {
+        var section = customerData.get('compare-products')() || {};
+        var rawItems = Array.isArray(section.items) ? section.items : [];
+
+        if (!rawItems.length && section.items && typeof section.items === 'object') {
+            rawItems = Object.keys(section.items).map(function (key) {
+                return section.items[key];
+            });
+        }
+
+        return rawItems.map(function (item) {
+            var id = Number(item.id || item.product_id || item.item_id);
+            return {
+                id: id,
+                name: item.name || item.product_name || item.product_sku || (item.image && item.image.alt) || 'Product',
+                url: item.product_url || item.url || item.productUrl || '#',
+                image: resolveImage(item),
+                price: item.price || item.product_price || item.final_price || '',
+                remove_url: item.remove_url || ''
+            };
+        }).filter(function (item) {
+            return item.id > 0;
+        }).slice(0, 4);
+    }
+
+    function nativeContent() {
+        return sidebar.children('.block-content').not(fallback);
+    }
+
+    function magentoCompareVisible() {
+        var section = customerData.get('compare-products')() || {};
+        var content = nativeContent();
+        return Number(section.count || 0) > 0 || content.find('.product-item').length > 0;
+    }
+
+    function setSidebarState(state) {
+        sidebar.removeClass('ttk-has-native-compare ttk-has-local-compare ttk-is-empty');
+        sidebar.addClass(state);
+        emptyState.prop('hidden', state !== 'ttk-is-empty');
+    }
+
+    function reloadCompareSection() {
+        customerData.invalidate(['compare-products']);
+        customerData.reload(['compare-products'], true).done(function () {
+            window.setTimeout(renderFallback, 80);
+        });
+    }
+
+    function postDataPost($link) {
+        var raw = $link.attr('data-post');
+        if (!raw) {
+            return $.Deferred().reject().promise();
+        }
+
+        try {
+            var payload = JSON.parse(raw);
+            return $.ajax({
+                url: payload.action,
+                type: 'POST',
+                data: payload.data || {}
+            });
+        } catch (error) {
+            return $.Deferred().reject().promise();
+        }
+    }
+
+    function magentoCompareHasItems() {
+        var section = customerData.get('compare-products')() || {};
+        var content = sidebar.children('.block-content').not(fallback);
+        return Number(section.count || 0) > 0 || content.find('.product-item').length > 0;
+    }
+
+    function compareUrl(items) {
+        var ids = items.map(function (item) {
+            return Number(item.id);
+        }).filter(function (id) {
+            return id > 0;
+        });
+
+        if (!ids.length) {
+            return compareBaseUrl;
+        }
+
+        return compareBaseUrl + (compareBaseUrl.indexOf('?') === -1 ? '?' : '&') + 'ids=' + encodeURIComponent(ids.join(','));
+    }
+
+    function saveItems(items) {
+        window.localStorage.setItem(storageKey, JSON.stringify(items));
+    }
+
+    function renderItems(items, skipImageBackfill) {
+        setSidebarState('ttk-has-local-compare');
+        nativeContent().hide().addClass('no-display');
+        fallbackItems.html(items.map(function (item) {
+            var url = item.product_url || item.url || item.productUrl || '#';
+            var name = item.product_name || item.name || item.product_sku || item.sku || 'Product';
+            var imageSrc = resolveImage(item);
+            var image = imageSrc
+                ? '<img src="' + escapeHtml(imageSrc) + '" alt="' + escapeHtml(name) + '" loading="lazy"/>'
+                : '';
+            var price = item.product_price || item.price || item.final_price || '';
+            price = price ? escapeHtml(price) : '';
+
+            return '<li class="product-item flex items-center gap-3 py-2 border-b border-gray-50 last:border-0">' +
+                '<input type="hidden" class="compare-item-id" value="' + Number(item.id) + '"/>' +
+                '<a class="ttk-sidebar-thumb" href="' + escapeHtml(url) + '" title="' + escapeHtml(name) + '">' + image + '</a>' +
+                '<div class="ttk-sidebar-product-copy flex-1 min-w-0">' +
+                    '<strong class="product-item-name truncate">' +
+                        '<a class="product-item-link" href="' + escapeHtml(url) + '">' + escapeHtml(name) + '</a>' +
+                    '</strong>' +
+                    '<span class="ttk-sidebar-price">' + price + '</span>' +
+                '</div>' +
+                '<a href="#" class="action delete ttk-sidebar-remove flex-shrink-0" data-role="tekntek-compare-remove" data-id="' + Number(item.id) + '" data-remove-url="' + escapeHtml(item.remove_url || '') + '">' +
+                    '<span><?= $block->escapeJs(__('Remove')) ?></span>' +
+                '</a>' +
+            '</li>';
+        }).join(''));
+
+        fallbackLink.attr('href', compareUrl(items));
+        emptyState.hide().prop('hidden', true);
+        fallback.show();
+
+        if (!skipImageBackfill) {
+            backfillMissingImages(items);
+        }
+    }
+
+    function parseComparePageItems(html) {
+        var doc = $.parseHTML(html, document, true);
+        var items = [];
+
+        $(doc).find('.ttk-compare-card').each(function () {
+            var card = $(this);
+            var photo = card.find('.ttk-compare-photo').first();
+            var image = photo.find('img').first();
+            var id = Number(card.attr('data-product-id'));
+            var name = $.trim(card.find('.ttk-compare-name a').first().text()) ||
+                photo.attr('title') ||
+                image.attr('alt') ||
+                'Product';
+
+            if (id <= 0 && photo.attr('href')) {
+                id = items.length + 1;
+            }
+
+            items.push({
+                id: id,
+                name: name,
+                url: photo.attr('href') || card.find('.ttk-compare-name a').first().attr('href') || '#',
+                image: image.attr('src') || '',
+                price: $.trim(card.find('.ttk-compare-price').first().text()),
+                remove_url: card.attr('data-remove-url') || ''
+            });
+        });
+
+        return items.filter(function (item) {
+            return item && Number(item.id) > 0;
+        }).slice(0, 4);
+    }
+
+    function fetchComparePageItems() {
+        return $.ajax({
+            url: compareBaseUrl,
+            type: 'GET',
+            cache: false
+        }).then(parseComparePageItems, function () {
+            return [];
+        });
+    }
+
+    function showLoadingState() {
+        setSidebarState('ttk-has-local-compare');
+        nativeContent().hide().addClass('no-display');
+        emptyState.hide().prop('hidden', true);
+        fallbackItems.html(
+            '<li class="product-item">' +
+                '<span class="ttk-sidebar-thumb"></span>' +
+                '<div class="ttk-sidebar-product-copy">' +
+                    '<strong class="product-item-name">Loading compare products...</strong>' +
+                '</div>' +
+            '</li>'
+        );
+        fallback.show();
+    }
+
+    function renderFallback() {
+        var section = customerData.get('compare-products')() || {};
+        var magentoItems = readMagentoCompareItems();
+        var localItems = readLocalCompare();
+        var seedCompareItems = readSeedCompare();
+        var renderedFallbackItems = readRenderedFallbackItems();
+        var items = magentoItems.length ?
+            magentoItems :
+            (seedCompareItems.length ? seedCompareItems : (localItems.length ? localItems : renderedFallbackItems));
+        items = mergeSeedData(items, seedCompareItems);
+        var magentoCount = Number(section.count || 0);
+        var existingFallbackItems = fallbackItems.find('.product-item').length;
+
+        if (items.length) {
+            if (items.some(function (item) {
+                return isPlaceholderImage(resolveImage(item));
+            }) && !renderFallback.isFetchingComparePageForImages) {
+                showLoadingState();
+                renderFallback.isFetchingComparePageForImages = true;
+                fetchComparePageItemsFor(items).done(function (pageItems) {
+                    if (pageItems.length) {
+                        items = mergeComparePageImages(items, pageItems);
+                    }
+                    saveItems(items);
+                    renderItems(items, true);
+                }).always(function () {
+                    renderFallback.isFetchingComparePageForImages = false;
+                });
+                return;
+            }
+
+            renderItems(items);
+            return;
+        }
+
+        if (existingFallbackItems > 0) {
+            setSidebarState('ttk-has-local-compare');
+            nativeContent().hide().addClass('no-display');
+            emptyState.hide().prop('hidden', true);
+            fallback.show();
+            if (renderedFallbackItems.length) {
+                backfillMissingImages(renderedFallbackItems);
+            }
+            return;
+        }
+
+        if (magentoCount > 0) {
+            showLoadingState();
+            if (!renderFallback.isFetchingComparePage) {
+                renderFallback.isFetchingComparePage = true;
+                fetchComparePageItems().done(function (pageItems) {
+                    renderFallback.isFetchingComparePage = false;
+                    if (pageItems.length) {
+                        saveItems(pageItems);
+                        renderItems(pageItems);
+                        return;
+                    }
+
+                    if (!renderFallback.hasRetriedCustomerData) {
+                        renderFallback.hasRetriedCustomerData = true;
+                        customerData.invalidate(['compare-products']);
+                        customerData.reload(['compare-products'], true).done(function () {
+                            window.setTimeout(renderFallback, 80);
+                        });
+                    }
+                });
+            }
+            return;
+        }
+
+        setSidebarState('ttk-is-empty');
+        nativeContent().hide().addClass('no-display');
+        fallback.hide();
+        emptyState.show().prop('hidden', false);
+    }
+
+    fallbackItems.on('click', '[data-role="tekntek-compare-remove"]', function (event) {
+        event.preventDefault();
+        var $link = $(this);
+        var id = Number($link.attr('data-id'));
+        var items = readLocalCompare().filter(function (item) {
+            return Number(item.id) !== id;
+        });
+        saveItems(items);
+        var removePayload = $link.attr('data-remove-url');
+        if (removePayload) {
+            postDataPost($link.attr('data-post', removePayload)).always(function () {
+                reloadCompareSection();
+                renderFallback();
+            });
+            return;
+        }
+
+        renderFallback();
+    });
+
+    sidebar.on('click', '.block-content:not([data-role="tekntek-compare-fallback"]) .ttk-sidebar-remove', function (event) {
+        var $link = $(this);
+        event.preventDefault();
+
+        postDataPost($link).always(function () {
+            var id = Number($link.closest('.product-item').find('.compare-item-id').val());
+            if (id > 0) {
+                saveItems(readLocalCompare().filter(function (item) {
+                    return Number(item.id) !== id;
+                }));
+            }
+            $link.closest('.product-item').remove();
+            if (!magentoCompareHasItems()) {
+                nativeContent().hide().addClass('no-display');
+            }
+            reloadCompareSection();
+            renderFallback();
+        });
+    });
+
+    fallbackClear.on('click', function (event) {
+        event.preventDefault();
+        saveItems([]);
+        nativeContent().hide().addClass('no-display').find('.product-item').remove();
+        fallbackItems.empty();
+        fallback.hide();
+        emptyState.show();
+        renderFallback();
+    });
+
+    sidebar.on('click', '#compare-clear-all', function (event) {
+        var $link = $(this);
+        event.preventDefault();
+        saveItems([]);
+        postDataPost($link).always(function () {
+            nativeContent().hide().addClass('no-display').find('.product-item').remove();
+            reloadCompareSection();
+            renderFallback();
+        });
+        fallback.hide();
+        emptyState.hide();
+    });
+
+    function clearStaleMagentoPrivateContentOnce() {
+        try {
+            if (window.localStorage.getItem(uiVersionKey) === uiVersion) {
+                return;
+            }
+
+            window.localStorage.removeItem('mage-cache-storage');
+            window.localStorage.removeItem('mage-cache-storage-section-invalidation');
+            window.localStorage.removeItem('mage-cache-timeout');
+            window.localStorage.setItem(uiVersionKey, uiVersion);
+        } catch (error) {
+            // Private browsing/storage failures should not block rendering.
+        }
+    }
+
+    clearStaleMagentoPrivateContentOnce();
+    reloadCompareSection();
+    renderFallback();
+    window.setTimeout(renderFallback, 100);
+    window.setTimeout(renderFallback, 500);
+    window.setTimeout(renderFallback, 1500);
+    window.setTimeout(renderFallback, 3000);
+    customerData.get('compare-products').subscribe(function () {
+        window.setTimeout(renderFallback, 80);
+    });
+    window.addEventListener('storage', function (event) {
+        if (event.key === storageKey) {
+            renderFallback();
+        }
+    });
+});
+</script>

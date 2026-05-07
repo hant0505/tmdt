@@ -4,7 +4,7 @@
         <referenceBlock name="tekntek.hello.category.list" remove="true"/>
         <referenceBlock name="category.description" remove="true"/>
         <referenceBlock name="category.cms" remove="true"/>
-        <referenceBlock name="wishlist_sidebar" remove="true"/>
+        <move element="wishlist_sidebar" destination="sidebar.main" after="catalog.leftnav"/>
 
         <referenceContainer name="sidebar.main">
             <block class="Magento\Framework\View\Element\Template" name="tekntek.category.sidebar.facets" template="Magento_Catalog::category/tekntek-sidebar-facets.phtml" before="catalog.leftnav"/>

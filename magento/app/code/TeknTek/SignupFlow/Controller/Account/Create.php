@@ -126,10 +126,30 @@ class Create extends Action implements HttpPostActionInterface
                 stripos($message, 'already exists') !== false
                 || stripos($message, 'same email address') !== false
             ) {
+                // Idempotent behavior for double-submit: if account now exists and password matches,
+                // sign the customer in instead of showing an error and bouncing to login.
+                try {
+                    if ($password !== '') {
+                        $existingCustomer = $this->accountManagement->authenticate($email, $password);
+                        $this->customerSession->loginById((int)$existingCustomer->getId());
+                        $this->signupSession->clear();
+                        $this->customerSession->unsData('tekntek_login_error');
+
+                        return $result->setData([
+                            'success' => true,
+                            'message' => __('Account created successfully. You are now signed in.'),
+                            'redirect_url' => $this->_url->getUrl('customer/account'),
+                            'telephone' => $telephone,
+                            'email' => $email,
+                        ]);
+                    }
+                } catch (\Throwable $authThrowable) {
+                    // Fallback to login redirect message below.
+                }
+
                 $redirectUrl = $this->_url->getUrl('customer/account/login');
                 $friendlyMessage = __('An account with this email already exists. Please log in instead.');
 
-                $this->customerSession->setData('tekntek_login_error', (string)$friendlyMessage);
                 $this->signupSession->clear();
 
                 return $result->setData([

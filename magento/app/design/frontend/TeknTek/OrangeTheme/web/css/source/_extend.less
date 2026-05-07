@@ -873,6 +873,246 @@ body.customer-account-index {
     display: none;
 }
 
+/* Global product-card Add to Cart style, matching wishlist cards. */
+.products-grid .product-item .action.tocart.primary,
+.products-list .product-item .action.tocart.primary,
+.products-grid .product-item .actions-primary .tocart,
+.products-list .product-item .actions-primary .tocart,
+#tekntek-home-v2 .ttk-card-cart {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-height: 42px !important;
+    padding: 0 14px !important;
+    border: 1px solid #1d4ed8 !important;
+    border-radius: 12px !important;
+    background: #1d4ed8 !important;
+    color: #ffffff !important;
+    font-size: 14px !important;
+    font-weight: 800 !important;
+    line-height: 1 !important;
+    white-space: nowrap !important;
+    box-shadow: 0 10px 18px rgba(37, 99, 235, 0.18) !important;
+    transition: background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease !important;
+}
+
+.products-grid .product-item .action.tocart.primary::before,
+.products-list .product-item .action.tocart.primary::before,
+.products-grid .product-item .actions-primary .tocart::before,
+.products-list .product-item .actions-primary .tocart::before,
+#tekntek-home-v2 .ttk-card-cart::before {
+    content: "" !important;
+    width: 15px !important;
+    height: 15px !important;
+    margin-right: 8px !important;
+    background: currentColor !important;
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='8' cy='21' r='1'/%3E%3Ccircle cx='19' cy='21' r='1'/%3E%3Cpath d='M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h8.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12'/%3E%3C/svg%3E") center / contain no-repeat !important;
+    mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='8' cy='21' r='1'/%3E%3Ccircle cx='19' cy='21' r='1'/%3E%3Cpath d='M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h8.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12'/%3E%3C/svg%3E") center / contain no-repeat !important;
+}
+
+.products-grid .product-item .action.tocart.primary:hover,
+.products-grid .product-item .action.tocart.primary:focus,
+.products-list .product-item .action.tocart.primary:hover,
+.products-list .product-item .action.tocart.primary:focus,
+.products-grid .product-item .actions-primary .tocart:hover,
+.products-grid .product-item .actions-primary .tocart:focus,
+.products-list .product-item .actions-primary .tocart:hover,
+.products-list .product-item .actions-primary .tocart:focus,
+#tekntek-home-v2 .ttk-card-cart:hover,
+#tekntek-home-v2 .ttk-card-cart:focus {
+    background: #1d4ed8 !important;
+    border-color: #1e40af !important;
+    box-shadow: 0 14px 22px rgba(37, 99, 235, 0.22) !important;
+    transform: translateY(-1px) !important;
+}
+
+// Modern category/search listing cards.
+.catalog-category-view,
+.catalogsearch-result-index {
+    .products-grid,
+    .products-list {
+        .product-item-info {
+            position: relative;
+            overflow: hidden;
+            border-radius: 12px;
+            transition: box-shadow 180ms ease, transform 180ms ease, border-color 180ms ease;
+
+            &:hover,
+            &:focus-within {
+                transform: translateY(-2px);
+                box-shadow: 0 16px 34px rgba(15, 23, 42, 0.12);
+            }
+        }
+
+        .product-item-photo {
+            position: relative;
+            display: block;
+        }
+
+        .product-item-name,
+        .product-item-link {
+            display: -webkit-box;
+            min-height: 40px;
+            overflow: hidden;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 2;
+            line-height: 20px;
+            text-overflow: ellipsis;
+        }
+
+        .product-item-inner,
+        .product-item-actions,
+        .actions-primary {
+            width: 100%;
+        }
+
+        .product-item-inner {
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(8px);
+            transition: opacity 180ms ease, transform 180ms ease, visibility 180ms ease;
+        }
+
+        .product-item-info:hover .product-item-inner,
+        .product-item-info:focus-within .product-item-inner {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .product-reviews-summary.empty {
+            display: block;
+            margin: 8px 0 4px;
+        }
+
+        .product-reviews-summary.empty .rating-result::before {
+            color: #d1d5db;
+        }
+    }
+
+    .tekntek-product-badges {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        z-index: 3;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        pointer-events: none;
+    }
+
+    .tekntek-product-badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 22px;
+        padding: 0 9px;
+        border-radius: 999px;
+        color: #ffffff;
+        font-size: 11px;
+        font-weight: 800;
+        line-height: 1;
+        box-shadow: 0 8px 18px rgba(15, 23, 42, 0.12);
+    }
+
+    .tekntek-product-badge--new {
+        background: #0f766e;
+    }
+
+    .tekntek-product-badge--sale {
+        background: #dc2626;
+    }
+
+    .sidebar.sidebar-main {
+        .block,
+        .filter {
+            border-radius: 14px;
+            background: #ffffff;
+            box-shadow: 0 10px 28px rgba(15, 23, 42, 0.08);
+        }
+
+        .filter-options-content a {
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 9px;
+            min-height: 34px;
+            padding: 7px 10px 7px 34px;
+            border-radius: 10px;
+            color: #334155;
+            font-weight: 600;
+            text-decoration: none;
+            transition: background-color 160ms ease, color 160ms ease;
+
+            &::before {
+                content: "";
+                position: absolute;
+                left: 10px;
+                width: 15px;
+                height: 15px;
+                border: 1px solid #cbd5e1;
+                border-radius: 4px;
+                background: #ffffff;
+                box-shadow: inset 0 0 0 2px #ffffff;
+            }
+
+            &:hover,
+            &:focus {
+                background: #f0f4f8;
+                color: #0056b3;
+
+                &::before {
+                    border-color: #0056b3;
+                    background: #0056b3;
+                }
+            }
+        }
+
+        [data-role="tekntek-wishlist-sidebar"].ttk-is-empty,
+        .block-wishlist.empty {
+            display: none;
+        }
+    }
+}
+
+.catalogsearch-result-index {
+    .tekntek-search-heading .page-title {
+        margin: 0 0 18px;
+        color: #0f172a;
+        font-size: 28px;
+        font-weight: 700;
+
+        strong {
+            color: #0056b3;
+            font-weight: 800;
+        }
+    }
+
+    .tekntek-search-suggestions,
+    .message.notice {
+        a,
+        .tekntek-search-suggestion a {
+            display: inline-flex;
+            align-items: center;
+            margin: 4px 6px 4px 0;
+            padding: 5px 12px;
+            border-radius: 20px;
+            background: #f0f4f8;
+            color: #0056b3;
+            font-weight: 700;
+            text-decoration: none;
+            transition: background-color 160ms ease, color 160ms ease, box-shadow 160ms ease;
+
+            &:hover,
+            &:focus {
+                background: #dbeafe;
+                color: #003f88;
+                box-shadow: 0 8px 18px rgba(0, 86, 179, 0.14);
+            }
+        }
+    }
+}
+
 @media (max-width: 1023px) {
     .customer-account-index .columns {
         gap: 18px;
@@ -1215,5 +1455,395 @@ body.customer-account-index {
 
     .customer-account-login .field .control input {
         height: 36px;
+    }
+}
+
+body.customer-account-logoutsuccess .page-main {
+    width: min(720px, calc(100vw - 32px));
+    margin: 48px auto;
+}
+
+body.customer-account-logoutsuccess .ttk-logout-countdown {
+    padding: 32px;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    background: #ffffff;
+    box-shadow: 0 14px 32px rgba(15, 23, 42, 0.08);
+    color: #111827;
+    text-align: center;
+}
+
+body.customer-account-logoutsuccess .ttk-logout-countdown h2 {
+    margin: 0 0 10px;
+    font-size: 28px;
+    font-weight: 800;
+    line-height: 1.2;
+}
+
+body.customer-account-logoutsuccess .ttk-logout-countdown p {
+    margin: 0 0 22px;
+    color: #475569;
+    font-size: 15px;
+}
+
+body.customer-account-logoutsuccess .ttk-logout-countdown strong {
+    color: #1d4ed8;
+}
+
+/* Auth Flow Revamp: Login/Register/Forgot/Reset/OTP */
+@media (min-width: 1024px) {
+    body.customer-account-login,
+    body.customer-account-create,
+    body.customer-account-forgotpassword,
+    body.customer-account-createpassword,
+    body.customer-account-login .page-wrapper,
+    body.customer-account-create .page-wrapper,
+    body.customer-account-forgotpassword .page-wrapper,
+    body.customer-account-createpassword .page-wrapper {
+        background: #12075d url('../images/auth-login-figma-bg.png') center center / cover fixed no-repeat !important;
+    }
+}
+
+body.customer-account-login .page-main,
+body.customer-account-create .page-main,
+body.customer-account-forgotpassword .page-main,
+body.customer-account-createpassword .page-main,
+body.customer-account-login .page-main .columns,
+body.customer-account-create .page-main .columns,
+body.customer-account-forgotpassword .page-main .columns,
+body.customer-account-createpassword .page-main .columns,
+body.customer-account-login .column.main,
+body.customer-account-create .column.main,
+body.customer-account-forgotpassword .column.main,
+body.customer-account-createpassword .column.main {
+    background: transparent !important;
+    border: 0 !important;
+    box-shadow: none !important;
+}
+
+body.customer-account-login .page-main,
+body.customer-account-create .page-main,
+body.customer-account-forgotpassword .page-main,
+body.customer-account-createpassword .page-main {
+    min-height: calc(100vh - 64px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 28px 16px !important;
+    box-sizing: border-box;
+}
+
+body.customer-account-login .tekntek-auth,
+body.customer-account-create .tekntek-auth,
+body.customer-account-forgotpassword .tekntek-auth,
+body.customer-account-createpassword .tekntek-auth {
+    width: min(1240px, calc(100vw - 40px)) !important;
+    margin: 0 auto !important;
+}
+
+body.customer-account-login .tekntek-auth__shell,
+body.customer-account-create .tekntek-auth__shell,
+body.customer-account-forgotpassword .tekntek-auth__shell,
+body.customer-account-createpassword .tekntek-auth__shell {
+    background: transparent !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+}
+
+body.customer-account-login .tekntek-auth__stage,
+body.customer-account-create .tekntek-auth__stage,
+body.customer-account-forgotpassword .tekntek-auth__stage,
+body.customer-account-createpassword .tekntek-auth__stage {
+    position: relative;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between;
+    gap: 40px;
+    min-height: 700px;
+    padding: 34px 38px;
+    border-radius: 30px;
+    overflow: hidden;
+    box-sizing: border-box;
+    background: rgba(255, 255, 255, 0.16) !important;
+    -webkit-backdrop-filter: blur(2px);
+    backdrop-filter: blur(2px);
+}
+
+body.customer-account-login .tekntek-auth__stage {
+    display: grid !important;
+    grid-template-columns: minmax(340px, 460px) 1fr;
+    align-items: center !important;
+    gap: 34px;
+    background: #ffffff !important;
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+}
+
+body.customer-account-login .tekntek-auth__stage::before,
+body.customer-account-login .tekntek-auth__panel--form::before,
+body.customer-account-login .tekntek-auth__panel--form::after {
+    content: none !important;
+    display: none !important;
+}
+
+body.customer-account-login .tekntek-auth__stage::after {
+    content: "";
+    display: block !important;
+    grid-column: 2;
+    align-self: stretch;
+    border-radius: 22px;
+    background: #eef4ff url('../images/auth-login-figma-bg.png') center center / cover no-repeat;
+}
+
+body.customer-account-login .tekntek-auth__panel--form,
+body.customer-account-create .tekntek-auth__panel--register,
+body.customer-account-forgotpassword .tekntek-auth__panel--form,
+body.customer-account-createpassword .tekntek-auth__panel--form {
+    position: relative !important;
+    left: auto !important;
+    top: auto !important;
+    transform: none !important;
+    width: 46% !important;
+    max-width: 540px !important;
+    min-width: 400px;
+    max-height: none !important;
+    margin: 0 !important;
+    padding: 34px 36px !important;
+    border-radius: 24px !important;
+    background: #ffffff !important;
+    box-shadow: 0 24px 60px rgba(8, 14, 40, 0.14) !important;
+    box-sizing: border-box;
+    z-index: 2;
+}
+
+body.customer-account-login .tekntek-auth__panel--form {
+    grid-column: 1;
+    width: 100% !important;
+    max-width: 460px !important;
+    min-width: 0;
+    padding: 26px 28px !important;
+    border: 1px solid #e5eaf3;
+    box-shadow: 0 14px 30px rgba(15, 23, 42, 0.08) !important;
+}
+
+body.customer-account-login .tekntek-auth__panel--form .block-content,
+body.customer-account-forgotpassword .tekntek-auth__panel--form .block-content,
+body.customer-account-createpassword .tekntek-auth__panel--form .block-content,
+body.customer-account-login .tekntek-auth .fieldset.login,
+body.customer-account-forgotpassword .tekntek-auth .fieldset,
+body.customer-account-createpassword .tekntek-auth .fieldset,
+body.customer-account-create .tekntek-register__form {
+    width: 100%;
+    margin: 0;
+}
+
+body.customer-account-login .tekntek-auth .field .control input,
+body.customer-account-forgotpassword .tekntek-auth .field .control input,
+body.customer-account-createpassword .tekntek-auth .field .control input,
+body.customer-account-create .tekntek-register__field input {
+    min-height: 46px !important;
+    border: 1px solid #d7deea !important;
+    border-radius: 10px !important;
+    background: #ffffff !important;
+    padding: 0 14px !important;
+    font-size: 14px !important;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+body.customer-account-login .tekntek-auth .field .control input {
+    min-height: 42px !important;
+    border-color: #c7d2e3 !important;
+}
+
+body.customer-account-login .tekntek-auth .field .control input:focus,
+body.customer-account-forgotpassword .tekntek-auth .field .control input:focus,
+body.customer-account-createpassword .tekntek-auth .field .control input:focus,
+body.customer-account-create .tekntek-register__field input:focus {
+    border-color: #3d6fcb !important;
+    box-shadow: 0 0 0 3px rgba(61, 111, 203, 0.16) !important;
+    outline: none;
+}
+
+body.customer-account-login .tekntek-auth .fieldset > .field,
+body.customer-account-forgotpassword .tekntek-auth .fieldset > .field,
+body.customer-account-createpassword .tekntek-auth .fieldset > .field {
+    margin-bottom: 16px !important;
+}
+
+body.customer-account-login .actions-toolbar,
+body.customer-account-forgotpassword .actions-toolbar,
+body.customer-account-createpassword .actions-toolbar {
+    margin-top: 18px !important;
+}
+
+body.customer-account-login .action.login.primary,
+body.customer-account-forgotpassword .action.login.primary,
+body.customer-account-createpassword .action.login.primary,
+body.customer-account-create .tekntek-register__button {
+    min-height: 46px !important;
+    border-radius: 10px !important;
+    font-size: 14px !important;
+    font-weight: 600 !important;
+}
+
+body.customer-account-login .actions-toolbar .secondary,
+body.customer-account-forgotpassword .actions-toolbar .secondary,
+body.customer-account-createpassword .actions-toolbar .secondary {
+    text-align: center;
+    margin-top: 10px !important;
+}
+
+body.customer-account-login .tekntek-login__register {
+    margin-top: 24px !important;
+    padding-top: 16px;
+    border-top: 1px solid #e8edf6;
+}
+
+body.customer-account-login .tekntek-login__register p {
+    margin: 0 0 12px !important;
+}
+
+body.customer-account-login .tekntek-auth__subtitle {
+    margin: 0 0 14px !important;
+    max-width: 280px;
+}
+
+body.customer-account-login .actions-toolbar .primary .action.login.primary,
+body.customer-account-login .tekntek-login__create-account {
+    width: 100% !important;
+    max-width: 280px;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+    min-height: 42px !important;
+    border-radius: 10px !important;
+    padding: 0 20px !important;
+}
+
+@media (max-width: 1023px) {
+    body.customer-account-login .tekntek-auth__stage {
+        display: block !important;
+        background: transparent !important;
+    }
+
+    body.customer-account-login .tekntek-auth__stage::after {
+        display: none !important;
+    }
+}
+
+body.customer-account-login .tekntek-login__create-account {
+    background: #355fbe !important;
+}
+
+body.customer-account-login .actions-toolbar .primary .action.login.primary:hover,
+body.customer-account-login .tekntek-login__create-account:hover {
+    filter: brightness(0.96);
+}
+
+body.customer-account-create .tekntek-register__form[data-role="profile-form"] {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px 12px;
+}
+
+body.customer-account-create .tekntek-register__form[data-role="profile-form"] .tekntek-register__titles,
+body.customer-account-create .tekntek-register__form[data-role="profile-form"] .tekntek-register__hint,
+body.customer-account-create .tekntek-register__form[data-role="profile-form"] .tekntek-register__button,
+body.customer-account-create .tekntek-register__form[data-role="profile-form"] .tekntek-register__field:nth-of-type(n + 3) {
+    grid-column: 1 / -1;
+}
+
+body.customer-account-create .tekntek-register__otp {
+    justify-content: center;
+    gap: 10px;
+}
+
+body.customer-account-create .tekntek-register__otp input {
+    width: 52px !important;
+    height: 56px !important;
+    border-radius: 12px !important;
+    border: 1px solid #cdd9ef !important;
+    font-size: 26px !important;
+    font-weight: 700;
+    text-align: center;
+}
+
+body.customer-account-create .tekntek-register__resend-row {
+    margin-top: 4px;
+    align-items: center;
+}
+
+body.customer-account-create .tekntek-register__resend {
+    color: #2d5fd3 !important;
+    font-weight: 600;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+}
+
+body.customer-account-create .tekntek-register__timer {
+    font-weight: 700;
+    color: #123f9b;
+}
+
+body.customer-account-login .tekntek-auth,
+body.customer-account-create .tekntek-auth,
+body.customer-account-forgotpassword .tekntek-auth,
+body.customer-account-createpassword .tekntek-auth,
+body.customer-account-login .tekntek-auth input,
+body.customer-account-create .tekntek-auth input,
+body.customer-account-forgotpassword .tekntek-auth input,
+body.customer-account-createpassword .tekntek-auth input,
+body.customer-account-login .tekntek-auth button,
+body.customer-account-create .tekntek-auth button,
+body.customer-account-forgotpassword .tekntek-auth button,
+body.customer-account-createpassword .tekntek-auth button {
+    font-family: "Inter", "Montserrat", "Segoe UI", Roboto, Arial, sans-serif !important;
+}
+
+@media (max-width: 1023px) {
+    body.customer-account-login,
+    body.customer-account-create,
+    body.customer-account-forgotpassword,
+    body.customer-account-createpassword,
+    body.customer-account-login .page-wrapper,
+    body.customer-account-create .page-wrapper,
+    body.customer-account-forgotpassword .page-wrapper,
+    body.customer-account-createpassword .page-wrapper {
+        background: #12075d !important;
+    }
+
+    body.customer-account-login .tekntek-auth,
+    body.customer-account-create .tekntek-auth,
+    body.customer-account-forgotpassword .tekntek-auth,
+    body.customer-account-createpassword .tekntek-auth {
+        width: min(680px, calc(100vw - 22px)) !important;
+    }
+
+    body.customer-account-login .tekntek-auth__stage,
+    body.customer-account-create .tekntek-auth__stage,
+    body.customer-account-forgotpassword .tekntek-auth__stage,
+    body.customer-account-createpassword .tekntek-auth__stage {
+        min-height: auto;
+        padding: 0;
+        border-radius: 18px;
+        background: transparent !important;
+        display: block !important;
+    }
+
+    body.customer-account-login .tekntek-auth__panel--form,
+    body.customer-account-create .tekntek-auth__panel--register,
+    body.customer-account-forgotpassword .tekntek-auth__panel--form,
+    body.customer-account-createpassword .tekntek-auth__panel--form {
+        width: 100% !important;
+        min-width: 0;
+        max-width: none !important;
+        padding: 24px 18px !important;
+        border-radius: 18px !important;
+    }
+
+    body.customer-account-create .tekntek-register__form[data-role="profile-form"] {
+        grid-template-columns: 1fr;
     }
 }

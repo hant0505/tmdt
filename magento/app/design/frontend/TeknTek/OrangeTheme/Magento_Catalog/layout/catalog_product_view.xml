@@ -16,7 +16,7 @@
         <referenceBlock name="require-cookie" remove="true"/>
 
         <referenceContainer name="content">
-            <block class="Magento\Framework\View\Element\Template" name="tekntek.custom.pdp" template="Magento_Catalog::product/view/custom-pdp.phtml"/>
+            <block class="Magento\Framework\View\Element\Template" name="tekntek.custom.pdp" template="Magento_Catalog::product/view/custom-pdp.phtml" cacheable="false"/>
         </referenceContainer>
     </body>
 </page>
