@@ -1,0 +1,79 @@
+<?php
+$currentProduct = $block->getProduct();
+if (!$currentProduct) {
+    return;
+}
+$productCollection = $block->getSameCategoryProducts($currentProduct);
+// Nếu không có sản phẩm, hiển thị thông báo (có thể bỏ qua nếu không muốn)
+?>
+<style>
+    .same-category-products .products-grid .product-item {
+        display: inline-block;
+        vertical-align: top;
+        width: 23%;
+        margin: 1%;
+        box-sizing: border-box;
+    }
+    .same-category-products .product-item-info {
+        text-align: center;
+    }
+    .same-category-products .product-item-photo {
+        display: block;
+        margin-bottom: 10px;
+    }
+    .same-category-products .product-item-name {
+        font-weight: 600;
+        margin: 10px 0;
+    }
+    .same-category-products .price-box {
+        margin: 5px 0;
+    }
+    .same-category-products .actions-primary {
+        margin-top: 10px;
+    }
+    @media (max-width: 768px) {
+        .same-category-products .products-grid .product-item {
+            width: 48%;
+        }
+    }
+</style>
+
+<div class="block widget block-products-list same-category-products">
+    <div class="block-title">
+        <strong><?= __('Sản phẩm tương tự') ?></strong>
+    </div>
+    <div class="block-content">
+        <?php if ($productCollection && $productCollection->count() > 0): ?>
+            <div class="products-grid grid">
+                <ol class="product-items widget-product-grid">
+                    <?php foreach ($productCollection as $_product): ?>
+                        <li class="product-item">
+                            <div class="product-item-info">
+                                <a href="<?= $_product->getProductUrl() ?>" class="product photo product-item-photo">
+                                    <?= $block->getImage($_product, 'product_small_image')->toHtml(); ?>
+                                </a>
+                                <div class="product details product-item-details">
+                                    <strong class="product name product-item-name">
+                                        <a href="<?= $_product->getProductUrl() ?>" class="product-item-link">
+                                            <?= $block->escapeHtml($_product->getName()) ?>
+                                        </a>
+                                    </strong>
+                                    <?= $block->getProductPrice($_product) ?>
+                                    <div class="actions-primary">
+                                        <a href="<?= $_product->getProductUrl() ?>" class="action tocart primary">
+                                            <span><?= __('Xem chi tiết') ?></span>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                    <?php endforeach; ?>
+                </ol>
+            </div>
+        <?php else: ?>
+            <div class="message info">
+                <span><?= __('Không có sản phẩm tương tự nào trong danh mục này.') ?></span>
+            </div>
+        <?php endif; ?>
+    </div>
+</div>
