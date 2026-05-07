@@ -39,6 +39,7 @@ class LayoutProcessorPlugin
 
         $this->setFieldVisibility($fieldset, 'company', false);
         $this->setFieldLabel($fieldset, 'region', 'Quận/Huyện');
+        $this->setFieldLabel($fieldset, 'region_id', 'Quận/Huyện');
         $this->setFieldVisibility($fieldset, 'region', true);
         $this->setFieldVisibility($fieldset, 'region_id', false);
 
