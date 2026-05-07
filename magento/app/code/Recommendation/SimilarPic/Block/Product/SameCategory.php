@@ -46,24 +46,37 @@ class SameCategory extends AbstractProduct
      */
     public function getSameCategoryProducts($currentProduct)
     {
-        // Lấy danh mục đầu tiên
         $categoryIds = $currentProduct->getCategoryIds();
         if (empty($categoryIds)) {
             return [];
         }
         $categoryId = $categoryIds[0];
 
+        // Lấy giá cuối cùng (đã bao gồm khuyến mãi)
+        $currentPrice = (float)$currentProduct->getFinalPrice();
+        // Đặt biên độ 30% (có thể điều chỉnh)
+        $minPrice = $currentPrice * 0.7;
+        $maxPrice = $currentPrice * 1.3;
+
         $collection = $this->productCollectionFactory->create();
         $collection->addAttributeToSelect(['name', 'price', 'url_key', 'small_image']);
         $collection->addCategoriesFilter(['in' => $categoryId]);
         $collection->addFieldToFilter('entity_id', ['neq' => $currentProduct->getId()]);
         
-        // TẠM THỜI COMMENT 2 BỘ LỌC NÀY ĐỂ CHẮC CHẮN CÓ SẢN PHẨM
-        // $collection->addFieldToFilter('price', ['from' => $minPrice, 'to' => $maxPrice]);
-        // $collection->addFieldToFilter('quantity_and_stock_status', ['is_in_stock' => true]);
+        $collection->addFieldToFilter('quantity_and_stock_status', ['is_in_stock' => true]);
+
+        // Thử lọc giá trước
+        $collectionPriceFiltered = clone $collection;
+        $collectionPriceFiltered->addFieldToFilter('price', ['from' => $minPrice, 'to' => $maxPrice]);
+
+        if ($collectionPriceFiltered->getSize() > 0) {
+            $collection = $collectionPriceFiltered;
+        }
+        // Nếu không có sản phẩm nào trong khoảng giá, giữ nguyên collection không lọc giá
+        $collection->setPageSize(6);
         
         $collection->setVisibility($this->catalogProductVisibility->getVisibleInSiteIds());
-        $collection->setPageSize(5);
+        $collection->setPageSize(6);
         $collection->setOrder('entity_id', 'DESC');
         
         return $collection;
