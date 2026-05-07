@@ -13,51 +13,9 @@ if (!isset($objectManager)) {
 }
 
 $customerSession = $objectManager->get(\Magento\Customer\Model\Session::class);
-$customLoginError = trim((string)$customerSession->getData('tekntek_login_error'));
-if ($customLoginError !== '') {
-    $customerSession->unsData('tekntek_login_error');
-}
+$customerSession->unsData('tekntek_login_error');
 ?>
 <style>
-@media (min-width: 1024px) {
-    .customer-account-login .page-main .columns {
-        width: auto !important;
-        min-height: 0 !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        border: 0 !important;
-        border-radius: 0 !important;
-        overflow: visible !important;
-        background: transparent !important;
-    }
-
-    .customer-account-login .login-container {
-        max-width: none !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        border: 0 !important;
-        border-radius: 0 !important;
-        background: transparent !important;
-        box-shadow: none !important;
-    }
-
-    .customer-account-login .block-new-customer {
-        display: none !important;
-    }
-
-    .customer-account-login .block-customer-login {
-        margin: 0 !important;
-    }
-
-    .customer-account-login .tekntek-login__create-account {
-        width: 100% !important;
-        margin: 0 !important;
-        display: flex !important;
-        align-items: center;
-        justify-content: center;
-    }
-}
-
 .tekntek-login__message {
     margin: 0 0 12px;
     padding: 8px 10px;
@@ -77,7 +35,6 @@ if ($customLoginError !== '') {
     background: #ffecec;
     color: #9d2d2d;
 }
-
 </style>
 <div class="tekntek-auth tekntek-auth--login">
     <div class="tekntek-auth__shell">
@@ -98,9 +55,9 @@ if ($customLoginError !== '') {
 
                 <p class="tekntek-auth__subtitle"><?= $escaper->escapeHtml(__('If you have an account, sign in with your email address.')) ?></p>
 
-                <div class="tekntek-login__messages" data-role="login-messages"<?= $customLoginError === '' ? ' hidden' : '' ?>>
+                <div class="tekntek-login__messages" data-role="login-messages" hidden>
                     <div class="tekntek-login__message is-error" data-role="login-message-text">
-                        <?= $escaper->escapeHtml($customLoginError) ?>
+                        <?= $escaper->escapeHtml('') ?>
                     </div>
                 </div>
 

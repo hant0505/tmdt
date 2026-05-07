@@ -23,10 +23,34 @@ $customerSession = $om->get(\Magento\Customer\Model\Session::class);
 $name = (string) $product->getName();
 $shortDesc = trim((string) $product->getShortDescription());
 $description = trim((string) $product->getDescription());
+
+$repairTextEncoding = static function (string $text): string {
+    if ($text === '') {
+        return '';
+    }
+
+    $text = strtr($text, [
+        'â€™' => '’',
+        'â€˜' => '‘',
+        'â€œ' => '“',
+        'â€' => '”',
+        'â€“' => '–',
+        'â€”' => '—',
+        'â€¦' => '…',
+        'Â ' => ' ',
+        'Â' => '',
+    ]);
+
+    return trim(preg_replace('/\s+/', ' ', $text) ?? $text);
+};
+
+$shortDesc = $repairTextEncoding($shortDesc);
+$description = $repairTextEncoding($description);
 $descriptionSource = $description !== '' ? $description : $shortDesc;
 $rawDescriptionHtml = trim($descriptionSource) !== ''
     ? (string) $outputHelper->productAttribute($product, $descriptionSource, 'description')
     : '';
+$rawDescriptionHtml = $repairTextEncoding($rawDescriptionHtml);
 $regular = (float) $product->getPrice();
 $final = (float) $product->getFinalPrice();
 $buyNowUrl = $block->getUrl('checkout/cart/add', [
@@ -162,6 +186,17 @@ $normalizeSpecLabel = static function (string $label): string {
 $cleanSpecValue = static function (string $value): string {
     $normalized = html_entity_decode($value, ENT_QUOTES | ENT_HTML5, 'UTF-8');
     $normalized = preg_replace('/\s+/', ' ', trim($normalized)) ?? trim($normalized);
+    $normalized = strtr($normalized, [
+        'â€™' => '’',
+        'â€˜' => '‘',
+        'â€œ' => '“',
+        'â€' => '”',
+        'â€“' => '–',
+        'â€”' => '—',
+        'â€¦' => '…',
+        'Â ' => ' ',
+        'Â' => '',
+    ]);
 
     if ($normalized === '' || $normalized === '0.000000' || strtolower($normalized) === 'none') {
         return '';
@@ -252,6 +287,31 @@ foreach ($specMap as $label => $codes) {
 
 $featureBullets = [];
 $descriptionHtml = '';
+$isMeaningfulDescription = static function (string $html): bool {
+    $text = trim(strip_tags($html));
+    $text = preg_replace('/\s+/u', ' ', $text) ?? $text;
+    $normalized = mb_strtolower($text, 'UTF-8');
+
+    if ($normalized === '') {
+        return false;
+    }
+
+    // Heading-only leftovers should not be used as final description content.
+    $headingOnlyPatterns = [
+        '/^đặc điểm(?: nổi bật)?$/u',
+        '/^features?$/u',
+        '/^thông số(?: kỹ thuật)?$/u',
+        '/^specifications?$/u',
+    ];
+
+    foreach ($headingOnlyPatterns as $pattern) {
+        if (preg_match($pattern, $normalized)) {
+            return false;
+        }
+    }
+
+    return true;
+};
 
 if ($rawDescriptionHtml !== '') {
     $normalizedDescriptionHtml = preg_replace('/<br\s*\/?>/i', "\n", $rawDescriptionHtml) ?? $rawDescriptionHtml;
@@ -283,7 +343,7 @@ if ($rawDescriptionHtml !== '') {
     $cleanDescriptionHtml = preg_replace('/(?:\s*<br\s*\/?>\s*){2,}/i', '<br>', (string) $cleanDescriptionHtml);
     $cleanDescriptionHtml = trim((string) $cleanDescriptionHtml);
 
-    if ($cleanDescriptionHtml !== '') {
+    if ($cleanDescriptionHtml !== '' && $isMeaningfulDescription($cleanDescriptionHtml)) {
         $descriptionHtml = $cleanDescriptionHtml;
     }
 }
