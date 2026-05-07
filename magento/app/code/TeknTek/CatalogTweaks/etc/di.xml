@@ -1,0 +1,16 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:ObjectManager/etc/config.xsd">
+    <type name="Magento\Search\Model\Autocomplete">
+        <arguments>
+            <argument name="dataProviders" xsi:type="array">
+                <item name="05_tekntek_product_suggestions" xsi:type="object">TeknTek\CatalogTweaks\Model\Autocomplete\ProductDataProvider</item>
+            </argument>
+        </arguments>
+    </type>
+    <type name="TeknTek\CatalogTweaks\Model\Autocomplete\ProductDataProvider">
+        <arguments>
+            <argument name="collectionFactory" xsi:type="object">Magento\CatalogSearch\Model\ResourceModel\Fulltext\SearchCollectionFactory</argument>
+        </arguments>
+    </type>
+</config>

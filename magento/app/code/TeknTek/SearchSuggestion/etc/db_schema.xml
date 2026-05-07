@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<schema xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Setup/Declaration/Schema/etc/schema.xsd">
+    <table name="tekntek_review_helpfulness" resource="default" engine="innodb" comment="TeknTek Review Helpfulness Votes">
+        <column xsi:type="int" name="vote_id" unsigned="true" nullable="false" identity="true" comment="Vote ID"/>
+        <column xsi:type="bigint" name="review_id" unsigned="true" nullable="false" comment="Review ID"/>
+        <column xsi:type="int" name="customer_id" unsigned="true" nullable="false" comment="Customer ID"/>
+        <column xsi:type="smallint" name="vote_type" nullable="false" comment="1 Helpful, -1 Not Helpful"/>
+        <column xsi:type="timestamp" name="created_at" nullable="false" default="CURRENT_TIMESTAMP" comment="Created At"/>
+        <constraint xsi:type="primary" referenceId="PRIMARY">
+            <column name="vote_id"/>
+        </constraint>
+        <constraint xsi:type="unique" referenceId="TEKNTEK_REVIEW_HELPFULNESS_REVIEW_CUSTOMER_UNQ">
+            <column name="review_id"/>
+            <column name="customer_id"/>
+        </constraint>
+        <constraint xsi:type="foreign" referenceId="TEKNTEK_REVIEW_HELPFULNESS_REVIEW_ID_REVIEW_REVIEW_ID"
+                    table="tekntek_review_helpfulness" column="review_id"
+                    referenceTable="review" referenceColumn="review_id"
+                    onDelete="CASCADE"/>
+        <constraint xsi:type="foreign" referenceId="TEKNTEK_REVIEW_HELPFULNESS_CUSTOMER_ID_CUSTOMER_ENTITY_ID"
+                    table="tekntek_review_helpfulness" column="customer_id"
+                    referenceTable="customer_entity" referenceColumn="entity_id"
+                    onDelete="CASCADE"/>
+        <index referenceId="TEKNTEK_REVIEW_HELPFULNESS_REVIEW_ID" indexType="btree">
+            <column name="review_id"/>
+        </index>
+    </table>
+</schema>

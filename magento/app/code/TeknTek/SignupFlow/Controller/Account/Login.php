@@ -58,15 +58,11 @@ class Login extends Action implements HttpPostActionInterface
                 'redirect_url' => $this->_url->getUrl('customer/account'),
             ]);
         } catch (LocalizedException $exception) {
-            $this->customerSession->setData('tekntek_login_error', $exception->getMessage());
-
             return $result->setData([
                 'success' => false,
                 'message' => $exception->getMessage(),
             ]);
         } catch (\Throwable $throwable) {
-            $this->customerSession->setData('tekntek_login_error', __('Unable to sign in right now. Please try again.'));
-
             return $result->setData([
                 'success' => false,
                 'message' => __('Unable to sign in right now. Please try again.'),

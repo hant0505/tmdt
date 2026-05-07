@@ -3,5 +3,10 @@
       xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <head>
         <css src="Magento_Customer::css/account-dashboard.css"/>
+        <css src="Magento_Customer::css/account-dashboard-modern.css"/>
     </head>
+    <body>
+        <referenceBlock name="sale.reorder.sidebar" remove="true"/>
+        <referenceBlock name="customer-account-navigation-downloadable-products-link" remove="true"/>
+    </body>
 </page>

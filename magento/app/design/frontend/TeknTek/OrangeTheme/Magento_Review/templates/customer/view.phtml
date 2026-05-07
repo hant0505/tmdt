@@ -1,0 +1,84 @@
+<?php
+/**
+ * Customer review detail.
+ *
+ * @var \Magento\Review\Block\Customer\View $block
+ * @var \Magento\Framework\View\Helper\SecureHtmlRenderer $secureRenderer
+ */
+
+$product = $block->getProductData();
+$objectManager = \Magento\Framework\App\ObjectManager::getInstance();
+$imageHelper = $objectManager->get(\Magento\Catalog\Helper\Image::class);
+$smallImage = (string) $product->getSmallImage();
+$productImageUrl = ($smallImage === '' || $smallImage === 'no_selection')
+    ? (string) $imageHelper->getDefaultPlaceholderUrl('small_image')
+    : (string) $imageHelper->init($product, 'product_small_image')->resize(300)->getUrl();
+?>
+<?php if ($product->getId()): ?>
+<div class="customer-review view ttk-review-view">
+    <section class="ttk-review-product-card">
+        <div class="product-media">
+            <a class="product-photo" href="<?= $block->escapeUrl($product->getProductUrl()) ?>">
+                <img class="ttk-review-product-image"
+                     src="<?= $block->escapeUrl($productImageUrl) ?>"
+                     alt="<?= $block->escapeHtmlAttr($product->getName()) ?>" />
+            </a>
+        </div>
+        <div class="product-info">
+            <h2 class="product-name">
+                <a href="<?= $block->escapeUrl($product->getProductUrl()) ?>">
+                    <?= $block->escapeHtml($product->getName()) ?>
+                </a>
+            </h2>
+            <?php if ($block->getRating() && $block->getRating()->getSize()): ?>
+                <span class="rating-average-label"><?= $block->escapeHtml(__('Average Customer Rating')) ?></span>
+                <?= $block->getReviewsSummaryHtml($product) ?>
+            <?php endif; ?>
+        </div>
+    </section>
+
+    <section class="review-details ttk-review-content-card">
+        <div class="title">
+            <strong><?= $block->escapeHtml(__('Your Review')) ?></strong>
+        </div>
+        <?php if ($block->getRating() && $block->getRating()->getSize()): ?>
+            <div class="customer-review-rating">
+                <?php foreach ($block->getRating() as $_rating): ?>
+                    <?php if ($_rating->getPercent()): ?>
+                        <?php $rating = (int) ceil((float) $_rating->getPercent()) ?>
+                        <?php $ratingId = (int) $_rating->getRatingId() ?>
+                        <div class="rating-summary item">
+                            <span class="rating-label">
+                                <span><?= $block->escapeHtml($_rating->getRatingCode()) ?></span>
+                            </span>
+                            <div class="rating-result" id="ttk-rating-div-<?= (int) $ratingId ?>" title="<?= (int) $rating ?>%">
+                                <span><span><?= (int) $rating ?>%</span></span>
+                            </div>
+                            <?= /* @noEscape */ $secureRenderer->renderStyleAsTag(
+                                'width:' . (int) $rating . '%',
+                                '#ttk-rating-div-' . (int) $ratingId . ' > span'
+                            ) ?>
+                        </div>
+                    <?php endif; ?>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
+
+        <h3 class="review-title"><?= $block->escapeHtml($block->getReviewData()->getTitle()) ?></h3>
+        <div class="review-content">
+            <?= /* @noEscape */ nl2br($block->escapeHtml($block->getReviewData()->getDetail())) ?>
+        </div>
+        <div class="review-date">
+            <?= $block->escapeHtml(__('Submitted on %1', '<time class="date">' .
+                $block->dateFormat($block->getReviewData()->getCreatedAt()) . '</time>'), ['time']) ?>
+        </div>
+    </section>
+</div>
+<div class="actions-toolbar">
+    <div class="secondary">
+        <a class="action back" href="<?= $block->escapeUrl($block->getBackUrl()) ?>">
+            <span><?= $block->escapeHtml(__('Back to My Reviews')) ?></span>
+        </a>
+    </div>
+</div>
+<?php endif; ?>

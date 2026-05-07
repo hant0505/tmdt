@@ -13,51 +13,9 @@ if (!isset($objectManager)) {
 }
 
 $customerSession = $objectManager->get(\Magento\Customer\Model\Session::class);
-$customLoginError = trim((string)$customerSession->getData('tekntek_login_error'));
-if ($customLoginError !== '') {
-    $customerSession->unsData('tekntek_login_error');
-}
+$customerSession->unsData('tekntek_login_error');
 ?>
 <style>
-@media (min-width: 1024px) {
-    .customer-account-login .page-main .columns {
-        width: auto !important;
-        min-height: 0 !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        border: 0 !important;
-        border-radius: 0 !important;
-        overflow: visible !important;
-        background: transparent !important;
-    }
-
-    .customer-account-login .login-container {
-        max-width: none !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        border: 0 !important;
-        border-radius: 0 !important;
-        background: transparent !important;
-        box-shadow: none !important;
-    }
-
-    .customer-account-login .block-new-customer {
-        display: none !important;
-    }
-
-    .customer-account-login .block-customer-login {
-        margin: 0 !important;
-    }
-
-    .customer-account-login .tekntek-login__create-account {
-        width: 100% !important;
-        margin: 0 !important;
-        display: flex !important;
-        align-items: center;
-        justify-content: center;
-    }
-}
-
 .tekntek-login__message {
     margin: 0 0 12px;
     padding: 8px 10px;
@@ -97,9 +55,9 @@ if ($customLoginError !== '') {
 
                 <p class="tekntek-auth__subtitle"><?= $escaper->escapeHtml(__('If you have an account, sign in with your email address.')) ?></p>
 
-                <div class="tekntek-login__messages" data-role="login-messages"<?= $customLoginError === '' ? ' hidden' : '' ?>>
+                <div class="tekntek-login__messages" data-role="login-messages" hidden>
                     <div class="tekntek-login__message is-error" data-role="login-message-text">
-                        <?= $escaper->escapeHtml($customLoginError) ?>
+                        <?= $escaper->escapeHtml('') ?>
                     </div>
                 </div>
 
@@ -156,13 +114,6 @@ if ($customLoginError !== '') {
                                 <div class="secondary"><a class="action remind" href="<?= $escaper->escapeUrl($block->getForgotPasswordUrl()) ?>"><span><?= $escaper->escapeHtml(__('Forgot Password?')) ?></span></a></div>
                             </div>
 
-                            <div class="tekntek-login__separator" aria-hidden="true"><span><?= $escaper->escapeHtml(__('OR')) ?></span></div>
-
-                            <a class="tekntek-login__google" href="<?= $escaper->escapeUrl($block->getUrl('tekntek_googlelogin/auth/google')) ?>" aria-label="<?= $escaper->escapeHtmlAttr(__('Login with Google account')) ?>">
-                                <span class="tekntek-login__google-mark">G</span>
-                                <span><?= $escaper->escapeHtml(__('Login with Google account')) ?></span>
-                            </a>
-
                             <div class="tekntek-login__register">
                                 <p><?= $escaper->escapeHtml(__('Do not have an account yet?')) ?></p>
                                 <a class="action login primary tekntek-login__create-account" href="<?= $escaper->escapeUrl($block->getUrl('customer/account/create')) ?>">
@@ -204,7 +155,11 @@ if ($customLoginError !== '') {
 
         var messagesWrap = document.querySelector('[data-role="login-messages"]');
         var messageText = document.querySelector('[data-role="login-message-text"]');
+        var submitButton = form.querySelector('button[type="submit"]');
+        var submitText = submitButton ? submitButton.querySelector('span') : null;
+        var originalSubmitText = submitText ? submitText.textContent : '';
         var isSubmittingNatively = false;
+        var isSubmitting = false;
 
         function setError(message) {
             if (!messagesWrap || !messageText) {
@@ -223,12 +178,29 @@ if ($customLoginError !== '') {
             HTMLFormElement.prototype.submit.call(form);
         }
 
+        function setLoading(isLoading) {
+            isSubmitting = isLoading;
+
+            if (submitButton) {
+                submitButton.disabled = isLoading;
+                submitButton.classList.toggle('is-loading', isLoading);
+            }
+
+            if (submitText) {
+                submitText.textContent = isLoading ? 'Signing in...' : originalSubmitText;
+            }
+        }
+
         form.addEventListener('submit', function (event) {
             if (isSubmittingNatively) {
                 return;
             }
 
             event.preventDefault();
+
+            if (isSubmitting) {
+                return;
+            }
 
             var emailField = form.querySelector('input[name="login[username]"]');
             var passwordField = form.querySelector('input[name="login[password]"]');
@@ -241,16 +213,29 @@ if ($customLoginError !== '') {
             }
 
             var formData = new FormData(form);
+            var controller = window.AbortController ? new AbortController() : null;
+            var timeoutId = window.setTimeout(function () {
+                if (controller) {
+                    controller.abort();
+                }
+            }, 10000);
+
+            setError('');
+            setLoading(true);
 
             fetch('<?= $escaper->escapeJs($block->getUrl('tekntek_signup/account/login')) ?>', {
                 method: 'POST',
                 headers: {
                     'X-Requested-With': 'XMLHttpRequest'
                 },
-                body: formData
+                body: formData,
+                signal: controller ? controller.signal : undefined
             }).then(function (resp) {
                 return resp.text();
             }).then(function (text) {
+                window.clearTimeout(timeoutId);
+                setLoading(false);
+
                 var data = {};
                 try {
                     data = text ? JSON.parse(text) : {};
@@ -266,7 +251,9 @@ if ($customLoginError !== '') {
 
                 window.location.href = data.redirect_url || '<?= $escaper->escapeJs($block->getUrl('customer/account')) ?>';
             }).catch(function () {
-                submitNatively();
+                window.clearTimeout(timeoutId);
+                setLoading(false);
+                setError('The sign-in request took too long. Please check your connection and try again.');
             });
         });
     });
