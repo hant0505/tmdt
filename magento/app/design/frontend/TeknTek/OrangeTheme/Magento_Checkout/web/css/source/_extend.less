@@ -636,7 +636,7 @@ body {
 }
 
 .checkout-index-index .opc-block-summary {
-    border: 1px solid #cbcbcb;
+    border: 1px solid #62136c;
     border-radius: 8px;
     background: #fdfdfd;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.03);
@@ -857,7 +857,7 @@ body {
 .checkout-index-index .opc-wrapper .checkout-shipping-method .step-content {
     border: 1px solid #e0e0e0;
     border-radius: 8px;
-    background: #fff;
+    background: #d66363;
     padding: 20px;
     margin-top: 16px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
@@ -1027,20 +1027,9 @@ body {
     background: #335789;
 }
 
-/* ====== Payment Methods Section - Bank Transfer & COD ====== */
+/* ====== Payment Methods Section - current selector styles ====== */
 .tekntek-payment-wrapper {
     margin-top: 20px;
-}
-
-.tekntek-payment-methods {
-    display: flex;
-    flex-direction: column;
-    gap: 32px;
-    padding: 20px;
-    background: #fff;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
 }
 
 .tekntek-payment-header {
@@ -1089,7 +1078,7 @@ body {
     min-height: 80px;
     border: 1px solid #939393;
     border-radius: 12px;
-    background: #fdfdfd;
+    background: #17afba;
     cursor: pointer;
     transition: all 0.2s;
     position: relative;
@@ -1171,36 +1160,6 @@ body {
     display: flex;
     flex-direction: column;
     gap: 22px;
-}
-
-.tekntek-payment-add-new {
-    display: flex;
-    align-items: center;
-}
-
-.tekntek-payment-add-btn {
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    border: none;
-    background: transparent;
-    cursor: pointer;
-    font-family: 'Inter', sans-serif;
-    font-size: 18px;
-    font-weight: 400;
-    color: #000;
-    padding: 0;
-    transition: opacity 0.2s;
-}
-
-.tekntek-payment-add-btn:hover {
-    opacity: 0.7;
-}
-
-.tekntek-payment-add-btn svg {
-    width: 24px;
-    height: 24px;
-    color: #000;
 }
 
 /* ====== Checkout Visual Polish v2 ====== */
@@ -1707,6 +1666,70 @@ body {
 .checkout-index-index .checkout-payment-method .payment-method,
 .checkout-index-index .checkout-payment-method .payment-method-content {
     margin-bottom: 0;
+}
+
+/* Remove the extra wrapper box around Apply Discount Code in payment step */
+/* Keep this scoped to the discount form itself so the checkout layout stays intact */
+.checkout-index-index #payment .payment-option-content .form-discount,
+.checkout-index-index #payment .payment-option-content .form-discount .fieldset,
+.checkout-index-index #payment .payment-option-content .form-discount .field,
+.checkout-index-index #payment .payment-option-content .form-discount .control,
+.checkout-index-index #payment .payment-option-content .form-discount .field .label {
+    border: 0 !important;
+    outline: 0 !important;
+    box-shadow: none !important;
+    background: transparent !important;
+    padding: 0 !important;
+    margin: 0 !important;
+}
+
+/* Keep Place Order visible after payment cleanup - use simple layout rules only */
+.checkout-index-index #payment .payment-method-content > .actions-toolbar {
+    display: none !important;
+}
+
+.checkout-index-index #payment .tekntek-payment-actions > .actions-toolbar,
+.checkout-index-index #payment .tekntek-payment-actions > .actions-toolbar .primary,
+.checkout-index-index #payment .tekntek-payment-actions > .actions-toolbar .primary .action,
+.checkout-index-index #payment .tekntek-payment-actions > .actions-toolbar .primary .action.primary,
+.checkout-index-index #payment .tekntek-payment-actions > .actions-toolbar .primary .action.primary.checkout {
+    display: inline-block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: relative !important;
+    z-index: 100 !important;
+}
+
+.checkout-index-index #payment .tekntek-payment-actions {
+    display: block !important;
+    margin-top: 14px;
+    position: relative;
+    z-index: 101;
+    clear: both;
+    text-align: right;
+}
+
+.checkout-index-index #payment .tekntek-payment-actions .actions-toolbar {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+/* Remove leftover outer border around payment/discount area (cleanup) */
+.checkout-index-index .opc-block-payment,
+.checkout-index-index .opc-block-payment .payment-option,
+.checkout-index-index #payment .payment-option,
+.checkout-index-index #payment .payment-option._collapsible,
+.checkout-index-index #payment .payment-option._collapsible .payment-option-content {
+    border: 0 !important;
+    box-shadow: none !important;
+    background: transparent !important;
+}
+
+/* Also ensure step content wrapper doesn't leave an extra rounded border */
+.checkout-index-index .opc-wrapper .step-content,
+.checkout-index-index .opc-wrapper .step-content .payment-option {
+    border: 0 !important;
+    box-shadow: none !important;
 }
 
 

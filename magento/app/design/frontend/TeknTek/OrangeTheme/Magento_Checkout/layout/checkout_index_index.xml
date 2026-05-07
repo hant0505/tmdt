@@ -40,6 +40,7 @@
                                                                     <item name="component" xsi:type="string">Magento_Checkout/js/view/payment-selection</item>
                                                                     <item name="sortOrder" xsi:type="string">5</item>
                                                                 </item>
+                                                                <!-- Temporarily disabled to test the default Magento payment step -->
                                                             </item>
                                                         </item>
                                                     </item>
