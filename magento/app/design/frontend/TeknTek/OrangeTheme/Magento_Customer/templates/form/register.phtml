@@ -961,12 +961,34 @@ document.addEventListener('DOMContentLoaded', function () {
             emailForm.addEventListener('submit', function (event) {
                 event.preventDefault();
 
+                if (emailForm.getAttribute('data-submitting') === '1') {
+                    return;
+                }
+
                 var email = (emailInput.value || '').trim();
                 var emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
                 if (!emailPattern.test(email)) {
                     showMessage('Please enter a valid email address.', 'error');
                     return;
+                }
+
+                var submitButton = emailForm.querySelector('button[type="submit"]');
+                var submitLabelNode = submitButton ? submitButton.querySelector('span') : null;
+                var originalSubmitLabel = submitLabelNode ? submitLabelNode.textContent : '';
+                var controller = window.AbortController ? new AbortController() : null;
+                var timeoutId = window.setTimeout(function () {
+                    if (controller) {
+                        controller.abort();
+                    }
+                }, 12000);
+
+                emailForm.setAttribute('data-submitting', '1');
+                if (submitButton) {
+                    submitButton.disabled = true;
+                }
+                if (submitLabelNode) {
+                    submitLabelNode.textContent = 'Sending code...';
                 }
 
                 var formKey = (root.querySelector('input[name="form_key"]') || {}).value || '';
@@ -980,10 +1002,12 @@ document.addEventListener('DOMContentLoaded', function () {
                         'X-Requested-With': 'XMLHttpRequest',
                         'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
                     },
-                    body: body.toString()
+                    body: body.toString(),
+                    signal: controller ? controller.signal : undefined
                 }).then(function (resp) {
                     return resp.text();
                 }).then(function (text) {
+                    window.clearTimeout(timeoutId);
                     var data = {};
                     try {
                         data = text ? JSON.parse(text) : {};
@@ -1012,7 +1036,16 @@ document.addEventListener('DOMContentLoaded', function () {
                         digits[0].focus();
                     }
                 }).catch(function () {
+                    window.clearTimeout(timeoutId);
                     showMessage('Unable to send verification code.', 'error');
+                }).finally(function () {
+                    emailForm.setAttribute('data-submitting', '0');
+                    if (submitButton) {
+                        submitButton.disabled = false;
+                    }
+                    if (submitLabelNode) {
+                        submitLabelNode.textContent = originalSubmitLabel || 'Continue';
+                    }
                 });
             });
         }
@@ -1126,12 +1159,19 @@ document.addEventListener('DOMContentLoaded', function () {
                     return;
                 }
 
+                if (resend.getAttribute('data-submitting') === '1') {
+                    return;
+                }
+
                 var formKey = (root.querySelector('input[name="form_key"]') || {}).value || '';
                 var email = hiddenEmail ? hiddenEmail.value : '';
 
                 if (!formKey || !email) {
                     return;
                 }
+
+                resend.setAttribute('data-submitting', '1');
+                resend.disabled = true;
 
                 var body = new URLSearchParams();
                 body.append('form_key', formKey);
@@ -1160,6 +1200,8 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
                 }).catch(function () {
                     showMessage('Unable to resend the code.', 'error');
+                }).finally(function () {
+                    resend.setAttribute('data-submitting', '0');
                 });
             });
         }
