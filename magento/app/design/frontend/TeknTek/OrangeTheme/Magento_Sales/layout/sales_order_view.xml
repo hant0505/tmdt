@@ -2,10 +2,6 @@
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <head>
-        <remove src="Magento_Sales::css/order-history-empty.css"/>
         <css src="Magento_Customer::css/account-order-fixes.css"/>
     </head>
-    <body>
-        <referenceBlock name="sales.order.history" template="Magento_Sales::order/history.phtml"/>
-    </body>
 </page>

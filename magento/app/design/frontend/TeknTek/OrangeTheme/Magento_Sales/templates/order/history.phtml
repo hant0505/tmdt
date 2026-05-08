@@ -48,11 +48,23 @@
                         <span><?= $block->escapeHtml(__('View Order')) ?></span>
                     </a>
                     <?php if ($this->helper(\Magento\Sales\Helper\Reorder::class)->canReorder($_order->getEntityId())) : ?>
-                        <a href="#"
-                           data-post='<?= /* @noEscape */ $this->helper(\Magento\Framework\Data\Helper\PostHelper::class)->getPostData($block->getReorderUrl($_order)) ?>'
-                           class="action order ttk-action-chip ttk-action-chip--primary">
-                            <span><?= $block->escapeHtml(__('Reorder')) ?></span>
-                        </a>
+                        <?php $reorderParams = json_decode(
+                            $this->helper(\Magento\Framework\Data\Helper\PostHelper::class)->getPostData($block->getReorderUrl($_order)),
+                            true
+                        ); ?>
+                        <form class="ttk-reorder-form"
+                              method="post"
+                              action="<?= $block->escapeUrl($reorderParams['action'] ?? $block->getReorderUrl($_order)) ?>">
+                            <?= $block->getBlockHtml('formkey') ?>
+                            <?php foreach (($reorderParams['data'] ?? []) as $key => $value) : ?>
+                                <input type="hidden"
+                                       name="<?= $block->escapeHtmlAttr($key) ?>"
+                                       value="<?= $block->escapeHtmlAttr((string) $value) ?>">
+                            <?php endforeach; ?>
+                            <button type="submit" class="action order ttk-action-chip ttk-action-chip--primary">
+                                <span><?= $block->escapeHtml(__('Reorder')) ?></span>
+                            </button>
+                        </form>
                     <?php endif ?>
                 </div>
             </article>

@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <referenceBlock name="logo">
+        <arguments>
+            <argument name="logo_file" xsi:type="string">css/images/tekntek-logo.png</argument>
+            <argument name="logo_alt" xsi:type="string">TeknTek</argument>
+            <argument name="logo_width" xsi:type="number">170</argument>
+            <argument name="logo_height" xsi:type="number">56</argument>
+        </arguments>
+    </referenceBlock>
+</page>

@@ -628,6 +628,22 @@ body.customer-account-index .field.choice {
     background: #f8fafc !important;
 }
 
+/* Do not render empty "show password" choice as a card block */
+body.account .field.choice[data-bind*="showPassword"],
+body.customer-account-index .field.choice[data-bind*="showPassword"] {
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: transparent !important;
+    display: block !important;
+}
+
+/* Hide Magento password strength helper on account edit by request */
+body.customer-account-edit #password-strength-meter-container {
+    display: none !important;
+}
+
 body.account .field.choice input[type="checkbox"],
 body.customer-account-index .field.choice input[type="checkbox"] {
     width: 20px !important;
