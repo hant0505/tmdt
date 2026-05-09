@@ -5,9 +5,11 @@ define(
         'uiComponent',
         'Magento_Checkout/js/model/quote',
         'Magento_Checkout/js/action/select-payment-method',
-        'Magento_Checkout/js/checkout-data'
+        'Magento_Checkout/js/checkout-data',
+        'Magento_Checkout/js/model/payment-service',
+        'Magento_Checkout/js/model/payment/method-list'
     ],
-    function ($, ko, Component, quote, selectPaymentMethodAction, checkoutData) {
+    function ($, ko, Component, quote, selectPaymentMethodAction, checkoutData, paymentService, methodList) {
         'use strict';
 
         return Component.extend({
@@ -21,11 +23,59 @@ define(
             initialize: function () {
                 this._super();
                 var self = this;
+                var debugEnabled = !!window.tekntekPaymentDebug;
+                var logDebug = function (message, payload) {
+                    if (!debugEnabled) {
+                        return;
+                    }
+
+                    if (payload !== undefined) {
+                        console.log('[TeknTek][Payment]', message, payload);
+                        return;
+                    }
+
+                    console.log('[TeknTek][Payment]', message);
+                };
+
+                this.placeOrderVm = ko.observable(null);
+                this.canPlaceOrder = ko.pureComputed(function () {
+                    var vm = self.placeOrderVm();
+                    var allowed;
+
+                    if (!vm) {
+                        return false;
+                    }
+
+                    allowed = vm.isPlaceOrderActionAllowed;
+
+                    if (typeof allowed === 'function') {
+                        return !!allowed();
+                    }
+
+                    return !!allowed;
+                });
+
+                this.isCashOnDeliveryAvailable = ko.pureComputed(function () {
+                    var code = self.resolveMagentoMethodCode('cashondelivery');
+                    return self.isAvailableMethodCode(code);
+                });
+
+                this.isVnpayAvailable = ko.pureComputed(function () {
+                    var code = self.resolveMagentoMethodCode('vnpay');
+                    return self.isAvailableMethodCode(code);
+                });
 
                 // Watch for changes in selected payment method
                 this.selectedMethod.subscribe(function(newValue) {
                     self.showVnpayDetails(newValue === 'vnpay');
                     self.applySelectedMethod(newValue);
+                    self.updatePlaceOrderViewModel();
+                });
+
+                methodList.subscribe(function () {
+                    logDebug('Available methods updated', self.getMethodList());
+                    self.ensureSelectedMethodAvailable();
+                    self.updatePlaceOrderViewModel();
                 });
 
                 // Keep custom radio UI synced with the real Magento quote selection.
@@ -36,6 +86,7 @@ define(
                     }
 
                     self.moveNativePlaceOrderToolbar();
+                    self.updatePlaceOrderViewModel();
                 });
 
                 // Initialize from quote if already selected (e.g. after refresh/back).
@@ -49,6 +100,10 @@ define(
                 }
 
                 this.moveNativePlaceOrderToolbar();
+                this.updatePlaceOrderViewModel();
+                this.ensureSelectedMethodAvailable();
+
+                logDebug('Initial available methods', this.getMethodList());
 
                 return this;
             },
@@ -72,7 +127,7 @@ define(
             },
 
             resolveMagentoMethodCode: function (desiredCode) {
-                var methods = (window.checkoutConfig && window.checkoutConfig.paymentMethods) || [];
+                var methods = this.getMethodList();
                 var desired = (desiredCode || '').toLowerCase();
                 var i;
                 var method;
@@ -105,6 +160,57 @@ define(
                 return desiredCode;
             },
 
+            getMethodList: function () {
+                var methods = paymentService.getAvailablePaymentMethods();
+
+                if (methods && methods.length) {
+                    return methods;
+                }
+
+                methods = (window.checkoutConfig && window.checkoutConfig.paymentMethods) || [];
+
+                return methods;
+            },
+
+            isAvailableMethodCode: function (methodCode) {
+                var methods = this.getMethodList();
+                var target = (methodCode || '').toLowerCase();
+
+                return methods.some(function (method) {
+                    return (method && method.method ? method.method : '').toLowerCase() === target;
+                });
+            },
+
+            ensureSelectedMethodAvailable: function () {
+                var desiredCustom = this.selectedMethod && this.selectedMethod();
+                var desiredCode = this.resolveMagentoMethodCode(desiredCustom);
+                var methods = this.getMethodList();
+                var fallback;
+                var fallbackCustom;
+
+                if (desiredCode && this.isAvailableMethodCode(desiredCode)) {
+                    return;
+                }
+
+                if (!methods.length) {
+                    return;
+                }
+
+                fallback = methods[0].method;
+                fallbackCustom = this.mapQuoteMethodToCustomOption(fallback) || fallback;
+
+                if (fallbackCustom && this.selectedMethod() !== fallbackCustom) {
+                    this.selectedMethod(fallbackCustom);
+                }
+
+                if (fallback) {
+                    selectPaymentMethodAction({
+                        method: fallback
+                    });
+                    checkoutData.setSelectedPaymentMethod(fallback);
+                }
+            },
+
             applySelectedMethod: function (desiredCode) {
                 var methodCode = this.resolveMagentoMethodCode(desiredCode);
                 var current = quote.paymentMethod();
@@ -113,9 +219,14 @@ define(
                     return;
                 }
 
+                if (!this.isAvailableMethodCode(methodCode)) {
+                    this.ensureSelectedMethodAvailable();
+                    return;
+                }
+
                 if (current && current.method === methodCode) {
                     checkoutData.setSelectedPaymentMethod(methodCode);
-                    this.syncPlaceOrderActionAllowed(methodCode);
+                    this.updatePlaceOrderViewModel();
                     return;
                 }
 
@@ -124,40 +235,84 @@ define(
                 });
 
                 checkoutData.setSelectedPaymentMethod(methodCode);
-                this.syncPlaceOrderActionAllowed(methodCode);
+                this.updatePlaceOrderViewModel();
             },
 
-            syncPlaceOrderActionAllowed: function (methodCode, attempt) {
-                var normalized = (methodCode || '').toLowerCase();
+            updatePlaceOrderViewModel: function (attempt) {
+                var desiredCustom = this.selectedMethod && this.selectedMethod();
+                var desiredCode = this.resolveMagentoMethodCode(desiredCustom);
+                var methodCode = (quote.paymentMethod() && quote.paymentMethod().method) || desiredCode;
                 var $methodContainer;
-                var methodVm;
+                var vm;
                 var self = this;
 
                 attempt = attempt || 0;
 
-                if (normalized !== 'cashondelivery') {
-                    return;
+                if (methodCode) {
+                    $methodContainer = $('#payment .payment-method').has(
+                        'input[type="radio"][name="payment[method]"][value="' + methodCode + '"]'
+                    ).first();
                 }
 
-                $methodContainer = $('#payment .payment-method').has(
-                    'input[type="radio"][name="payment[method]"][value="' + methodCode + '"]'
-                ).first();
+                if (!$methodContainer || !$methodContainer.length) {
+                    $methodContainer = $('#payment .payment-method._active').first();
+                }
 
-                if ($methodContainer.length) {
-                    methodVm = ko.dataFor($methodContainer[0]);
-
-                    if (methodVm && typeof methodVm.isPlaceOrderActionAllowed === 'function') {
-                        methodVm.isPlaceOrderActionAllowed(true);
+                if ($methodContainer && $methodContainer.length) {
+                    vm = ko.dataFor($methodContainer[0]);
+                    if (vm && typeof vm.placeOrder === 'function') {
+                        if (methodCode && typeof vm.getCode === 'function' && vm.getCode() !== methodCode) {
+                            vm = null;
+                        }
                     }
 
-                    return;
+                    if (vm && typeof vm.placeOrder === 'function') {
+                        this.placeOrderVm(vm);
+                        return;
+                    }
                 }
 
                 if (attempt < 20) {
                     window.setTimeout(function () {
-                        self.syncPlaceOrderActionAllowed(methodCode, attempt + 1);
-                    }, 100);
+                        self.updatePlaceOrderViewModel(attempt + 1);
+                    }, 120);
                 }
+            },
+
+            placeOrder: function () {
+                var desiredCustom = this.selectedMethod && this.selectedMethod();
+                var desiredCode = this.resolveMagentoMethodCode(desiredCustom);
+                var current = quote.paymentMethod() && quote.paymentMethod().method;
+
+                if (!!window.tekntekPaymentDebug) {
+                    console.log('[TeknTek][Payment] placeOrder', {
+                        desiredCustom: desiredCustom,
+                        desiredCode: desiredCode,
+                        current: current,
+                        available: this.getMethodList()
+                    });
+                }
+
+                if (!this.isAvailableMethodCode(desiredCode)) {
+                    return false;
+                }
+
+                if (desiredCode && current !== desiredCode) {
+                    selectPaymentMethodAction({
+                        method: desiredCode
+                    });
+                    checkoutData.setSelectedPaymentMethod(desiredCode);
+                }
+
+                this.updatePlaceOrderViewModel();
+
+                var vm = this.placeOrderVm();
+
+                if (vm && typeof vm.placeOrder === 'function') {
+                    return vm.placeOrder();
+                }
+
+                return false;
             },
 
             moveNativePlaceOrderToolbar: function (attempt) {
