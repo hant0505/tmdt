@@ -4,12 +4,19 @@
         <referenceBlock name="product.info.main" remove="true"/>
         <referenceContainer name="product.info.media" remove="true"/>
         <referenceBlock name="product.info.details" remove="true"/>
+        <referenceBlock name="product.info.description" remove="true"/>
+        <referenceBlock name="product.attributes" remove="true"/>
+        <referenceBlock name="product.info.overview" remove="true"/>
+        <referenceBlock name="product.info.review" remove="true"/>
+        <referenceBlock name="reviews.tab" remove="true"/>
+        <referenceBlock name="product.review.form" remove="true"/>
         <referenceBlock name="catalog.product.related" remove="true"/>
         <referenceBlock name="product.info.upsell" remove="true"/>
         <referenceBlock name="product.info.additional" remove="true"/>
+        <referenceBlock name="require-cookie" remove="true"/>
 
         <referenceContainer name="content">
-            <block class="Magento\Framework\View\Element\Template" name="tekntek.custom.pdp" template="Magento_Catalog::product/view/custom-pdp.phtml"/>
+            <block class="Magento\Framework\View\Element\Template" name="tekntek.custom.pdp" template="Magento_Catalog::product/view/custom-pdp.phtml" cacheable="false"/>
         </referenceContainer>
     </body>
 </page>

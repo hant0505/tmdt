@@ -14,6 +14,7 @@ if ($signupSession->hasVerifiedEmail()) {
 
 $prefilledEmail = $signupSession->getEmail();
 $expiresAt = $signupSession->getExpiresAt();
+$registerBackgroundUrl = $block->getViewFileUrl('images/auth-login-figma-bg.png');
 $signupInit = [
     'TeknTek_SignupFlow/js/signup-flow' => [
         'sendUrl' => $block->getUrl('tekntek_signup/code/send'),
@@ -42,6 +43,488 @@ $signupInit = [
         display: none !important;
         margin: 0 !important;
         padding: 0 !important;
+    }
+
+    .customer-account-create .page-main .columns {
+        width: auto !important;
+        min-height: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: 0 !important;
+        border-radius: 0 !important;
+        overflow: visible !important;
+        background: transparent !important;
+    }
+
+    .customer-account-create .column.main {
+        padding: 0 !important;
+    }
+
+    .customer-account-create .tekntek-auth {
+        width: min(1340px, calc(100vw - 36px));
+        margin: 0 auto;
+    }
+
+    .customer-account-create .tekntek-auth__shell {
+        border-radius: 52px;
+        background: #11035d;
+        padding: 22px;
+    }
+
+    .customer-account-create .tekntek-auth__stage {
+        position: relative;
+        display: block;
+        min-height: 740px;
+        background: #ffffff url('<?= $escaper->escapeUrl($registerBackgroundUrl) ?>') 100% 50% / cover no-repeat;
+        border-radius: 28px;
+        overflow: hidden;
+    }
+
+    .customer-account-create .tekntek-auth__stage::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(90deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.92) 28%, rgba(255, 255, 255, 0.58) 44%, rgba(255, 255, 255, 0) 62%);
+        pointer-events: none;
+    }
+
+    .customer-account-create .tekntek-auth__panel--register {
+        position: absolute;
+        z-index: 1;
+        left: 120px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 404px;
+        max-width: calc(100% - 44px);
+        max-height: calc(100% - 88px);
+        margin: 0;
+        padding: 28px 22px 20px 28px;
+        border-radius: 24px;
+        background: rgba(255, 255, 255, 0.96);
+        box-shadow: 0 18px 48px rgba(8, 10, 31, 0.18);
+        overflow-y: auto;
+        scrollbar-gutter: stable;
+    }
+
+    .customer-account-create .tekntek-auth__brand {
+        display: inline-flex;
+        align-items: center;
+        margin-bottom: 12px;
+        text-decoration: none;
+    }
+
+    .customer-account-create .tekntek-auth__brand-logo {
+        width: 136px;
+        height: auto;
+        display: block;
+    }
+
+    .customer-account-create .tekntek-register__progress {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin: 0 0 12px;
+    }
+
+    .customer-account-create .tekntek-register__step-indicator {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        min-width: 0;
+        color: #6b7280;
+        font-size: 13px;
+        line-height: 1.2;
+        font-weight: 600;
+    }
+
+    .customer-account-create .tekntek-register__step-indicator span {
+        width: 24px;
+        height: 24px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 999px;
+        border: 1px solid #c7d2fe;
+        background: #eef2ff;
+        color: #365fd6;
+        flex: 0 0 24px;
+    }
+
+    .customer-account-create .tekntek-register__step-indicator strong {
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .customer-account-create .tekntek-register__step-indicator.is-active {
+        color: #111827;
+    }
+
+    .customer-account-create .tekntek-register__step-indicator.is-active span,
+    .customer-account-create .tekntek-register__step-indicator.is-complete span {
+        background: #365fd6;
+        border-color: #365fd6;
+        color: #ffffff;
+    }
+
+    .customer-account-create .tekntek-register__progress-line {
+        width: 28px;
+        height: 1px;
+        background: #dbe3f3;
+        flex: 0 0 28px;
+    }
+
+    .customer-account-create .tekntek-register__message {
+        margin: 0 0 10px;
+        padding: 8px 10px;
+        border-radius: 10px;
+        font-size: 12px;
+        line-height: 1.4;
+    }
+
+    .customer-account-create .tekntek-register__message.is-error {
+        background: #ffecec;
+        color: #9d2d2d;
+    }
+
+    .customer-account-create .tekntek-register__message.is-success {
+        background: #edf5ff;
+        color: #254b91;
+    }
+
+    .customer-account-create .tekntek-auth .block-title {
+        margin: 0 0 8px;
+        padding: 0;
+    }
+
+    .customer-account-create .tekntek-auth .block-title strong {
+        display: block;
+        color: #2a2a2a;
+        font-size: 20px;
+        line-height: 1.14;
+        font-weight: 500;
+    }
+
+    .customer-account-create .tekntek-auth__subtitle {
+        margin: 0 0 12px;
+        color: #757575;
+        font-size: 13px;
+        line-height: 1.35;
+        max-width: 294px;
+    }
+
+    .customer-account-create .tekntek-register__form {
+        display: grid;
+        gap: 10px;
+    }
+
+    .customer-account-create .tekntek-register__field {
+        display: grid;
+        gap: 4px;
+    }
+
+    .customer-account-create .tekntek-register__field > span {
+        color: #4a4a4a;
+        font-size: 12px;
+        line-height: 1.25;
+        font-weight: 600;
+    }
+
+    .customer-account-create .tekntek-register__field input {
+        width: 100%;
+        height: 39px;
+        border-radius: 12px;
+        border: 1px solid #d0d7e6;
+        background: #ffffff;
+        box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.04);
+        padding: 0 12px;
+        font-size: 13px;
+        color: #222;
+    }
+
+    .customer-account-create .tekntek-register__field input::placeholder {
+        color: #9ca3af;
+        opacity: 1;
+    }
+
+    .customer-account-create .tekntek-register__button {
+        width: 100%;
+        min-height: 40px;
+        border: 0;
+        border-radius: 12px;
+        background: #3d6fcb;
+        color: #ffffff;
+        font-size: 13px;
+        font-weight: 600;
+        line-height: 1;
+        box-shadow: none;
+        text-transform: none;
+    }
+
+    .customer-account-create .tekntek-register__button:hover {
+        background: #315dad;
+    }
+
+    .customer-account-create .tekntek-register__login-link {
+        margin-top: 12px;
+        color: #4b5563;
+        font-size: 14px;
+        line-height: 1.45;
+    }
+
+    .customer-account-create .tekntek-register__login-link p {
+        margin: 0 0 6px;
+    }
+
+    .customer-account-create .tekntek-register__text-link {
+        color: #365fd6;
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+    .customer-account-create .tekntek-register__otp {
+        display: grid;
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+        gap: 10px;
+    }
+
+    .customer-account-create .tekntek-register__otp input {
+        width: 100%;
+        height: 52px;
+        border-radius: 14px;
+        border: 1px solid #d0d7e6;
+        background: #ffffff;
+        text-align: center;
+        font-size: 22px;
+        font-weight: 700;
+    }
+
+    .customer-account-create .tekntek-register__resend-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+    }
+
+    .customer-account-create .tekntek-register__resend {
+        border: 0;
+        background: transparent;
+        padding: 0;
+        color: #365fd6;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .customer-account-create .tekntek-register__resend[disabled] {
+        color: #9ca3af;
+    }
+
+    .customer-account-create .tekntek-register__timer,
+    .customer-account-create .tekntek-register__hint {
+        color: #6b7280;
+        font-size: 12px;
+        line-height: 1.35;
+    }
+
+    .customer-account-create .tekntek-register__hint {
+        margin: -2px 0 0;
+    }
+
+    .customer-account-create .tekntek-register__titles {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        margin-bottom: 2px;
+    }
+
+    .customer-account-create .tekntek-register__titles label {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 10px;
+        border: 1px solid #d0d7e6;
+        border-radius: 999px;
+        background: #ffffff;
+        font-size: 12px;
+        color: #374151;
+    }
+}
+
+@media (max-width: 1023px) {
+    body.customer-account-create {
+        background: #f2f2f2;
+    }
+
+    .customer-account-create .page-main {
+        padding: 0 0 20px !important;
+    }
+
+    .customer-account-create .page-main .columns,
+    .customer-account-create .column.main {
+        width: 100%;
+        min-height: 0;
+        border: 0;
+        border-radius: 0;
+        padding: 0;
+        background: #f2f2f2;
+    }
+
+    .customer-account-create .tekntek-auth {
+        width: min(680px, calc(100vw - 24px));
+        margin: 16px auto;
+    }
+
+    .customer-account-create .tekntek-auth__shell {
+        padding: 0;
+        background: transparent;
+    }
+
+    .customer-account-create .tekntek-auth__stage {
+        background: #ffffff;
+        border-radius: 22px;
+        overflow: hidden;
+        box-shadow: 0 16px 36px rgba(15, 23, 42, 0.08);
+    }
+
+    .customer-account-create .tekntek-auth__panel--register {
+        width: auto;
+        margin: 0;
+        padding: 24px 18px;
+        background: #ffffff;
+    }
+
+    .customer-account-create .tekntek-auth__brand-logo {
+        width: 122px;
+    }
+
+    .customer-account-create .tekntek-register__progress {
+        display: grid;
+        gap: 10px;
+        margin: 0 0 18px;
+    }
+
+    .customer-account-create .tekntek-register__progress-line {
+        display: none;
+    }
+
+    .customer-account-create .tekntek-register__step-indicator {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 14px;
+        color: #4b5563;
+    }
+
+    .customer-account-create .tekntek-register__step-indicator span {
+        width: 28px;
+        height: 28px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 999px;
+        background: #eef2ff;
+        color: #365fd6;
+        font-weight: 700;
+    }
+
+    .customer-account-create .tekntek-auth .block-title strong {
+        font-size: 30px;
+        line-height: 1.12;
+        color: #1f2937;
+    }
+
+    .customer-account-create .tekntek-auth__subtitle,
+    .customer-account-create .tekntek-register__login-link,
+    .customer-account-create .tekntek-register__hint,
+    .customer-account-create .tekntek-register__timer {
+        font-size: 14px;
+        line-height: 1.5;
+        color: #6b7280;
+    }
+
+    .customer-account-create .tekntek-register__form {
+        display: grid;
+        gap: 14px;
+    }
+
+    .customer-account-create .tekntek-register__field {
+        display: grid;
+        gap: 6px;
+    }
+
+    .customer-account-create .tekntek-register__field > span {
+        font-size: 13px;
+        font-weight: 600;
+        color: #374151;
+    }
+
+    .customer-account-create .tekntek-register__field input {
+        width: 100%;
+        height: 46px;
+        padding: 0 14px;
+        border: 1px solid #d0d7e6;
+        border-radius: 12px;
+        font-size: 15px;
+        background: #ffffff;
+    }
+
+    .customer-account-create .tekntek-register__button {
+        width: 100%;
+        min-height: 46px;
+        border: 0;
+        border-radius: 12px;
+        background: #3d6fcb;
+        color: #ffffff;
+        font-size: 15px;
+        font-weight: 600;
+    }
+
+    .customer-account-create .tekntek-register__otp {
+        display: grid;
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+        gap: 8px;
+    }
+
+    .customer-account-create .tekntek-register__otp input {
+        width: 100%;
+        height: 46px;
+        border-radius: 12px;
+        border: 1px solid #d0d7e6;
+        text-align: center;
+        font-size: 20px;
+        font-weight: 700;
+    }
+
+    .customer-account-create .tekntek-register__resend-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+    }
+
+    .customer-account-create .tekntek-register__resend {
+        border: 0;
+        background: transparent;
+        padding: 0;
+        color: #365fd6;
+        font-size: 14px;
+        font-weight: 600;
+    }
+
+    .customer-account-create .tekntek-register__titles {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    .customer-account-create .tekntek-register__titles label {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 12px;
+        border: 1px solid #d0d7e6;
+        border-radius: 999px;
+        font-size: 13px;
+        color: #374151;
     }
 }
 </style>
@@ -76,7 +559,7 @@ $signupInit = [
                     <div class="tekntek-register__progress-line"></div>
                     <div class="tekntek-register__step-indicator<?= $initialStep === 'profile' ? ' is-active' : '' ?>" data-role="progress-step" data-step-index="2">
                         <span>3</span>
-                        <strong><?= $escaper->escapeHtml(__('Add info')) ?></strong>
+                        <strong><?= $escaper->escapeHtml(__('Create account')) ?></strong>
                     </div>
                 </div>
 
@@ -84,7 +567,7 @@ $signupInit = [
 
                 <div class="tekntek-register__stage<?= $initialStep === 'email' ? ' is-active' : '' ?>" data-step="email"<?= $initialStep !== 'email' ? ' hidden' : '' ?>>
                     <div class="block-title">
-                        <strong id="tekntek-register-heading" role="heading" aria-level="2"><?= $escaper->escapeHtml(__('Create an account')) ?></strong>
+                        <strong id="tekntek-register-heading" role="heading" aria-level="2" tabindex="-1"><?= $escaper->escapeHtml(__('Create an account')) ?></strong>
                     </div>
 
                     <p class="tekntek-auth__subtitle">
@@ -113,7 +596,7 @@ $signupInit = [
 
                 <div class="tekntek-register__stage<?= $initialStep === 'verify' ? ' is-active' : '' ?>" data-step="verify"<?= $initialStep !== 'verify' ? ' hidden' : '' ?>>
                     <div class="block-title">
-                        <strong role="heading" aria-level="2"><?= $escaper->escapeHtml(__('Verify email')) ?></strong>
+                        <strong role="heading" aria-level="2" tabindex="-1"><?= $escaper->escapeHtml(__('Verify email')) ?></strong>
                     </div>
 
                     <p class="tekntek-auth__subtitle" data-role="verify-copy">
@@ -154,11 +637,11 @@ $signupInit = [
 
                 <div class="tekntek-register__stage<?= $initialStep === 'profile' ? ' is-active' : '' ?>" data-step="profile"<?= $initialStep !== 'profile' ? ' hidden' : '' ?>>
                     <div class="block-title">
-                        <strong role="heading" aria-level="2"><?= $escaper->escapeHtml(__('Add info')) ?></strong>
+                        <strong role="heading" aria-level="2" tabindex="-1"><?= $escaper->escapeHtml(__('Create your account')) ?></strong>
                     </div>
 
                     <p class="tekntek-auth__subtitle">
-                        <?= $escaper->escapeHtml(__('Fill in your personal information to finish creating your account.')) ?>
+                        <?= $escaper->escapeHtml(__('Your email is verified. Fill in your information below to finish creating your account and sign in.')) ?>
                     </p>
 
                     <form class="tekntek-register__form" data-role="profile-form" action="<?= $escaper->escapeUrl($block->getUrl('tekntek_signup/account/create')) ?>" method="post" autocomplete="off">
@@ -196,7 +679,7 @@ $signupInit = [
                         </label>
 
                         <button type="submit" class="tekntek-register__button">
-                            <span><?= $escaper->escapeHtml(__('Continue')) ?></span>
+                            <span><?= $escaper->escapeHtml(__('Create account')) ?></span>
                         </button>
                     </form>
                 </div>
@@ -216,6 +699,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (root.getAttribute('data-signup-flow-bound') === '1') {
             return;
         }
+        root.setAttribute('data-signup-flow-bound', '1');
 
         var digits = Array.prototype.slice.call(root.querySelectorAll('[data-role="code-digit"]'));
         var countdown = root.querySelector('[data-role="countdown"]');
@@ -227,11 +711,14 @@ document.addEventListener('DOMContentLoaded', function () {
         var hiddenEmail = root.querySelector('[data-role="verified-email-hidden"]');
         var finalEmail = root.querySelector('[data-role="final-email-hidden"]');
         var emailInput = root.querySelector('[data-role="email-input"]');
+        var verifyCopy = root.querySelector('[data-role="verify-copy"]');
         var messageBox = root.querySelector('[data-role="message"]');
+        var registerPanel = root.querySelector('.tekntek-auth__panel--register');
         var steps = Array.prototype.slice.call(root.querySelectorAll('[data-step]'));
         var progressSteps = Array.prototype.slice.call(root.querySelectorAll('[data-role="progress-step"]'));
         var initialStep = root.getAttribute('data-initial-step') || 'email';
         var expiresAt = parseInt(root.getAttribute('data-initial-expires-at') || '0', 10) || 0;
+        var timerId = null;
 
         function showMessage(text, type) {
             if (!messageBox) {
@@ -267,6 +754,41 @@ document.addEventListener('DOMContentLoaded', function () {
                 item.classList.toggle('is-active', index === activeIndex);
                 item.classList.toggle('is-complete', index < activeIndex);
             });
+
+            if (registerPanel) {
+                window.requestAnimationFrame(function () {
+                    registerPanel.scrollTop = 0;
+                });
+            }
+        }
+
+        function setEmailValue(email) {
+            var normalizedEmail = (email || '').trim();
+
+            if (emailInput) {
+                emailInput.value = normalizedEmail;
+            }
+
+            if (hiddenEmail) {
+                hiddenEmail.value = normalizedEmail;
+            }
+
+            if (finalEmail) {
+                finalEmail.value = normalizedEmail;
+            }
+
+            if (verifyCopy) {
+                verifyCopy.textContent = normalizedEmail
+                    ? 'Check your inbox at ' + normalizedEmail + '. Enter the 6-digit verification code we sent to your email. The code expires after 5 minutes.'
+                    : 'Check your inbox. Enter the 6-digit verification code we sent to your email. The code expires after 5 minutes.';
+            }
+        }
+
+        function resetCodeInputs() {
+            digits.forEach(function (input) {
+                input.value = '';
+            });
+            syncCode();
         }
 
         function syncCode() {
@@ -286,8 +808,10 @@ document.addEventListener('DOMContentLoaded', function () {
             if (!countdown || !resend) {
                 return;
             }
-
-            var timerId = null;
+            if (timerId) {
+                window.clearInterval(timerId);
+                timerId = null;
+            }
 
             function tick() {
                 var now = Math.floor(Date.now() / 1000);
@@ -297,6 +821,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 if (remaining <= 0 && timerId) {
                     window.clearInterval(timerId);
+                    timerId = null;
                 }
             }
 
@@ -307,6 +832,10 @@ document.addEventListener('DOMContentLoaded', function () {
         }
 
         digits.forEach(function (input, idx) {
+            input.addEventListener('focus', function () {
+                input.select();
+            });
+
             input.addEventListener('input', function () {
                 var value = (input.value || '').replace(/\D+/g, '');
                 if ((input.value || '') !== value) {
@@ -330,16 +859,49 @@ document.addEventListener('DOMContentLoaded', function () {
 
                 input.value = value.slice(0, 1);
                 if (input.value && digits[idx + 1]) {
-                    digits[idx + 1].focus();
-                    digits[idx + 1].select();
+                    window.setTimeout(function () {
+                        digits[idx + 1].focus();
+                        digits[idx + 1].select();
+                    }, 0);
                 }
                 syncCode();
             });
 
             input.addEventListener('keydown', function (event) {
+                if (event.key >= '0' && event.key <= '9') {
+                    if (input.value) {
+                        input.value = '';
+                    }
+                    return;
+                }
+
                 if (event.key === 'Backspace' && !input.value && digits[idx - 1]) {
                     digits[idx - 1].focus();
                     digits[idx - 1].select();
+                }
+            });
+
+            input.addEventListener('paste', function (event) {
+                var clipboard = event.clipboardData || window.clipboardData;
+                var pasted = clipboard ? String(clipboard.getData('text') || '') : '';
+                var numbers = pasted.replace(/\D+/g, '');
+
+                if (!numbers) {
+                    return;
+                }
+
+                event.preventDefault();
+                numbers.split('').forEach(function (digit, offset) {
+                    if (digits[idx + offset]) {
+                        digits[idx + offset].value = digit;
+                    }
+                });
+                syncCode();
+
+                var nextIndex = Math.min(idx + numbers.length, digits.length - 1);
+                if (digits[nextIndex]) {
+                    digits[nextIndex].focus();
+                    digits[nextIndex].select();
                 }
             });
         });
@@ -387,7 +949,7 @@ document.addEventListener('DOMContentLoaded', function () {
                         finalEmail.value = data.email;
                     }
 
-                    showMessage(data.message || 'Email verified successfully.', 'success');
+                    showMessage(data.message || 'Email verified successfully. Continue below to create your account and sign in.', 'success');
                     setStep('profile');
                 }).catch(function () {
                     showMessage('Unable to verify the code right now. Please try again.', 'error');
@@ -399,12 +961,34 @@ document.addEventListener('DOMContentLoaded', function () {
             emailForm.addEventListener('submit', function (event) {
                 event.preventDefault();
 
+                if (emailForm.getAttribute('data-submitting') === '1') {
+                    return;
+                }
+
                 var email = (emailInput.value || '').trim();
                 var emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
                 if (!emailPattern.test(email)) {
                     showMessage('Please enter a valid email address.', 'error');
                     return;
+                }
+
+                var submitButton = emailForm.querySelector('button[type="submit"]');
+                var submitLabelNode = submitButton ? submitButton.querySelector('span') : null;
+                var originalSubmitLabel = submitLabelNode ? submitLabelNode.textContent : '';
+                var controller = window.AbortController ? new AbortController() : null;
+                var timeoutId = window.setTimeout(function () {
+                    if (controller) {
+                        controller.abort();
+                    }
+                }, 12000);
+
+                emailForm.setAttribute('data-submitting', '1');
+                if (submitButton) {
+                    submitButton.disabled = true;
+                }
+                if (submitLabelNode) {
+                    submitLabelNode.textContent = 'Sending code...';
                 }
 
                 var formKey = (root.querySelector('input[name="form_key"]') || {}).value || '';
@@ -418,10 +1002,12 @@ document.addEventListener('DOMContentLoaded', function () {
                         'X-Requested-With': 'XMLHttpRequest',
                         'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8'
                     },
-                    body: body.toString()
+                    body: body.toString(),
+                    signal: controller ? controller.signal : undefined
                 }).then(function (resp) {
                     return resp.text();
                 }).then(function (text) {
+                    window.clearTimeout(timeoutId);
                     var data = {};
                     try {
                         data = text ? JSON.parse(text) : {};
@@ -443,13 +1029,23 @@ document.addEventListener('DOMContentLoaded', function () {
                         renderTimer();
                     }
 
+                    resetCodeInputs();
                     showMessage(data.message || 'We sent a 6-digit verification code.', 'success');
                     setStep('verify');
                     if (digits[0]) {
                         digits[0].focus();
                     }
                 }).catch(function () {
+                    window.clearTimeout(timeoutId);
                     showMessage('Unable to send verification code.', 'error');
+                }).finally(function () {
+                    emailForm.setAttribute('data-submitting', '0');
+                    if (submitButton) {
+                        submitButton.disabled = false;
+                    }
+                    if (submitLabelNode) {
+                        submitLabelNode.textContent = originalSubmitLabel || 'Continue';
+                    }
                 });
             });
         }
@@ -457,11 +1053,23 @@ document.addEventListener('DOMContentLoaded', function () {
         if (profileForm) {
             profileForm.addEventListener('submit', function (event) {
                 event.preventDefault();
+
+                if (profileForm.getAttribute('data-submitting') === '1') {
+                    return;
+                }
                 
                 var passwordInput = profileForm.querySelector('input[name="password"]');
                 var confirmInput = profileForm.querySelector('input[name="password_confirmation"]');
-                var password = passwordInput ? (passwordInput.value || '') : '';
-                var passwordConfirmation = confirmInput ? (confirmInput.value || '') : '';
+                var password = passwordInput ? (passwordInput.value || '').trim() : '';
+                var passwordConfirmation = confirmInput ? (confirmInput.value || '').trim() : '';
+
+                if (passwordInput) {
+                    passwordInput.value = password;
+                }
+
+                if (confirmInput) {
+                    confirmInput.value = passwordConfirmation;
+                }
 
                 if (password.length < 8) {
                     showMessage('Password must be at least 8 characters, start with an uppercase letter, and contain at least one number.', 'error');
@@ -473,18 +1081,33 @@ document.addEventListener('DOMContentLoaded', function () {
                     return;
                 }
 
+                if (password !== passwordConfirmation) {
+                    showMessage('New Password and Confirm New Password values did not match.', 'error');
+                    return;
+                }
+
                 var firstnameInput = profileForm.querySelector('input[name="firstname"]');
                 var lastnameInput = profileForm.querySelector('input[name="lastname"]');
-                    var firstname = firstnameInput ? (firstnameInput.value || '').trim() : '';
-                    var lastname = lastnameInput ? (lastnameInput.value || '').trim() : '';
+                var firstname = firstnameInput ? (firstnameInput.value || '').trim() : '';
+                var lastname = lastnameInput ? (lastnameInput.value || '').trim() : '';
 
-                    if (firstname.length === 0 || lastname.length === 0) {
+                if (firstname.length === 0 || lastname.length === 0) {
                     showMessage('Please fill in your name details.', 'error');
                     return;
                 }
 
-                    // Use FormData which properly serializes all form fields including hidden ones
-                    var formData = new FormData(profileForm);
+                var formData = new FormData(profileForm);
+                var submitButton = profileForm.querySelector('button[type="submit"]');
+                var submitLabelNode = submitButton ? submitButton.querySelector('span') : null;
+                var originalSubmitLabel = submitLabelNode ? submitLabelNode.textContent : '';
+
+                profileForm.setAttribute('data-submitting', '1');
+                if (submitButton) {
+                    submitButton.disabled = true;
+                }
+                if (submitLabelNode) {
+                    submitLabelNode.textContent = 'Creating account...';
+                }
 
                 fetch('<?= $escaper->escapeJs($block->getUrl('tekntek_signup/account/create')) ?>', {
                     method: 'POST',
@@ -503,6 +1126,12 @@ document.addEventListener('DOMContentLoaded', function () {
                     }
 
                     if (!data.success) {
+                        if (data.redirect_to_login && data.redirect_url) {
+                            showMessage((data && data.message) || 'An account with this email already exists. Please log in instead.', 'error');
+                            window.location.href = data.redirect_url;
+                            return;
+                        }
+
                         showMessage((data && data.message) || 'Unable to create your account right now. Please try again.', 'error');
                         return;
                     }
@@ -512,6 +1141,14 @@ document.addEventListener('DOMContentLoaded', function () {
                 }).catch(function (error) {
                     console.error('Profile form submission error:', error);
                     showMessage('Unable to create your account right now. Please try again.', 'error');
+                }).finally(function () {
+                    profileForm.setAttribute('data-submitting', '0');
+                    if (submitButton) {
+                        submitButton.disabled = false;
+                    }
+                    if (submitLabelNode) {
+                        submitLabelNode.textContent = originalSubmitLabel || 'Create account';
+                    }
                 });
             });
         }
@@ -522,12 +1159,19 @@ document.addEventListener('DOMContentLoaded', function () {
                     return;
                 }
 
+                if (resend.getAttribute('data-submitting') === '1') {
+                    return;
+                }
+
                 var formKey = (root.querySelector('input[name="form_key"]') || {}).value || '';
                 var email = hiddenEmail ? hiddenEmail.value : '';
 
                 if (!formKey || !email) {
                     return;
                 }
+
+                resend.setAttribute('data-submitting', '1');
+                resend.disabled = true;
 
                 var body = new URLSearchParams();
                 body.append('form_key', formKey);
@@ -546,21 +1190,32 @@ document.addEventListener('DOMContentLoaded', function () {
                     if (data && data.success && data.expires_at) {
                         expiresAt = parseInt(data.expires_at, 10) || 0;
                         renderTimer();
+                        resetCodeInputs();
                         showMessage(data.message || 'Verification code sent again.', 'success');
+                        if (digits[0]) {
+                            digits[0].focus();
+                        }
                     } else {
                         showMessage((data && data.message) || 'Unable to resend the code.', 'error');
                     }
                 }).catch(function () {
                     showMessage('Unable to resend the code.', 'error');
+                }).finally(function () {
+                    resend.setAttribute('data-submitting', '0');
                 });
             });
         }
 
         if (initialStep === 'verify') {
+            setEmailValue(hiddenEmail ? hiddenEmail.value : '');
             renderTimer();
             if (digits[0]) {
                 digits[0].focus();
             }
+        } else if (initialStep === 'profile') {
+            setEmailValue(finalEmail ? finalEmail.value : '');
+        } else {
+            setEmailValue(emailInput ? emailInput.value : '');
         }
     }, 300);
 });

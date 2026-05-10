@@ -9,184 +9,8 @@ $items = $block->getItems();
 $total = $items->getSize();
 $compareHelper = $this->helper(Magento\Catalog\Helper\Product\Compare::class);
 $outputHelper = $this->helper(Magento\Catalog\Helper\Output::class);
-$imageHelper = $this->helper(Magento\Catalog\Helper\Image::class);
-$allAttributes = [];
-foreach ($block->getAttributes() as $attribute) {
-    $allAttributes[] = $attribute;
-}
-
-$groupOrder = [
-    'Performance' => 1,
-    'Storage' => 2,
-    'Display' => 3,
-    'Connectivity' => 4,
-    'Battery' => 5,
-    'Dimensions' => 6,
-    'System' => 7,
-    'Other' => 8
-];
-
-$groupResolver = static function (string $code, string $label): string {
-    $text = strtolower($code . ' ' . $label);
-    if (preg_match('/processor|cpu|core|chipset|graphics|gpu|ram|memory/', $text)) {
-        return 'Performance';
-    }
-    if (preg_match('/storage|ssd|hdd|hard[_ ]?drive|capacity|disk/', $text)) {
-        return 'Storage';
-    }
-    if (preg_match('/display|screen|panel|resolution|brightness|webcam|refresh/', $text)) {
-        return 'Display';
-    }
-    if (preg_match('/wireless|wifi|bluetooth|usb|port|hdmi|thunderbolt|network/', $text)) {
-        return 'Connectivity';
-    }
-    if (preg_match('/battery|power/', $text)) {
-        return 'Battery';
-    }
-    if (preg_match('/weight|dimension|size|height|width|depth/', $text)) {
-        return 'Dimensions';
-    }
-    if (preg_match('/operating[_ ]?system|os|keyboard|audio|speaker/', $text)) {
-        return 'System';
-    }
-    return 'Other';
-};
-
-$orderedCodes = [
-    'processor',
-    'cpu',
-    'ram',
-    'memory',
-    'internal_memory',
-    'hard_drive_size',
-    'hard_drive_capacity',
-    'storage',
-    'graphics_card',
-    'video_card',
-    'operating_system',
-    'display_type',
-    'screen_size',
-    'screen_diagonal',
-    'battery_life',
-    'maximum_battery_battery_life',
-    'weight_item',
-    'weight',
-    'webcam_resolution',
-    'wireless_connectivity',
-    'bluetooth',
-    'keyboard_layout'
-];
-
-$skipCodes = [
-    'small_image',
-    'thumbnail',
-    'image',
-    'media_gallery',
-    'sku',
-    'name',
-    'price',
-    'special_price',
-    'description',
-    'short_description',
-    'meta_title',
-    'meta_keyword',
-    'meta_description',
-    'url_key',
-    'url_path',
-    'has_options',
-    'required_options',
-    'created_at',
-    'updated_at'
-];
-
-$attributesByCode = [];
-foreach ($allAttributes as $attribute) {
-    $attributesByCode[(string) $attribute->getAttributeCode()] = $attribute;
-}
-
-$priorityIndex = [];
-foreach ($orderedCodes as $idx => $code) {
-    $priorityIndex[$code] = $idx;
-}
-
-$selectedAttributes = [];
-foreach ($allAttributes as $attribute) {
-    $code = (string) $attribute->getAttributeCode();
-    if (in_array($code, $skipCodes, true)) {
-        continue;
-    }
-    if (!$block->hasAttributeValueForProducts($attribute)) {
-        continue;
-    }
-    $label = (string) ($attribute->getStoreLabel() ?: $attribute->getFrontendLabel());
-    if ($label === '') {
-        continue;
-    }
-    $selectedAttributes[] = [
-        'attribute' => $attribute,
-        'code' => $code,
-        'label' => $label,
-        'group' => $groupResolver($code, $label),
-        'priority' => $priorityIndex[$code] ?? 999
-    ];
-}
-
-usort($selectedAttributes, static function (array $a, array $b) use ($groupOrder): int {
-    $ga = $groupOrder[$a['group']] ?? 999;
-    $gb = $groupOrder[$b['group']] ?? 999;
-    if ($ga !== $gb) {
-        return $ga <=> $gb;
-    }
-    if ($a['priority'] !== $b['priority']) {
-        return $a['priority'] <=> $b['priority'];
-    }
-    return strcasecmp($a['label'], $b['label']);
-});
-
-if (count($selectedAttributes) > 120) {
-    $selectedAttributes = array_slice($selectedAttributes, 0, 120);
-}
-
-if (empty($selectedAttributes)) {
-    foreach ($allAttributes as $attribute) {
-        $code = (string) $attribute->getAttributeCode();
-        if (in_array($code, $skipCodes, true)) {
-            continue;
-        }
-        if (!$block->hasAttributeValueForProducts($attribute)) {
-            continue;
-        }
-        $fallbackLabel = trim((string) ($attribute->getStoreLabel() ?: $attribute->getFrontendLabel()));
-        if ($fallbackLabel === '') {
-            $fallbackLabel = ucwords(str_replace('_', ' ', $code));
-        }
-        $selectedAttributes[] = [
-            'attribute' => $attribute,
-            'code' => $code,
-            'label' => $fallbackLabel,
-            'group' => 'Other',
-            'priority' => 999
-        ];
-        if (count($selectedAttributes) >= 120) {
-            break;
-        }
-    }
-}
-
-$formatValue = static function ($value): string {
-    $text = html_entity_decode((string) $value, ENT_QUOTES | ENT_HTML5, 'UTF-8');
-    $text = trim(preg_replace('/\s+/', ' ', strip_tags($text)));
-    if ($text === '') {
-        return '-';
-    }
-    if (function_exists('mb_strlen') && mb_strlen($text) > 800) {
-        return mb_substr($text, 0, 797) . '...';
-    }
-    if (strlen($text) > 800) {
-        return substr($text, 0, 797) . '...';
-    }
-    return $text;
-};
+$om = \Magento\Framework\App\ObjectManager::getInstance();
+$mediaConfig = $om->get(\Magento\Catalog\Model\Product\Media\Config::class);
 
 $itemsList = [];
 foreach ($items as $item) {
@@ -194,100 +18,72 @@ foreach ($items as $item) {
 }
 
 $tableRows = [];
-$om = \Magento\Framework\App\ObjectManager::getInstance();
-$productCollectionFactory = $om->get(\Magento\Catalog\Model\ResourceModel\Product\CollectionFactory::class);
 $compareIds = array_map(static function ($product) {
     return (int) $product->getId();
 }, $itemsList);
 
-$fullProducts = [];
+if (empty($compareIds)) {
+    $idsParam = (string) $block->getRequest()->getParam('ids', '');
+    if ($idsParam !== '') {
+        $compareIds = array_values(array_unique(array_filter(array_map(static function ($part): int {
+            return (int) trim((string) $part);
+        }, explode(',', $idsParam)), static function (int $id): bool {
+            return $id > 0;
+        })));
+        $compareIds = array_slice($compareIds, 0, 4);
+    }
+}
+
+$compareAttributeProvider = $om->get(\TeknTek\CatalogTweaks\Model\Compare\AttributeProvider::class);
 if (!empty($compareIds)) {
-    $fullCollection = $productCollectionFactory->create();
-    $fullCollection->addAttributeToSelect('*');
-    $fullCollection->addFieldToFilter('entity_id', ['in' => $compareIds]);
-    $fullCollection->load();
-    foreach ($fullCollection as $fullProduct) {
-        $fullProducts[(int) $fullProduct->getId()] = $fullProduct;
+    $providerProducts = $compareAttributeProvider->loadProductsWithComparableAttributes($compareIds);
+    if (!empty($providerProducts)) {
+        $itemsList = $providerProducts;
+        $total = count($itemsList);
     }
 }
 
-// Same source model as PDP specification table.
-$sharedSpecMap = [
-    'Display' => ['display', 'display_size', 'screen_size', 'screen_diagonal', 'resolution', 'display_resolution'],
-    'Processor' => ['processor', 'cpu', 'processor_type', 'chipset'],
-    'Internal memory (RAM)' => ['ram', 'memory', 'internal_memory', 'ram_type'],
-    'Hard drive capacity' => ['hard_drive_size', 'hard_drive_capacity', 'storage_capacity', 'storage', 'ssd_capacity'],
-    'Video card' => ['graphics_card', 'video_card', 'graphics_processor', 'graphics_coprocessor'],
-    'Operating system' => ['operating_system', 'os'],
-    'Weight' => ['weight_item', 'weight'],
-    'Battery life' => ['battery_life', 'maximum_battery_battery_life']
-];
+$total = count($itemsList);
 
-$firstNonEmpty = static function (array $source, array $codes): string {
-    foreach ($codes as $code) {
-        if (!array_key_exists($code, $source)) {
-            continue;
-        }
-        $value = $source[$code];
-        if (is_array($value)) {
-            $value = implode(', ', array_map('strval', $value));
-        } elseif (is_bool($value)) {
-            $value = $value ? 'Yes' : 'No';
-        } elseif (!is_scalar($value) && $value !== null) {
-            $value = '';
-        }
-        $value = trim((string) $value);
-        if ($value !== '') {
-            return $value;
-        }
-    }
-    return '';
-};
-
-$extractFromText = static function (string $label, string $text): string {
-    $patternsByLabel = [
-        'Display' => ['/\b\d{2}(\.\d)?\s?(inch|\"|in)\b/i', '/(1920\s?x\s?1080|1366\s?x\s?768|2k|4k)/i'],
-        'Processor' => ['/(intel|amd)\s+[a-z0-9\- ]{2,30}/i', '/\bn\d{3,4}\b/i'],
-        'Internal memory (RAM)' => ['/\b\d+\s?gb\s?(ram|memory)\b/i'],
-        'Hard drive capacity' => ['/\b\d+\s?(gb|tb)\s?(ssd|hdd|storage)\b/i'],
-        'Video card' => ['/(intel|amd|nvidia)\s+[a-z0-9\- ]{2,30}/i', '/\b(iris xe|radeon|geforce|rtx|gtx)\b/i'],
-        'Operating system' => ['/windows\s?\d{1,2}(\s?(pro|home))?/i', '/\bchrome\s?os\b/i', '/\bmac\s?os\b/i'],
-        'Weight' => ['/\b\d+(\.\d+)?\s?(kg|g)\b/i'],
-        'Battery life' => ['/\b\d+\s?(hours|hour|hrs|hr)\b/i']
-    ];
-
-    $patterns = $patternsByLabel[$label] ?? [];
-    foreach ($patterns as $pattern) {
-        if (preg_match($pattern, $text, $m)) {
-            return trim((string) $m[0]);
-        }
-    }
-    return '';
-};
-
-foreach ($sharedSpecMap as $label => $codes) {
-    $values = [];
-
-    foreach ($itemsList as $item) {
-        $pid = (int) $item->getId();
-        $source = isset($fullProducts[$pid]) ? $fullProducts[$pid] : $item;
-        $productData = (array) $source->getData();
-
-        $raw = $firstNonEmpty($productData, $codes);
-        if ($raw === '') {
-            $textPool = strtolower(trim((string) $source->getName() . ' ' . (string) $source->getData('short_description') . ' ' . (string) $source->getData('description')));
-            $raw = $extractFromText($label, $textPool);
-        }
-
-        $values[] = $formatValue($raw);
-    }
-
-    // Always keep PDP spec rows so compare table is never empty.
-    $tableRows[] = [
-        'label' => $label,
-        'values' => $values
-    ];
+$compareAttributes = $compareAttributeProvider->getComparableAttributesForProducts($itemsList);
+$tableRows = $compareAttributeProvider->buildRows($itemsList, $compareAttributes);
+if (empty($tableRows)) {
+    $compareAttributes = $compareAttributeProvider->getDataBackedAttributesForProducts($itemsList);
+    $tableRows = $compareAttributeProvider->buildRows($itemsList, $compareAttributes);
 }
+$descriptionRows = $compareAttributeProvider->buildDescriptionSpecRows($itemsList);
+if (!empty($descriptionRows)) {
+    $existingRowCodes = [];
+    foreach ($tableRows as $row) {
+        $existingRowCodes[(string) ($row['code'] ?? '')] = true;
+    }
+    foreach ($descriptionRows as $row) {
+        $rowCode = (string) ($row['code'] ?? '');
+        if ($rowCode !== '' && !isset($existingRowCodes[$rowCode])) {
+            $tableRows[] = $row;
+            $existingRowCodes[$rowCode] = true;
+        }
+    }
+}
+
+$getCompareProductImageUrl = static function ($product) use ($mediaConfig): string {
+    $image = (string) $product->getImage();
+    if ($image !== '' && $image !== 'no_selection') {
+        return (string) $mediaConfig->getMediaUrl($image);
+    }
+
+    $smallImage = (string) $product->getSmallImage();
+    if ($smallImage !== '' && $smallImage !== 'no_selection') {
+        return (string) $mediaConfig->getMediaUrl($smallImage);
+    }
+
+    $thumbnail = (string) $product->getThumbnail();
+    if ($thumbnail !== '' && $thumbnail !== 'no_selection') {
+        return (string) $mediaConfig->getMediaUrl($thumbnail);
+    }
+
+    return '';
+};
 ?>
 
 <?php if ($total): ?>
@@ -454,7 +250,7 @@ foreach ($sharedSpecMap as $label => $codes) {
     <div class="ttk-compare-head" style="--ttk-count:<?= (int) $total ?>;">
         <div class="ttk-compare-head-spacer" aria-hidden="true"></div>
         <div class="ttk-compare-cards">
-            <?php foreach ($items as $item): ?>
+            <?php foreach ($itemsList as $item): ?>
                 <?php
                 $regular = (float) $item->getPrice();
                 $final = (float) $item->getFinalPrice();
@@ -463,7 +259,9 @@ foreach ($sharedSpecMap as $label => $codes) {
                     $percent = (int) round((($regular - $final) / $regular) * 100);
                 }
                 ?>
-                <article class="ttk-compare-card">
+                <article class="ttk-compare-card"
+                         data-product-id="<?= (int) $item->getId() ?>"
+                         data-remove-url="<?= $block->escapeHtmlAttr($compareHelper->getPostDataRemove($item)) ?>">
                     <?php if ($percent > 0): ?>
                         <span class="ttk-compare-badge">-<?= (int) $percent ?>%</span>
                     <?php endif; ?>
@@ -471,8 +269,11 @@ foreach ($sharedSpecMap as $label => $codes) {
                     <a class="ttk-compare-photo"
                        href="<?= $block->escapeUrl($block->getProductUrl($item)) ?>"
                        title="<?= $block->escapeHtmlAttr($block->stripTags((string) $item->getName(), null, true)) ?>">
-                        <img src="<?= $block->escapeUrl($imageHelper->init($item, 'product_small_image')->getUrl()) ?>"
-                             alt="<?= $block->escapeHtmlAttr((string) $item->getName()) ?>" />
+                        <?php $compareImageUrl = $getCompareProductImageUrl($item); ?>
+                        <?php if ($compareImageUrl !== ''): ?>
+                            <img src="<?= $block->escapeUrl($compareImageUrl) ?>"
+                                 alt="<?= $block->escapeHtmlAttr((string) $item->getName()) ?>" />
+                        <?php endif; ?>
                     </a>
 
                     <p class="ttk-compare-name">
@@ -521,92 +322,36 @@ foreach ($sharedSpecMap as $label => $codes) {
     <div class="message info empty ttk-compare-empty"><div id="ttk-compare-empty-msg"><?= $block->escapeHtml(__('You have no items to compare.')) ?></div></div>
     <script>
     (function () {
-        var key = 'tekntek_compare_v1';
-        var addBaseUrl = '<?= $block->escapeJs($block->getUrl('catalog/product_compare/add')) ?>';
-        var clearUrl = '<?= $block->escapeJs($block->getUrl('catalog/product_compare/clear')) ?>';
-        var msg = document.getElementById('ttk-compare-empty-msg');
+        'use strict';
 
-        function formKey() {
-            var node = document.querySelector('input[name="form_key"]');
-            if (node && node.value) {
-                return node.value;
-            }
-            if (window.FORM_KEY) {
-                return window.FORM_KEY;
-            }
-            return '';
-        }
+        var storageKey = 'tekntek_compare_v2';
+        var currentUrl = new URL(window.location.href);
 
-        function post(url, payload) {
-            return fetch(url, {
-                method: 'POST',
-                credentials: 'same-origin',
-                headers: { 'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8' },
-                body: new URLSearchParams(payload).toString()
-            }).catch(function () { return null; });
-        }
-
-        function addUrl(productId) {
-            var base = addBaseUrl;
-            if (base.slice(-1) !== '/') {
-                base += '/';
-            }
-            return base + 'product/' + Number(productId) + '/';
-        }
-
-        var state = [];
-        var idsFromUrl = [];
-        try {
-            var params = new URLSearchParams(window.location.search);
-            var idsRaw = params.get('ids') || '';
-            if (idsRaw) {
-                idsFromUrl = idsRaw.split(',').map(function (part) {
-                    return Number(String(part).trim());
-                }).filter(function (id) {
-                    return id > 0;
-                }).slice(0, 3);
-            }
-        } catch (e) {
-            idsFromUrl = [];
-        }
-
-        if (idsFromUrl.length) {
-            state = idsFromUrl.map(function (id) {
-                return { id: id };
-            });
-        }
-
-        try {
-            var raw = window.localStorage.getItem(key);
-            var parsed = JSON.parse(raw || '[]');
-            if (!state.length && Array.isArray(parsed)) {
-                state = parsed.filter(function (item) {
-                    return item && Number(item.id) > 0;
-                }).slice(0, 3);
-            }
-        } catch (e) {
-            state = [];
-        }
-
-        if (!state.length) {
+        if (currentUrl.searchParams.get('ids')) {
             return;
         }
 
-        var fk = formKey();
-        var uenc = window.btoa(window.location.href);
-        if (msg) {
-            msg.textContent = 'Syncing compare items...';
-        }
+        try {
+            var items = JSON.parse(window.localStorage.getItem(storageKey) || '[]');
+            if (!Array.isArray(items)) {
+                return;
+            }
 
-        Promise.all(state.map(function (item) {
-            return post(addUrl(item.id), {
-                form_key: fk,
-                product: Number(item.id),
-                uenc: uenc
-            });
-        })).then(function () {
-            window.location.reload();
-        });
+            var ids = items.map(function (item) {
+                return Number(item && item.id);
+            }).filter(function (id, index, list) {
+                return id > 0 && list.indexOf(id) === index;
+            }).slice(0, 4);
+
+            if (!ids.length) {
+                return;
+            }
+
+            currentUrl.searchParams.set('ids', ids.join(','));
+            window.location.replace(currentUrl.toString());
+        } catch (error) {
+            // Keep Magento's native empty state when localStorage is unavailable.
+        }
     })();
     </script>
 <?php endif; ?>

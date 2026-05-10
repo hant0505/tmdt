@@ -1,0 +1,37 @@
+<?php
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+
+// phpcs:disable Magento2.Templates.ThisInTemplate
+?>
+<div class="actions">
+    <?php $_order = $block->getOrder() ?>
+    <?php if ($this->helper(\Magento\Sales\Helper\Reorder::class)->canReorder($_order->getEntityId())) : ?>
+        <?php $reorderParams = json_decode(
+            $this->helper(\Magento\Framework\Data\Helper\PostHelper::class)->getPostData($block->getReorderUrl($_order)),
+            true
+        ); ?>
+        <form class="order-action-form order-action-form--reorder"
+              method="post"
+              action="<?= $block->escapeUrl($reorderParams['action'] ?? $block->getReorderUrl($_order)) ?>">
+            <?= $block->getBlockHtml('formkey') ?>
+            <?php foreach (($reorderParams['data'] ?? []) as $key => $value) : ?>
+                <input type="hidden"
+                       name="<?= $block->escapeHtmlAttr($key) ?>"
+                       value="<?= $block->escapeHtmlAttr((string) $value) ?>">
+            <?php endforeach; ?>
+            <button type="submit" class="action order">
+                <span><?= $block->escapeHtml(__('Reorder')) ?></span>
+            </button>
+        </form>
+    <?php endif ?>
+    <a href="<?= $block->escapeUrl($block->getPrintUrl($_order)) ?>"
+       class="action print"
+       target="_blank"
+       rel="noopener">
+        <span><?= $block->escapeHtml(__('Print Order')) ?></span>
+    </a>
+    <?= $block->getChildHtml() ?>
+</div>

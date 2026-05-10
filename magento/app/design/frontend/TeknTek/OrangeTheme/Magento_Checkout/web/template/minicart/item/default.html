@@ -1,0 +1,52 @@
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<li class="item product product-item tekntek-minicart-item" data-role="product-item">
+    <div class="tekntek-minicart-item__card">
+        <!-- ko if: product_has_url -->
+        <a data-bind="attr: {href: product_url, title: product_name}" tabindex="-1" class="tekntek-minicart-item__image">
+            <!-- ko foreach: $parent.getRegion('itemImage') -->
+            <!-- ko template: {name: getTemplate(), data: item.product_image} --><!-- /ko -->
+            <!-- /ko -->
+        </a>
+        <!-- /ko -->
+        <!-- ko ifnot: product_has_url -->
+        <span class="tekntek-minicart-item__image">
+            <!-- ko foreach: $parent.getRegion('itemImage') -->
+            <!-- ko template: {name: getTemplate(), data: item.product_image} --><!-- /ko -->
+            <!-- /ko -->
+        </span>
+        <!-- /ko -->
+
+        <div class="tekntek-minicart-item__details">
+            <div class="tekntek-minicart-item__top">
+                <strong class="tekntek-minicart-item__name">
+                    <!-- ko if: product_has_url -->
+                    <a data-bind="attr: {href: product_url}, html: $parent.getProductNameUnsanitizedHtml(product_name)"></a>
+                    <!-- /ko -->
+                    <!-- ko ifnot: product_has_url -->
+                    <span data-bind="html: $parent.getProductNameUnsanitizedHtml(product_name)"></span>
+                    <!-- /ko -->
+                </strong>
+                <div class="tekntek-minicart-item__price">
+                    <!-- ko foreach: $parent.getRegion('priceSidebar') -->
+                    <!-- ko template: {name: getTemplate(), data: item.product_price, as: 'price'} --><!-- /ko -->
+                    <!-- /ko -->
+                </div>
+            </div>
+
+            <div class="tekntek-minicart-item__bottom">
+                <div class="tekntek-minicart-item__meta">
+                    <span class="qty" data-bind="text: '×' + qty"></span>
+                    <!-- ko if: options.length -->
+                    <span class="option" data-bind="text: options[0].value"></span>
+                    <!-- /ko -->
+                </div>
+                <span class="shipping" translate="'Free shipping'"></span>
+            </div>
+        </div>
+    </div>
+</li>

@@ -1,0 +1,85 @@
+<?php
+/**
+ * Modern card-based order history.
+ *
+ * @var \Magento\Sales\Block\Order\History $block
+ */
+?>
+<?php $_orders = $block->getOrders(); ?>
+<?= $block->getChildHtml('info') ?>
+<?php if ($_orders && count($_orders)) : ?>
+    <div class="ttk-account-list ttk-orders-list">
+        <?php foreach ($_orders as $_order) : ?>
+            <?php
+            $statusLabel = (string) $_order->getStatusLabel();
+            $statusKey = strtolower(preg_replace('/[^a-z0-9]+/', '-', $statusLabel) ?: 'status');
+            ?>
+            <article class="ttk-account-row-card ttk-order-card">
+                <div class="ttk-account-row-card__main">
+                    <div>
+                        <span class="ttk-account-row-card__eyebrow"><?= $block->escapeHtml(__('Order #')) ?></span>
+                        <strong class="ttk-account-row-card__title"><?= $block->escapeHtml($_order->getRealOrderId()) ?></strong>
+                    </div>
+                    <span class="ttk-status-badge ttk-status-badge--<?= $block->escapeHtmlAttr($statusKey) ?>">
+                        <?= $block->escapeHtml($statusLabel) ?>
+                    </span>
+                </div>
+                <div class="ttk-account-row-card__meta">
+                    <div>
+                        <span><?= $block->escapeHtml(__('Date')) ?></span>
+                        <strong><?= /* @noEscape */ $block->formatDate($_order->getCreatedAt()) ?></strong>
+                    </div>
+                    <?php $extra = $block->getChildBlock('extra.container'); ?>
+                    <?php if ($extra) : ?>
+                        <?php $extra->setOrder($_order); ?>
+                        <?php $extraText = trim(preg_replace('/\s+/', ' ', strip_tags($extra->getChildHtml())) ?? ''); ?>
+                        <div class="ttk-account-row-card__extra">
+                            <span><?= $block->escapeHtml(__('Ship To')) ?></span>
+                            <strong><?= $block->escapeHtml($extraText) ?></strong>
+                        </div>
+                    <?php endif; ?>
+                    <div>
+                        <span><?= $block->escapeHtml(__('Order Total')) ?></span>
+                        <strong><?= /* @noEscape */ $_order->formatPrice($_order->getGrandTotal()) ?></strong>
+                    </div>
+                </div>
+                <div class="ttk-account-row-card__actions">
+                    <a href="<?= $block->escapeUrl($block->getViewUrl($_order)) ?>" class="action view ttk-action-chip">
+                        <span><?= $block->escapeHtml(__('View Order')) ?></span>
+                    </a>
+                    <?php if ($this->helper(\Magento\Sales\Helper\Reorder::class)->canReorder($_order->getEntityId())) : ?>
+                        <?php $reorderParams = json_decode(
+                            $this->helper(\Magento\Framework\Data\Helper\PostHelper::class)->getPostData($block->getReorderUrl($_order)),
+                            true
+                        ); ?>
+                        <form class="ttk-reorder-form"
+                              method="post"
+                              action="<?= $block->escapeUrl($reorderParams['action'] ?? $block->getReorderUrl($_order)) ?>">
+                            <?= $block->getBlockHtml('formkey') ?>
+                            <?php foreach (($reorderParams['data'] ?? []) as $key => $value) : ?>
+                                <input type="hidden"
+                                       name="<?= $block->escapeHtmlAttr($key) ?>"
+                                       value="<?= $block->escapeHtmlAttr((string) $value) ?>">
+                            <?php endforeach; ?>
+                            <button type="submit" class="action order ttk-action-chip ttk-action-chip--primary">
+                                <span><?= $block->escapeHtml(__('Reorder')) ?></span>
+                            </button>
+                        </form>
+                    <?php endif ?>
+                </div>
+            </article>
+        <?php endforeach; ?>
+    </div>
+    <?php if ($block->getPagerHtml()) : ?>
+        <div class="order-products-toolbar toolbar bottom"><?= $block->getPagerHtml() ?></div>
+    <?php endif ?>
+<?php else : ?>
+    <div class="ttk-account-empty">
+        <div class="ttk-account-empty__illustration" aria-hidden="true">□</div>
+        <h2><?= $block->escapeHtml(__('Your order history is currently empty.')) ?></h2>
+        <p><?= $block->escapeHtml($block->getEmptyOrdersMessage()) ?></p>
+        <a class="ttk-account-empty__cta" href="<?= $block->escapeUrl($block->getUrl('')) ?>">
+            <?= $block->escapeHtml(__('Back to Shopping')) ?>
+        </a>
+    </div>
+<?php endif ?>

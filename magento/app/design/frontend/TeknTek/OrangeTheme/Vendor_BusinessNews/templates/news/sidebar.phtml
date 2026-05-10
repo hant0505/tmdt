@@ -1,0 +1,46 @@
+<?php
+/**
+ * sidebar.phtml — Sidebar "Tin Nổi Bật"
+ * Nguồn: RSS thi-truong (KHÁC với main list kinh-doanh)
+ * @var \Vendor\BusinessNews\Block\BusinessNews $block
+ */
+$featuredNews = $block->getFeaturedNews();
+$esc = function(string $s): string {
+    return htmlspecialchars($s, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+};
+?>
+<div class="bn-sidebar">
+    <h4 class="bn-sidebar__title">Tin Nổi Bật</h4>
+
+    <?php if (!empty($featuredNews)): ?>
+        <ul class="bn-sidebar__list">
+            <?php foreach ($featuredNews as $news): ?>
+                <li class="bn-sidebar__item">
+                    <div class="bn-sidebar__thumb-wrap">
+                        <img
+                            src="<?= $esc($news['image'] ?? 'https://via.placeholder.com/64x64') ?>"
+                            alt="<?= $esc($news['title'] ?? '') ?>"
+                            class="bn-sidebar__thumb"
+                            loading="lazy"
+                            onerror="this.src='https://via.placeholder.com/64x64?text=?'"
+                        />
+                    </div>
+                    <div class="bn-sidebar__meta">
+                        <?php if (!empty($news['link'])): ?>
+                            <a href="<?= $esc($news['link']) ?>"
+                               class="bn-sidebar__news-title"
+                               target="_blank" rel="noopener noreferrer">
+                                <?= $esc($news['title'] ?? '') ?>
+                            </a>
+                        <?php else: ?>
+                            <span class="bn-sidebar__news-title"><?= $esc($news['title'] ?? '') ?></span>
+                        <?php endif; ?>
+                        <span class="bn-sidebar__news-date"><?= $esc($news['date'] ?? '') ?></span>
+                    </div>
+                </li>
+            <?php endforeach; ?>
+        </ul>
+    <?php else: ?>
+        <p class="bn-sidebar__empty">Chưa có tin nổi bật.</p>
+    <?php endif; ?>
+</div>

@@ -1,18 +1,41 @@
 <?php
+$om = \Magento\Framework\App\ObjectManager::getInstance();
 /** @var \Magento\Framework\View\Element\Template $block */
 
-$listBlock = $block->getLayout()->getBlock('category.products.list');
-if (!$listBlock) {
-    $listBlock = $block->getLayout()->getBlock('search_result_list');
+$registry = $om->get(\Magento\Framework\Registry::class);
+$currentCategory = $registry->registry('current_category');
+$collection = null;
+$storeId = 0;
+
+try {
+    $storeId = (int) $om->get(\Magento\Store\Model\StoreManagerInterface::class)->getStore()->getId();
+} catch (\Throwable $e) {
+    $storeId = 0;
 }
 
-$collection = $listBlock ? $listBlock->getLoadedProductCollection() : null;
+if ($currentCategory) {
+    try {
+        $collectionFactory = $om->get(\Magento\Catalog\Model\ResourceModel\Product\CollectionFactory::class);
+        $storeManager = $om->get(\Magento\Store\Model\StoreManagerInterface::class);
+        $productVisibility = $om->get(\Magento\Catalog\Model\Product\Visibility::class);
 
-$om = \Magento\Framework\App\ObjectManager::getInstance();
+        $collection = $collectionFactory->create();
+        $collection->setStoreId((int) $storeManager->getStore()->getId());
+        $collection->addStoreFilter();
+        $collection->addAttributeToSelect('*');
+        $collection->addCategoriesFilter(['in' => [(int) $currentCategory->getId()]]);
+        $collection->setVisibility($productVisibility->getVisibleInCatalogIds());
+    } catch (\Throwable $e) {
+        $collection = null;
+    }
+}
+
 if (!$collection) {
     try {
         $layerResolver = $om->get(\Magento\Catalog\Model\Layer\Resolver::class);
         $collection = $layerResolver->get()->getProductCollection();
+        $collection->setPageSize(false);
+        $collection->setCurPage(1);
     } catch (\Throwable $e) {
         $collection = null;
     }
@@ -22,8 +45,23 @@ if (!$collection) {
     return;
 }
 
-$registry = $om->get(\Magento\Framework\Registry::class);
-$currentCategory = $registry->registry('current_category');
+try {
+    $collection->addAttributeToSelect('*');
+    $collection->addAttributeToFilter(
+        'status',
+        ['eq' => \Magento\Catalog\Model\Product\Attribute\Source\Status::STATUS_ENABLED]
+    );
+} catch (\Throwable $e) {
+    // The loaded product list collection may already be filtered.
+}
+
+try {
+    $stockHelper = $om->get(\Magento\CatalogInventory\Helper\Stock::class);
+    $stockHelper->addInStockFilterToCollection($collection);
+} catch (\Throwable $e) {
+    // Keep the sidebar usable if the stock helper is unavailable.
+}
+
 $queryText = strtolower(trim((string) $block->getRequest()->getParam('q')));
 $categoryText = strtolower(trim((string) ($currentCategory ? $currentCategory->getName() : '')));
 $contextText = trim($categoryText . ' ' . $queryText);
@@ -95,6 +133,10 @@ foreach (array_keys($facetGroups) as $groupKey) {
 }
 
 $productsMeta = [];
+$facetCompleteness = [];
+foreach (array_keys($facetGroups) as $groupKey) {
+    $facetCompleteness[$groupKey] = 0;
+}
 
 $extractScreenSize = static function (string $text): string {
     if (preg_match('/\b11(\.\d+)?\s?(inch|\"|in)\b/i', $text)) {
@@ -182,45 +224,47 @@ $extractBatteryBucket = static function (string $text): string {
     return '';
 };
 
-$extractConnectivity = static function (string $text): string {
+$extractConnectivity = static function (string $text): array {
+    $values = [];
     if (preg_match('/\b5g\b/i', $text)) {
-        return '5G';
+        $values[] = '5G';
     }
     if (preg_match('/\b4g\b|\blte\b/i', $text)) {
-        return '4G';
+        $values[] = '4G';
     }
     if (preg_match('/\bwi[ -]?fi\b|\bwlan\b/i', $text)) {
-        return 'Wi-Fi';
+        $values[] = 'Wi-Fi';
     }
     if (preg_match('/\bbluetooth\b|\bbt\b/i', $text)) {
-        return 'Bluetooth';
+        $values[] = 'Bluetooth';
     }
-    if (preg_match('/\bwired\b|\busb\b|\beth\b|ethernet/i', $text)) {
-        return 'Wired';
+    if (preg_match('/\bwired\b|\b3\.5mm\b|\baux\b|\busb\b|\beth\b|ethernet/i', $text)) {
+        $values[] = 'Wired';
     }
-    return '';
+    return array_values(array_unique($values));
 };
 
-$extractInterface = static function (string $text): string {
+$extractInterface = static function (string $text): array {
+    $values = [];
     if (preg_match('/usb[ -]?c|type[ -]?c/i', $text)) {
-        return 'USB-C';
+        $values[] = 'USB-C';
     }
     if (preg_match('/usb[ -]?a|usb\s+2\.0|usb\s+3\.0/i', $text)) {
-        return 'USB-A';
+        $values[] = 'USB-A';
     }
     if (preg_match('/displayport/i', $text)) {
-        return 'DisplayPort';
+        $values[] = 'DisplayPort';
     }
     if (preg_match('/hdmi/i', $text)) {
-        return 'HDMI';
+        $values[] = 'HDMI';
     }
     if (preg_match('/wireless/i', $text)) {
-        return 'Wireless';
+        $values[] = 'Wireless';
     }
     if (preg_match('/bluetooth/i', $text)) {
-        return 'Bluetooth';
+        $values[] = 'Bluetooth';
     }
-    return '';
+    return array_values(array_unique($values));
 };
 
 $extractMegapixelBucket = static function (string $text): string {
@@ -314,7 +358,73 @@ $normalizeBrand = static function (string $brand): string {
         'msi' => 'MSI',
         'samsung' => 'Samsung',
         'philips' => 'Philips',
-        'viewsonic' => 'ViewSonic'
+        'viewsonic' => 'ViewSonic',
+        'jbl' => 'JBL',
+        'sony' => 'Sony',
+        'apple' => 'Apple',
+        'lenovo' => 'Lenovo',
+        'logitech' => 'Logitech',
+        'motorola' => 'Motorola',
+        'google' => 'Google',
+        'sennheiser' => 'Sennheiser',
+        'symphonized' => 'Symphonized',
+        'shokz' => 'SHOKZ',
+        'joywise' => 'JOYWISE',
+        'pocbuds' => 'PocBuds',
+        'boean' => 'BOEAN',
+        'soundcore' => 'Soundcore',
+        'beats' => 'Beats',
+        'canon' => 'Canon',
+        'minolta' => 'Minolta',
+        'sandisk' => 'SanDisk',
+        'seagate' => 'Seagate',
+        'western digital' => 'Western Digital',
+        'wd' => 'WD',
+        'redragon' => 'Redragon',
+        'epomaker' => 'EPOMAKER',
+        'aula' => 'AULA',
+        'anker' => 'Anker',
+        'garmin' => 'Garmin',
+        'fitbit' => 'Fitbit',
+        'amazfit' => 'Amazfit',
+        'tensky' => 'Tensky',
+        'vortex' => 'Vortex',
+        'hoerrye' => 'Hoerrye',
+        'blu' => 'BLU',
+        'moto' => 'Motorola',
+        'coopers' => 'COOPERS',
+        'amazon' => 'Amazon',
+        'seymac' => 'SEYMAC',
+        'gleeso' => 'Gleeso',
+        'newmen' => 'Newmen',
+        'womier' => 'Womier',
+        'kn85' => 'KN85',
+        'huo ji' => 'HUO JI',
+        'huo' => 'HUO JI',
+        'steelseries' => 'SteelSeries',
+        'risophy' => 'RisoPhy',
+        'magegee' => 'MageGee',
+        'rk royal kludge' => 'RK Royal Kludge',
+        'rk' => 'RK Royal Kludge',
+        'beribes' => 'BERIBES',
+        'oneodio' => 'OneOdio',
+        'kurdene' => 'kurdene',
+        'kvidio' => 'KVIDIO',
+        'maxone' => 'Maxone',
+        'lacie' => 'LaCie',
+        'toshiba' => 'Toshiba',
+        'sceptre' => 'Sceptre',
+        'sansui' => 'SANSUI',
+        'crua' => 'CRUA',
+        'kodak' => 'Kodak',
+        'panasonic' => 'Panasonic',
+        'corsair' => 'Corsair',
+        'keychron' => 'Keychron',
+        'carbinox' => 'Carbinox',
+        'avolusion' => 'Avolusion',
+        'arcticpro' => 'ArcticPro',
+        'wdblack' => 'WD_BLACK',
+        'nrico' => 'NRICO'
     ];
 
     if (isset($special[$lower])) {
@@ -328,23 +438,176 @@ $normalizeBrand = static function (string $brand): string {
     return ucwords($lower);
 };
 
+$knownBrandPatterns = [
+    'Western Digital' => '/\bwestern\s+digital\b/i',
+    'RK Royal Kludge' => '/\brk\s+royal\s+kludge\b|\broyal\s+kludge\b/i',
+    'ViewSonic' => '/\bviewsonic\b/i',
+    'Sennheiser' => '/\bsennheiser\b/i',
+    'Symphonized' => '/\bsymphonized\b/i',
+    'Soundcore' => '/\bsoundcore\b/i',
+    'Motorola' => '/\bmotorola\b|\bmoto\s+g\b/i',
+    'Logitech' => '/\blogitech\b/i',
+    'SteelSeries' => '/\bsteelseries\b/i',
+    'Samsung' => '/\bsamsung\b/i',
+    'Philips' => '/\bphilips\b/i',
+    'Panasonic' => '/\bpanasonic\b/i',
+    'Minolta' => '/\bminolta\b/i',
+    'SanDisk' => '/\bsandisk\b/i',
+    'Seagate' => '/\bseagate\b/i',
+    'Redragon' => '/\bredragon\b/i',
+    'EPOMAKER' => '/\bepomaker\b/i',
+    'Corsair' => '/\bcorsair\b/i',
+    'Keychron' => '/\bkeychron\b/i',
+    'COOPERS' => '/\bcoopers\b/i',
+    'SEYMAC' => '/\bseymac\b/i',
+    'JOYWISE' => '/\bjoywise\b/i',
+    'PocBuds' => '/\bpocbuds\b/i',
+    'OneOdio' => '/\boneodio\b/i',
+    'BERIBES' => '/\bberibes\b/i',
+    'SHOKZ' => '/\bshokz\b/i',
+    'BOEAN' => '/\bboean\b/i',
+    'KVIDIO' => '/\bkvidio\b/i',
+    'RisoPhy' => '/\brisophy\b/i',
+    'Google' => '/\bgoogle\b/i',
+    'Lenovo' => '/\blenovo\b/i',
+    'Newmen' => '/\bnewmen\b/i',
+    'Canon' => '/\bcanon\b/i',
+    'Kodak' => '/\bkodak\b/i',
+    'Apple' => '/\bapple\b/i',
+    'Amazon' => '/\bamazon\b/i',
+    'Tensky' => '/\btensky\b/i',
+    'Garmin' => '/\bgarmin\b/i',
+    'Fitbit' => '/\bfitbit\b/i',
+    'Amazfit' => '/\bamazfit\b/i',
+    'Anker' => '/\banker\b/i',
+    'Sceptre' => '/\bsceptre\b/i',
+    'Carbinox' => '/\bcarbinox\b/i',
+    'Avolusion' => '/\bavolusion\b/i',
+    'ArcticPro' => '/\barcticpro\b/i',
+    'WD_BLACK' => '/\bwdblack\b|\bwd_black\b|\bwd\s+black\b/i',
+    'NRICO' => '/\bnrico\b/i',
+    'Toshiba' => '/\btoshiba\b/i',
+    'Maxone' => '/\bmaxone\b/i',
+    'LaCie' => '/\blacie\b/i',
+    'SANSUI' => '/\bsansui\b/i',
+    'Vortex' => '/\bvortex\b/i',
+    'Hoerrye' => '/\bhoerrye\b/i',
+    'Gleeso' => '/\bgleeso\b/i',
+    'Womier' => '/\bwomier\b/i',
+    'MageGee' => '/\bmagegee\b/i',
+    'kurdene' => '/\bkurdene\b/i',
+    'Beats' => '/\bbeats\b/i',
+    'Sony' => '/\bsony\b/i',
+    'Dell' => '/\bdell\b/i',
+    'Acer' => '/\bacer\b/i',
+    'ASUS' => '/\basus\b/i',
+    'MSI' => '/\bmsi\b/i',
+    'JBL' => '/\bjbl\b/i',
+    'AOC' => '/\baoc\b/i',
+    'BLU' => '/\bblu\b/i',
+    'AULA' => '/\baula\b/i',
+    'KN85' => '/\bkn85\b/i',
+    'HUO JI' => '/\bhuo\s+ji\b|\bhuo\b/i',
+    'CRUA' => '/\bcrua\b/i',
+    'WD' => '/\bwd\b/i',
+    'HP' => '/\bhp\b/i',
+    'LG' => '/\blg\b/i'
+];
+
+$extractKnownBrand = static function (string $text) use ($knownBrandPatterns): string {
+    foreach ($knownBrandPatterns as $brandName => $pattern) {
+        if (preg_match($pattern, $text)) {
+            return $brandName;
+        }
+    }
+    return '';
+};
+
+$isUsefulBrandFallback = static function (string $brand): bool {
+    $clean = strtolower(trim((string) preg_replace('/[^A-Za-z0-9\-\+\. ]+/', '', $brand)));
+    if ($clean === '' || strlen($clean) < 2 || preg_match('/^\d/', $clean)) {
+        return false;
+    }
+
+    $blocked = [
+        'wireless', 'wired', 'bluetooth', 'smart', 'watch', 'watches', 'headphones',
+        'earbuds', 'earphones', 'kids', 'android', 'iphone', 'usb', 'type', 'new',
+        'renewed', 'gaming', 'laptop', 'tablet', 'tablets', 'monitor', 'camera', 'portable',
+        'digital', 'hybrid', 'external', 'inch', 'inches', '2026', '2025', '2024', '4k',
+        '5k', '8k', '10', '500gb', '750gb', '1tb', '2tb', '4tb', '5tb',
+        'military', 'tablet14', 'garbage'
+    ];
+
+    return !in_array($clean, $blocked, true);
+};
+
+$hasFacetValue = static function ($value): bool {
+    if (is_array($value)) {
+        return count(array_filter($value, static function ($item): bool {
+            return trim((string) $item) !== '';
+        })) > 0;
+    }
+
+    return trim((string) $value) !== '';
+};
+
+$cacheKey = 'TTK_SMART_FACETS_' . sha1(json_encode([
+    'store' => $storeId,
+    'category' => $currentCategory ? (int) $currentCategory->getId() : 0,
+    'query' => $queryText,
+    'profile' => $profile,
+    'groups' => array_keys($facetGroups),
+    'size' => (int) $collection->getSize()
+]));
+$cachePayload = null;
+
+try {
+    $cache = $om->get(\Magento\Framework\App\CacheInterface::class);
+    $cached = $cache->load($cacheKey);
+    if (is_string($cached) && $cached !== '') {
+        $decoded = json_decode($cached, true);
+        if (is_array($decoded)) {
+            $cachePayload = $decoded;
+        }
+    }
+} catch (\Throwable $e) {
+    $cachePayload = null;
+}
+
+if ($cachePayload !== null) {
+    $productsMeta = $cachePayload['productsMeta'] ?? [];
+    $facetCounts = $cachePayload['facetCounts'] ?? $facetCounts;
+    $facetCompleteness = $cachePayload['facetCompleteness'] ?? $facetCompleteness;
+    $minPrice = (float) ($cachePayload['minPrice'] ?? 0);
+    $maxPrice = (float) ($cachePayload['maxPrice'] ?? 0);
+} else {
+    $minPrice = 0;
+    $maxPrice = 0;
+}
+
+if ($cachePayload === null) {
 foreach ($collection as $item) {
     $name = trim((string) $item->getName());
     $shortDesc = trim((string) $item->getShortDescription());
     $description = trim((string) $item->getDescription());
     $text = strtolower($name . ' ' . $shortDesc . ' ' . $description);
+    $brandSourceText = $name . ' ' . $shortDesc . ' ' . $description;
 
     $manufacturer = $item->getAttributeText('manufacturer');
     if (is_array($manufacturer)) {
         $manufacturer = implode(', ', $manufacturer);
     }
-    $brand = trim((string) $manufacturer);
-    if ($brand === '') {
+    $brand = $extractKnownBrand($brandSourceText);
+    if ($brand === '' && $isUsefulBrandFallback((string) $manufacturer)) {
+        $brand = trim((string) $manufacturer);
+    }
+    if ($brand === '' && $isUsefulBrandFallback((string) $item->getData('brand'))) {
         $brand = trim((string) $item->getData('brand'));
     }
     if ($brand === '') {
         $firstWord = preg_split('/\s+/', $name);
-        $brand = isset($firstWord[0]) ? (string) $firstWord[0] : '';
+        $fallbackBrand = isset($firstWord[0]) ? (string) $firstWord[0] : '';
+        $brand = $isUsefulBrandFallback($fallbackBrand) ? $fallbackBrand : '';
     }
     $brand = trim((string) preg_replace('/[^A-Za-z0-9\-\+\. ]+/', '', $brand));
     $brand = $normalizeBrand($brand);
@@ -361,9 +624,6 @@ foreach ($collection as $item) {
     }
     if (preg_match('/student|school|study/', $text)) {
         $classification[] = 'Student';
-    }
-    if (empty($classification)) {
-        $classification[] = 'Office';
     }
 
     $screenSource = strtolower(
@@ -410,6 +670,10 @@ foreach ($collection as $item) {
     $refreshRate = $extractRefreshRate($screenSource . ' ' . $text);
 
     $meta = [
+        'id' => (int) $item->getId(),
+        'url' => (string) $item->getProductUrl(),
+        'price' => (float) $item->getFinalPrice(),
+        'in_stock' => (bool) $item->isAvailable(),
         'classification' => $classification,
         'screen_size' => $screenSize,
         'touchscreen' => $touchscreen,
@@ -429,9 +693,22 @@ foreach ($collection as $item) {
         'brand' => $brand
     ];
 
+    $price = (float) $item->getFinalPrice();
+    if ($price > 0) {
+        if ($minPrice === 0 || $price < $minPrice) {
+            $minPrice = $price;
+        }
+        if ($price > $maxPrice) {
+            $maxPrice = $price;
+        }
+    }
+
     foreach ($activeGroupKeys as $groupKey) {
         if (!isset($meta[$groupKey]) || !isset($facetCounts[$groupKey])) {
             continue;
+        }
+        if ($hasFacetValue($meta[$groupKey])) {
+            $facetCompleteness[$groupKey] = ($facetCompleteness[$groupKey] ?? 0) + 1;
         }
         if (is_array($meta[$groupKey])) {
             foreach ($meta[$groupKey] as $v) {
@@ -445,24 +722,31 @@ foreach ($collection as $item) {
     $productsMeta[] = $meta;
 }
 
+$totalFacetProducts = count($productsMeta);
+usort($productsMeta, static function (array $a, array $b): int {
+    return ((int) ($b['id'] ?? 0)) <=> ((int) ($a['id'] ?? 0));
+});
+
+try {
+    if (isset($cache)) {
+        $cache->save(json_encode([
+            'productsMeta' => $productsMeta,
+            'facetCounts' => $facetCounts,
+            'facetCompleteness' => $facetCompleteness,
+            'minPrice' => $minPrice,
+            'maxPrice' => $maxPrice
+        ]), $cacheKey, ['TTK_SMART_FACETS'], 900);
+    }
+} catch (\Throwable $e) {
+    // Cache is an optimization only.
+}
+} else {
+    $totalFacetProducts = count($productsMeta);
+}
+
 if (isset($facetCounts['brand'])) {
     arsort($facetCounts['brand'], SORT_NATURAL | SORT_FLAG_CASE);
     $facetCounts['brand'] = array_slice($facetCounts['brand'], 0, 12, true);
-}
-
-$minPrice = 0;
-$maxPrice = 0;
-foreach ($collection as $item) {
-    $price = (float) $item->getFinalPrice();
-    if ($price <= 0) {
-        continue;
-    }
-    if ($minPrice === 0 || $price < $minPrice) {
-        $minPrice = $price;
-    }
-    if ($price > $maxPrice) {
-        $maxPrice = $price;
-    }
 }
 
 if ($maxPrice <= 0) {
@@ -522,6 +806,45 @@ $stockOnly = (string) $block->getRequest()->getParam('stock') === '1';
 .ttk-facet-range {
     width: 100%;
     margin: 2px 0;
+    -webkit-appearance: none;
+    appearance: none;
+    background: transparent;
+}
+
+.ttk-facet-range::-webkit-slider-runnable-track {
+    height: 4px;
+    border-radius: 999px;
+    background: #f6c445;
+}
+
+.ttk-facet-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    margin-top: -7px;
+    border-radius: 50%;
+    border: 2px solid #ffffff;
+    background: #f6c445;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.2);
+    cursor: pointer;
+}
+
+.ttk-facet-range::-moz-range-track {
+    height: 4px;
+    border: 0;
+    border-radius: 999px;
+    background: #f6c445;
+}
+
+.ttk-facet-range::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border: 2px solid #ffffff;
+    border-radius: 50%;
+    background: #f6c445;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.2);
+    cursor: pointer;
 }
 
 .ttk-facet-toggle {
@@ -695,6 +1018,13 @@ $stockOnly = (string) $block->getRequest()->getParam('stock') === '1';
     <div class="ttk-accordion" id="ttk-facet-accordion">
         <?php foreach ($facetGroups as $groupKey => $groupConfig): ?>
             <?php
+            $groupCoverageCount = (int) ($facetCompleteness[$groupKey] ?? 0);
+            $groupCoverageRatio = $totalFacetProducts > 0 ? ($groupCoverageCount / $totalFacetProducts) : 0;
+
+            if ($totalFacetProducts <= 0 || $groupCoverageCount < 2 || $groupCoverageRatio < 0.1) {
+                continue;
+            }
+
             $counts = $facetCounts[$groupKey];
             if (empty($counts)) {
                 continue;
@@ -717,20 +1047,30 @@ $stockOnly = (string) $block->getRequest()->getParam('stock') === '1';
             } else {
                 $orderedValues = array_keys($counts);
             }
+
+            $renderableValues = array_values(array_filter($orderedValues, static function ($valueName) use ($counts) {
+                return isset($counts[$valueName]) && (int) $counts[$valueName] > 0;
+            }));
+            if (count($renderableValues) <= 1) {
+                continue;
+            }
+            if (count($renderableValues) === 1 && (int) $counts[$renderableValues[0]] >= $totalFacetProducts) {
+                continue;
+            }
             ?>
-            <details class="ttk-accordion-item" open>
+            <details class="ttk-accordion-item" data-facet-group="<?= $block->escapeHtmlAttr($groupKey) ?>" open>
                 <summary class="ttk-accordion-summary">
                     <span><?= $block->escapeHtml($groupConfig['label']) ?></span>
                     <span class="ttk-accordion-arrow" aria-hidden="true"></span>
                 </summary>
                 <div class="ttk-option-list">
-                    <?php foreach ($orderedValues as $valueName): ?>
-                        <div class="ttk-option-row">
+                    <?php foreach ($renderableValues as $valueName): ?>
+                        <div class="ttk-option-row" data-facet-option="<?= $block->escapeHtmlAttr($valueName) ?>">
                             <label>
                                 <input type="checkbox" class="ttk-facet-check" data-group="<?= $block->escapeHtmlAttr($groupKey) ?>" data-value="<?= $block->escapeHtmlAttr($valueName) ?>" />
                                 <span><?= $block->escapeHtml($valueName) ?></span>
                             </label>
-                            <span class="ttk-option-count">(<?= (int) $counts[$valueName] ?>)</span>
+                            <span class="ttk-option-count" data-count>(<?= (int) $counts[$valueName] ?>)</span>
                         </div>
                     <?php endforeach; ?>
                 </div>
@@ -758,15 +1098,35 @@ $stockOnly = (string) $block->getRequest()->getParam('stock') === '1';
     var metaNode = document.getElementById('ttk-facet-meta-json');
     var checks = Array.prototype.slice.call(document.querySelectorAll('.ttk-facet-check'));
     var cards = Array.prototype.slice.call(document.querySelectorAll('.products-grid .product-item'));
+    var pendingFilterTimer = 0;
+    var ajaxController = null;
 
-    var productMeta = [];
-    try {
-        productMeta = JSON.parse(metaNode ? metaNode.textContent : '[]');
-        if (!Array.isArray(productMeta)) {
+    var productMeta = null;
+    var productMetaById = {};
+    var selectedFacetState = {};
+
+    function ensureProductMeta() {
+        if (productMeta !== null) {
+            return productMeta;
+        }
+
+        try {
+            productMeta = JSON.parse(metaNode ? metaNode.textContent : '[]');
+            if (!Array.isArray(productMeta)) {
+                productMeta = [];
+            }
+        } catch (e) {
             productMeta = [];
         }
-    } catch (e) {
-        productMeta = [];
+
+        productMetaById = {};
+        productMeta.forEach(function (meta) {
+            if (meta && meta.id) {
+                productMetaById[String(meta.id)] = meta;
+            }
+        });
+
+        return productMeta;
     }
 
     if (!minInput || !maxInput || !minRange || !maxRange || !stockToggle || !applyBtn || !clearBtn) {
@@ -823,26 +1183,117 @@ $stockOnly = (string) $block->getRequest()->getParam('stock') === '1';
         var url = new URL(window.location.href);
         url.searchParams.delete('price');
         url.searchParams.delete('stock');
+        url.searchParams.delete('p');
+        Array.prototype.slice.call(url.searchParams.keys()).forEach(function (key) {
+            if (key.indexOf('ttkf_') === 0) {
+                url.searchParams.delete(key);
+            }
+        });
         window.location.href = url.toString();
     });
 
-    function collectSelectedFacets() {
+    function cloneSelectedFacetState() {
         var selected = {};
-        checks.forEach(function (input) {
-            if (!input.checked) {
-                return;
+        Object.keys(selectedFacetState).forEach(function (groupKey) {
+            if (selectedFacetState[groupKey] && selectedFacetState[groupKey].length) {
+                selected[groupKey] = selectedFacetState[groupKey].slice();
             }
-            var group = input.getAttribute('data-group') || '';
-            var value = input.getAttribute('data-value') || '';
-            if (!group || !value) {
-                return;
-            }
-            if (!selected[group]) {
-                selected[group] = [];
-            }
-            selected[group].push(value);
         });
         return selected;
+    }
+
+    function collectSelectedFacets() {
+        return cloneSelectedFacetState();
+    }
+
+    function getFacetParamName(groupKey) {
+        return 'ttkf_' + groupKey;
+    }
+
+    function getCurrentPerPage() {
+        var limiter = document.querySelector('[data-role="limiter"], #limiter');
+        var value = limiter ? Number(limiter.value || 0) : 0;
+        if (value > 0) {
+            return value;
+        }
+        return cards.length > 0 ? cards.length : 10;
+    }
+
+    function syncSelectedFacetsToUrl(url, selected) {
+        Array.prototype.slice.call(url.searchParams.keys()).forEach(function (key) {
+            if (key.indexOf('ttkf_') === 0) {
+                url.searchParams.delete(key);
+            }
+        });
+
+        Object.keys(selected).forEach(function (groupKey) {
+            var values = selected[groupKey] || [];
+            if (values.length) {
+                url.searchParams.set(getFacetParamName(groupKey), values.join('|'));
+            }
+        });
+    }
+
+    function setFacetValue(groupKey, value, shouldSelect) {
+        if (!groupKey || !value) {
+            return;
+        }
+
+        var values = selectedFacetState[groupKey] || [];
+        var index = values.indexOf(value);
+
+        if (shouldSelect && index === -1) {
+            values.push(value);
+        } else if (!shouldSelect && index !== -1) {
+            values.splice(index, 1);
+        }
+
+        if (values.length) {
+            selectedFacetState[groupKey] = values;
+        } else {
+            delete selectedFacetState[groupKey];
+        }
+    }
+
+    function isFacetValueSelected(groupKey, value) {
+        return !!(selectedFacetState[groupKey] && selectedFacetState[groupKey].indexOf(value) !== -1);
+    }
+
+    function syncCheckboxesFromState() {
+        checks.forEach(function (input) {
+            var group = input.getAttribute('data-group') || '';
+            var value = input.getAttribute('data-value') || '';
+            input.checked = isFacetValueSelected(group, value);
+        });
+    }
+
+    function restoreSelectedFacetsFromUrl() {
+        var url = new URL(window.location.href);
+        selectedFacetState = {};
+
+        Array.prototype.slice.call(url.searchParams.keys()).forEach(function (key) {
+            if (key.indexOf('ttkf_') !== 0) {
+                return;
+            }
+            var group = key.replace('ttkf_', '');
+            var raw = url.searchParams.get(key) || '';
+            raw.split('|').forEach(function (value) {
+                if (value) {
+                    setFacetValue(group, value, true);
+                }
+            });
+        });
+
+        syncCheckboxesFromState();
+    }
+
+    function hasActiveFacetParams() {
+        var url = new URL(window.location.href);
+        var hasFacet = Array.prototype.slice.call(url.searchParams.keys()).some(function (key) {
+            return key.indexOf('ttkf_') === 0;
+        });
+
+        return hasFacet || url.searchParams.get('stock') === '1';
     }
 
     function matchesGroup(metaValue, selectedValues) {
@@ -857,32 +1308,331 @@ $stockOnly = (string) $block->getRequest()->getParam('stock') === '1';
         return selectedValues.indexOf(metaValue) !== -1;
     }
 
-    function applyFacetVisibility() {
-        var selected = collectSelectedFacets();
-        cards.forEach(function (card, idx) {
-            var meta = productMeta[idx] || {};
-            var visible = true;
+    function getCardProductId(card) {
+        var info = card.querySelector('[id^="product-item-info_"]');
+        if (info && info.id) {
+            return info.id.replace('product-item-info_', '');
+        }
+        var price = card.querySelector('[data-product-id]');
+        return price ? price.getAttribute('data-product-id') : '';
+    }
 
-            Object.keys(selected).forEach(function (groupKey) {
-                if (!visible) {
+    function getCardMeta(card, fallbackIndex) {
+        ensureProductMeta();
+        var productId = getCardProductId(card);
+        if (productId && productMetaById[productId]) {
+            return productMetaById[productId];
+        }
+        return productMeta[fallbackIndex] || {};
+    }
+
+    function metaIsOutOfStock(meta) {
+        return !!(meta && meta.in_stock === false);
+    }
+
+    function matchesSelectedFilters(meta, selected, excludedGroup) {
+        var visible = true;
+        Object.keys(selected).forEach(function (groupKey) {
+            if (!visible || groupKey === excludedGroup) {
+                return;
+            }
+            var selectedValues = selected[groupKey] || [];
+            if (!matchesGroup(meta[groupKey], selectedValues)) {
+                visible = false;
+            }
+        });
+
+        if (visible && stockToggle.checked && metaIsOutOfStock(meta)) {
+            visible = false;
+        }
+
+        return visible;
+    }
+
+    function metaContainsValue(metaValue, value) {
+        if (Array.isArray(metaValue)) {
+            return metaValue.indexOf(value) !== -1;
+        }
+        return metaValue === value;
+    }
+
+    function refreshFacetCounts(selected) {
+        ensureProductMeta();
+        var groups = Array.prototype.slice.call(root.querySelectorAll('.ttk-accordion-item[data-facet-group]'));
+        groups.forEach(function (groupNode) {
+            var groupKey = groupNode.getAttribute('data-facet-group') || '';
+            var rows = Array.prototype.slice.call(groupNode.querySelectorAll('.ttk-option-row[data-facet-option]'));
+            var baseTotal = 0;
+            var counts = {};
+            var visibleRows = 0;
+            var onlyVisibleCount = 0;
+            var hasSelectedValue = !!(selected[groupKey] && selected[groupKey].length);
+
+            productMeta.forEach(function (meta) {
+                meta = meta || {};
+                if (!matchesSelectedFilters(meta, selected, groupKey)) {
                     return;
                 }
-                var selectedValues = selected[groupKey] || [];
-                if (!matchesGroup(meta[groupKey], selectedValues)) {
-                    visible = false;
+
+                baseTotal += 1;
+                var metaValue = meta[groupKey];
+                if (Array.isArray(metaValue)) {
+                    metaValue.forEach(function (value) {
+                        if (value) {
+                            counts[value] = (counts[value] || 0) + 1;
+                        }
+                    });
+                    return;
+                }
+
+                if (metaValue) {
+                    counts[metaValue] = (counts[metaValue] || 0) + 1;
                 }
             });
 
-            if (stockToggle.checked && card.querySelector('.stock.unavailable')) {
-                visible = false;
-            }
+            rows.forEach(function (row) {
+                var value = row.getAttribute('data-facet-option') || '';
+                var count = counts[value] || 0;
+                var input = row.querySelector('.ttk-facet-check');
+                var countNode = row.querySelector('[data-count]');
+                var isSelected = isFacetValueSelected(groupKey, value);
 
-            card.style.display = visible ? '' : 'none';
+                if (countNode) {
+                    countNode.textContent = '(' + count + ')';
+                }
+                row.style.display = (count > 0 || isSelected) ? '' : 'none';
+                if (input) {
+                    input.checked = isSelected;
+                    input.disabled = count <= 0 && !isSelected;
+                }
+
+                if (count > 0) {
+                    visibleRows += 1;
+                    onlyVisibleCount = count;
+                }
+            });
+
+            groupNode.style.display = (!hasSelectedValue && (visibleRows <= 1 || onlyVisibleCount >= baseTotal)) ? 'none' : '';
+            groupNode.open = true;
         });
     }
 
+    function applyFacetVisibility(selected) {
+        selected = selected || collectSelectedFacets();
+        cards.forEach(function (card, idx) {
+            var meta = getCardMeta(card, idx);
+            card.style.display = matchesSelectedFilters(meta, selected, '') ? '' : 'none';
+        });
+        refreshFacetCounts(selected);
+    }
+
+    function pageHasMatchingCard(selected) {
+        return cards.some(function (card, idx) {
+            return matchesSelectedFilters(getCardMeta(card, idx), selected, '');
+        });
+    }
+
+    function getMatchingMeta(selected) {
+        ensureProductMeta();
+        return productMeta.filter(function (meta) {
+            return matchesSelectedFilters(meta || {}, selected, '');
+        });
+    }
+
+    function updateBrowserFilterUrl(selected, targetPage, replaceOnly) {
+        var url = new URL(window.location.href);
+        syncSelectedFacetsToUrl(url, selected);
+        if (stockToggle.checked) {
+            url.searchParams.set('stock', '1');
+        } else {
+            url.searchParams.delete('stock');
+        }
+
+        if (targetPage > 1) {
+            url.searchParams.set('p', String(targetPage));
+        } else if (targetPage === 1) {
+            url.searchParams.delete('p');
+        }
+
+        if (replaceOnly) {
+            window.history.replaceState(null, '', url.toString());
+            return url;
+        }
+
+        return url;
+    }
+
+    function getProductListNode(doc) {
+        return doc.querySelector('.products-grid .product-items, .products.wrapper .product-items, ol.product-items');
+    }
+
+    function getToolbarAmountNodes() {
+        return Array.prototype.slice.call(document.querySelectorAll('.toolbar-amount'));
+    }
+
+    function buildPageUrl(pageNumber) {
+        var url = new URL(window.location.href);
+        Array.prototype.slice.call(url.searchParams.keys()).forEach(function (key) {
+            if (key.indexOf('ttkf_') === 0) {
+                url.searchParams.delete(key);
+            }
+        });
+        if (pageNumber > 1) {
+            url.searchParams.set('p', String(pageNumber));
+        } else {
+            url.searchParams.delete('p');
+        }
+        return url.toString();
+    }
+
+    function updateToolbarForAjaxResult(count) {
+        getToolbarAmountNodes().forEach(function (node) {
+            if (count <= 0) {
+                node.textContent = '0 products';
+            } else {
+                node.textContent = 'Items 1-' + count + ' of ' + count;
+            }
+        });
+        document.querySelectorAll('.pages').forEach(function (node) {
+            node.style.display = count > getCurrentPerPage() ? '' : 'none';
+        });
+    }
+
+    function renderNoAjaxResults(listNode) {
+        listNode.innerHTML = '<li class="item product product-item ttk-no-filter-results">No products match these filters.</li>';
+        cards = [];
+        updateToolbarForAjaxResult(0);
+    }
+
+    function ajaxRenderMatches(matchingMeta) {
+        ensureProductMeta();
+        var listNode = getProductListNode(document);
+        if (!listNode) {
+            applyFacetVisibility();
+            return;
+        }
+
+        if (ajaxController) {
+            ajaxController.abort();
+        }
+        ajaxController = new AbortController();
+
+        if (!matchingMeta.length) {
+            renderNoAjaxResults(listNode);
+            return;
+        }
+
+        var perPage = getCurrentPerPage();
+        var targetIds = {};
+        var pages = {};
+        matchingMeta.forEach(function (meta) {
+            targetIds[String(meta.id)] = true;
+            var index = productMeta.findIndex(function (item) {
+                return String(item.id) === String(meta.id);
+            });
+            var page = Math.floor(Math.max(index, 0) / perPage) + 1;
+            pages[page] = true;
+        });
+
+        var pageNumbers = Object.keys(pages).map(Number).sort(function (a, b) {
+            return a - b;
+        });
+        var parser = new DOMParser();
+        listNode.setAttribute('aria-busy', 'true');
+
+        Promise.all(pageNumbers.map(function (pageNumber) {
+            if (pageNumber === Number(new URL(window.location.href).searchParams.get('p') || 1)) {
+                return Promise.resolve(document);
+            }
+            return fetch(buildPageUrl(pageNumber), {
+                credentials: 'same-origin',
+                signal: ajaxController.signal
+            }).then(function (response) {
+                return response.text();
+            }).then(function (html) {
+                return parser.parseFromString(html, 'text/html');
+            });
+        })).then(function (docs) {
+            var nodesById = {};
+            docs.forEach(function (doc) {
+                Array.prototype.slice.call(doc.querySelectorAll('.products-grid .product-item, .products.wrapper .product-item')).forEach(function (item) {
+                    var info = item.querySelector('[id^="product-item-info_"]');
+                    if (!info || !info.id) {
+                        return;
+                    }
+                    var id = info.id.replace('product-item-info_', '');
+                    if (targetIds[id]) {
+                        nodesById[id] = item.outerHTML;
+                    }
+                });
+            });
+
+            listNode.innerHTML = matchingMeta.map(function (meta) {
+                return nodesById[String(meta.id)] || '';
+            }).filter(Boolean).join('');
+            cards = Array.prototype.slice.call(document.querySelectorAll('.products-grid .product-item'));
+            listNode.removeAttribute('aria-busy');
+            updateToolbarForAjaxResult(cards.length);
+            syncCheckboxesFromState();
+            refreshFacetCounts(collectSelectedFacets());
+        }).catch(function (error) {
+            if (error && error.name === 'AbortError') {
+                return;
+            }
+            listNode.removeAttribute('aria-busy');
+            applyFacetVisibility();
+        });
+    }
+
+    function applyFacetState() {
+        syncCheckboxesFromState();
+        var selected = collectSelectedFacets();
+        var matchingMeta = getMatchingMeta(selected);
+        updateBrowserFilterUrl(selected, 1, true);
+        refreshFacetCounts(selected);
+
+        if (matchingMeta.length === 1 && matchingMeta[0].url) {
+            window.location.href = matchingMeta[0].url;
+            return;
+        }
+
+        ajaxRenderMatches(matchingMeta);
+    }
+
+    function scheduleFacetStateUpdate() {
+        if (pendingFilterTimer) {
+            window.clearTimeout(pendingFilterTimer);
+        }
+        pendingFilterTimer = window.setTimeout(function () {
+            pendingFilterTimer = 0;
+            applyFacetState();
+        }, 350);
+    }
+
     checks.forEach(function (input) {
-        input.addEventListener('change', applyFacetVisibility);
+        input.addEventListener('click', function (event) {
+            event.stopPropagation();
+
+            if (input.disabled) {
+                return;
+            }
+
+            var group = input.getAttribute('data-group') || '';
+            var value = input.getAttribute('data-value') || '';
+            setFacetValue(group, value, !isFacetValueSelected(group, value));
+            syncCheckboxesFromState();
+            scheduleFacetStateUpdate();
+        });
+    });
+
+    root.querySelectorAll('.ttk-accordion-summary').forEach(function (summary) {
+        summary.addEventListener('click', function (event) {
+            event.preventDefault();
+            var details = summary.closest('.ttk-accordion-item');
+            if (details) {
+                details.open = true;
+            }
+        });
     });
 
     // Remove duplicated native "Price" block from layered navigation.
@@ -904,7 +1654,10 @@ $stockOnly = (string) $block->getRequest()->getParam('stock') === '1';
         stockToggle.checked = true;
     }
 
-    stockToggle.addEventListener('change', applyFacetVisibility);
-    applyFacetVisibility();
+    restoreSelectedFacetsFromUrl();
+    stockToggle.addEventListener('change', scheduleFacetStateUpdate);
+    if (hasActiveFacetParams()) {
+        applyFacetVisibility();
+    }
 })();
 </script>

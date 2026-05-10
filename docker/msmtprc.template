@@ -1,0 +1,12 @@
+defaults
+logfile /tmp/msmtp.log
+
+account default
+host __SMTP_HOST__
+port __SMTP_PORT__
+auth __SMTP_AUTH__
+tls __SMTP_TLS__
+tls_starttls __SMTP_STARTTLS__
+from __SMTP_FROM__
+user __SMTP_USER__
+password __SMTP_PASS__
