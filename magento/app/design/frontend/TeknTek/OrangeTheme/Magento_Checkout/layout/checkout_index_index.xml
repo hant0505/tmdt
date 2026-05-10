@@ -9,6 +9,8 @@
                    template="Magento_Theme::html/tekntek-header.phtml"/>
         </referenceContainer>
 
+        <move element="minicart" destination="tekntek.checkout.header" as="minicart"/>
+
         <!-- Render custom footer below checkout content -->
         <referenceContainer name="page.wrapper">
             <container name="tekntek.checkout.footer.container"
