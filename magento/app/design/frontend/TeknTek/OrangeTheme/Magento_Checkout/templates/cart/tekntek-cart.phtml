@@ -2,6 +2,8 @@
 /** @var \Magento\Checkout\Block\Cart\Grid $block */
 $quote = $block->getQuote();
 $currencyCode = (string) $quote->getQuoteCurrencyCode();
+$items = $block->getItems();
+$hasItems = !empty($items);
 
 $formatPrice = static function (float $amount, string $currencyCode): string {
     return $currencyCode . ' ' . number_format($amount, 2, '.', ',');
@@ -13,10 +15,13 @@ $formatPrice = static function (float $amount, string $currencyCode): string {
         <span class="separator" aria-hidden="true">&gt;</span>
         <span class="current" aria-current="page"><?= $block->escapeHtml(__('Shopping cart')) ?></span>
     </nav>
+    <h1 class="tekntek-cart__title">
+        <?= $block->escapeHtml(__('Shopping Cart')) ?>
+    </h1>
 
     <div class="tekntek-cart__layout">
-        <article class="tekntek-cart__items" aria-label="Items">
-            <?php foreach ($block->getItems() as $item): ?>
+        <article class="tekntek-cart__items" aria-label="Items"<?= $hasItems ? '' : ' style="display:none;"' ?>>
+            <?php foreach ($items as $item): ?>
                 <?php
                 $product = $item->getProduct();
                 $name = (string) $item->getName();
@@ -64,12 +69,19 @@ $formatPrice = static function (float $amount, string $currencyCode): string {
                 </div>
             <?php endforeach; ?>
         </article>
+        <div class="tekntek-cart__empty" aria-live="polite"<?= $hasItems ? ' style="display:none;"' : '' ?>>
+            <?= $block->escapeHtml(__('Your shopping cart is empty.')) ?>
+        </div>
     </div>
 </section>
 
 <!-- Cart item quantity and delete handlers -->
 <script type="text/javascript">
-require(['jquery'], function($) {
+require([
+    'jquery',
+    'Magento_Customer/js/customer-data',
+    'Magento_Checkout/js/action/get-totals'
+], function($, customerData, getTotalsAction) {
     'use strict';
 
     function getFormKey() {
@@ -81,6 +93,41 @@ require(['jquery'], function($) {
 
         cookieMatch = document.cookie.match(/(?:^|; )form_key=([^;]+)/);
         return cookieMatch ? decodeURIComponent(cookieMatch[1]) : '';
+    }
+
+    var currencyCode = '<?= $block->escapeJs($currencyCode) ?>';
+
+    function parseMoney(value) {
+        var normalized = String(value || '').replace(/[^0-9.,-]/g, '');
+        var lastComma = normalized.lastIndexOf(',');
+        var lastDot = normalized.lastIndexOf('.');
+        var decimalSeparator = lastDot > lastComma ? '.' : ',';
+
+        if (decimalSeparator === ',') {
+            normalized = normalized.replace(/\./g, '').replace(',', '.');
+        } else {
+            normalized = normalized.replace(/,/g, '');
+        }
+
+        return parseFloat(normalized) || 0;
+    }
+
+    function formatMoney(amount) {
+        var fixed = Number(amount || 0).toFixed(2);
+        var parts = fixed.split('.');
+        parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+        return currencyCode + ' ' + parts.join('.');
+    }
+
+    function updateRowTotal(itemId, qty) {
+        var $item = $('.tekntek-item').find('[data-item-id="' + itemId + '"]').closest('.tekntek-item');
+        var unitText = $item.find('.tekntek-item__price .old').first().text();
+        var unitPrice = parseMoney(unitText);
+        var newTotal = unitPrice * qty;
+
+        if ($item.length) {
+            $item.find('.tekntek-item__price .new').text(formatMoney(newTotal));
+        }
     }
 
     function updateCartItemQty(itemId, qty) {
@@ -96,6 +143,15 @@ require(['jquery'], function($) {
             data: payload,
             showLoader: true
         });
+    }
+
+    function refreshCartTotals() {
+        var deferred = $.Deferred();
+
+        getTotalsAction([], deferred);
+        customerData.reload(['cart'], true);
+
+        return deferred.promise();
     }
     
     $(document).ready(function() {
@@ -125,7 +181,8 @@ require(['jquery'], function($) {
                             alert(response.error_message);
                             return;
                         }
-                        location.reload();
+                        updateRowTotal(itemId, newQty);
+                        refreshCartTotals();
                     })
                     .fail(function() {
                         $input.val(currentQty);
@@ -139,6 +196,7 @@ require(['jquery'], function($) {
             var $input = $(this);
             var itemId = $input.data('item-id');
             var newQty = parseInt($input.val(), 10);
+            var oldQty = parseInt($input.attr('data-last-qty'), 10) || parseInt($input.val(), 10) || 1;
             
             if (newQty < 1) {
                 $input.val(1);
@@ -148,16 +206,37 @@ require(['jquery'], function($) {
             updateCartItemQty(itemId, newQty)
                 .done(function(response) {
                     if (response && response.error_message) {
+                        $input.val(oldQty);
                         alert(response.error_message);
                         return;
                     }
-                    location.reload();
+                    $input.attr('data-last-qty', newQty);
+                    updateRowTotal(itemId, newQty);
+                    refreshCartTotals();
                 })
                 .fail(function() {
+                    $input.val(oldQty);
                     alert('Error updating cart. Please try again.');
                 });
         });
         
+        function showEmptyStateIfNeeded() {
+            if (!$('.tekntek-item').length) {
+                $('.tekntek-cart__items').hide();
+                $('.tekntek-cart__empty').show();
+            }
+        }
+
+        function removeItemFromDom(itemId) {
+            var $item = $('.tekntek-item').find('[data-item-id="' + itemId + '"]').closest('.tekntek-item');
+
+            if ($item.length) {
+                $item.remove();
+            }
+
+            showEmptyStateIfNeeded();
+        }
+
         // Handle delete button
         $(document).on('click', '.btn-delete-item', function(e) {
             e.preventDefault();
@@ -168,11 +247,13 @@ require(['jquery'], function($) {
                     url: '<?= $block->escapeUrl($block->getUrl('checkout/cart/delete')) ?>',
                     type: 'POST',
                     data: {
-                        'item_id': itemId
+                        'id': itemId,
+                        'form_key': getFormKey()
                     },
                     showLoader: true,
                     success: function(res) {
-                        location.reload();
+                        removeItemFromDom(itemId);
+                        refreshCartTotals();
                     },
                     error: function() {
                         alert('Error removing item. Please try again.');

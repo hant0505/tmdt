@@ -21,22 +21,12 @@
                  render="shippingFormTemplate"></div>
         </if>
 
-        <if args="isFormInline && !isNewAddressAdded()">
+        <if args="canAddNewAddress && canAddNewAddress()">
             <div class="new-address-popup tekntek-new-address-popup tekntek-new-address-popup--top">
                 <button type="button"
                         class="action action-show-popup"
-                        click="openNewAddressForm">
-                    <span translate="'Register a new address'"></span>
-                </button>
-            </div>
-        </if>
-
-        <if args="!isFormInline || isNewAddressAdded()">
-            <div class="new-address-popup tekntek-new-address-popup tekntek-new-address-popup--bottom">
-                <button type="button"
-                        class="action action-show-popup"
-                        click="openNewAddressForm">
-                    <span translate="'Register a new address'"></span>
+                        click="showFormPopUp">
+                    <span translate="'New Address'"></span>
                 </button>
             </div>
         </if>

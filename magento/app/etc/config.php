@@ -374,6 +374,7 @@ return [
         'TeknTek_SearchSuggestion' => 1,
         'TeknTek_SignupFlow' => 1,
         'Vendor_BusinessNews' => 1,
+        'Vendor_CheckoutAddress' => 1,
         'Vendor_Currency' => 1,
         'Vendor_Rma' => 1,
         'Vendor_Weather' => 1,

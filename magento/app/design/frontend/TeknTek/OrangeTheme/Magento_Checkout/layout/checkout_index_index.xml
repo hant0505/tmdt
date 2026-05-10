@@ -1,6 +1,27 @@
 <?xml version="1.0"?>
-<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="checkout" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
+        <!-- Render custom header inside checkout header wrapper -->
+        <referenceBlock name="logo" remove="true"/>
+        <referenceContainer name="checkout.header.wrapper">
+            <block class="Magento\Framework\View\Element\Template"
+                   name="tekntek.checkout.header"
+                   template="Magento_Theme::html/tekntek-header.phtml"/>
+        </referenceContainer>
+
+        <!-- Render custom footer below checkout content -->
+        <referenceContainer name="page.wrapper">
+            <container name="tekntek.checkout.footer.container"
+                       htmlTag="div"
+                       htmlClass="tekntek-checkout-footer-container"
+                       after="main.content">
+                <block class="Magento\Framework\View\Element\Template"
+                       name="tekntek.checkout.footer"
+                       template="Magento_Theme::html/tekntek-footer.phtml"/>
+            </container>
+        </referenceContainer>
+
+        <!-- Checkout Content -->
         <referenceBlock name="checkout.root">
             <arguments>
                 <argument name="jsLayout" xsi:type="array">
@@ -19,6 +40,7 @@
                                                                     <item name="component" xsi:type="string">Magento_Checkout/js/view/payment-selection</item>
                                                                     <item name="sortOrder" xsi:type="string">5</item>
                                                                 </item>
+                                                                <!-- Temporarily disabled to test the default Magento payment step -->
                                                             </item>
                                                         </item>
                                                     </item>
@@ -33,25 +55,5 @@
                 </argument>
             </arguments>
         </referenceBlock>
-
-        <referenceContainer name="content">
-            <block class="Magento\Framework\View\Element\Template"
-                   name="tekntek.checkout.header"
-                   template="Magento_Theme::html/tekntek-header.phtml"
-                   before="checkout.root">
-                <block class="Magento\Theme\Block\Html\Topmenu"
-                       name="checkout.catalog.topnav"
-                       template="Magento_Theme::html/topmenu.phtml"
-                       ttl="3600"
-                       as="catalog.topnav"/>
-            </block>
-
-            <block class="Magento\Framework\View\Element\Template"
-                   name="tekntek.checkout.footer"
-                   template="Magento_Theme::html/tekntek-footer.phtml"
-                     after="checkout.root"/>
-        </referenceContainer>
-
-        <move element="minicart" destination="tekntek.checkout.header" as="minicart"/>
     </body>
 </page>
