@@ -973,3 +973,22 @@ body.sales-order-view .actions-toolbar .secondary {
         grid-template-columns: 1fr;
     }
 }
+
+/* Keep account sidebar in normal document flow on desktop (incl. vault pages) */
+@media (min-width: 1025px) {
+    body.customer-account .page-main .columns,
+    body.account .page-main .columns,
+    body.vault-cards-listaction .page-main .columns {
+        align-items: flex-start !important;
+        overflow: visible !important;
+    }
+
+    body.customer-account .page-main .columns .sidebar.sidebar-main,
+    body.account .page-main .columns .sidebar.sidebar-main,
+    body.vault-cards-listaction .page-main .columns .sidebar.sidebar-main {
+        position: static !important;
+        top: auto !important;
+        align-self: flex-start !important;
+        z-index: auto !important;
+    }
+}

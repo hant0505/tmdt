@@ -48,6 +48,7 @@ $now = time();
                 $regularPrice = (float) $_product->getPrice();
                 $finalPrice = (float) $_product->getFinalPrice();
                 $isSale = $regularPrice > 0 && $finalPrice > 0 && $finalPrice < $regularPrice;
+                $salePercent = $isSale ? (int) round((($regularPrice - $finalPrice) / $regularPrice) * 100) : 0;
                 $newsFrom = $_product->getNewsFromDate() ? strtotime((string) $_product->getNewsFromDate()) : null;
                 $newsTo = $_product->getNewsToDate() ? strtotime((string) $_product->getNewsToDate()) : null;
                 $isNew = ($newsFrom && $newsFrom <= $now) && (!$newsTo || $newsTo >= $now);
@@ -65,7 +66,9 @@ $now = time();
                                     <span class="tekntek-product-badge tekntek-product-badge--new"><?= $escaper->escapeHtml(__('Mới')) ?></span>
                                 <?php endif; ?>
                                 <?php if ($isSale): ?>
-                                    <span class="tekntek-product-badge tekntek-product-badge--sale"><?= $escaper->escapeHtml(__('Sale')) ?></span>
+                                    <span class="tekntek-product-badge tekntek-product-badge--sale">
+                                        <?= $escaper->escapeHtml(__('SALE -%1%%', $salePercent)) ?>
+                                    </span>
                                 <?php endif; ?>
                             </span>
                             <?= $productImage->toHtml() ?>

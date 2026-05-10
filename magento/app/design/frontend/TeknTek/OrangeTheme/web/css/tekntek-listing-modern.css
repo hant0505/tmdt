@@ -397,3 +397,50 @@
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 }
+
+/* Global catalog card tuning: larger images + red prices */
+.catalog-category-view .products-grid .product-item-photo,
+.catalogsearch-result-index .products-grid .product-item-photo {
+    height: 220px;
+    min-height: 220px;
+    display: flex !important;
+    align-items: center;
+    justify-content: center;
+}
+
+.catalog-category-view .products-grid .product-image-photo,
+.catalogsearch-result-index .products-grid .product-image-photo {
+    max-height: 190px !important;
+    object-fit: contain;
+}
+
+.catalog-category-view .products-grid .price-box .price,
+.catalogsearch-result-index .products-grid .price-box .price {
+    color: #dc2626 !important;
+}
+
+.catalog-category-view .products-grid .price-box,
+.catalogsearch-result-index .products-grid .price-box {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.catalog-category-view .products-grid .price-box .old-price,
+.catalogsearch-result-index .products-grid .price-box .old-price {
+    margin: 0;
+    order: 1;
+}
+
+.catalog-category-view .products-grid .price-box .special-price,
+.catalogsearch-result-index .products-grid .price-box .special-price {
+    margin: 0;
+    order: 2;
+}
+
+.catalog-category-view .products-grid .price-box .old-price .price,
+.catalogsearch-result-index .products-grid .price-box .old-price .price {
+    color: #9ca3af !important;
+    text-decoration: line-through;
+}

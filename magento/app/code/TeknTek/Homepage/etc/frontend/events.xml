@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="catalog_product_get_final_price">
+        <observer name="tekntek_homepage_apply_offer_final_price"
+                  instance="TeknTek\Homepage\Observer\ApplyOfferFinalPrice"/>
+    </event>
+    <event name="sales_quote_item_set_product">
+        <observer name="tekntek_homepage_apply_offer_quote_item_price"
+                  instance="TeknTek\Homepage\Observer\ApplyOfferQuoteItemPrice"/>
+    </event>
+</config>

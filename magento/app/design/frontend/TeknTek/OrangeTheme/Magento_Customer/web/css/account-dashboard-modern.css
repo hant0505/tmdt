@@ -717,6 +717,144 @@ body.customer-account-index .actions-toolbar .secondary .action {
     text-decoration: none !important;
 }
 
+/* Edit Address page: remove noisy extra sidebar block and tighten form spacing */
+body.customer-address-form .sidebar-additional {
+    display: none !important;
+}
+
+body.customer-address-form .columns,
+body.customer-address-index .columns {
+    display: grid !important;
+    grid-template-columns: 280px minmax(0, 1fr) !important;
+    gap: 24px !important;
+    align-items: stretch !important;
+}
+
+body.customer-address-form .column.main,
+body.customer-address-index .column.main {
+    grid-column: 2 !important;
+    width: auto !important;
+    max-width: none !important;
+    float: none !important;
+    order: initial !important;
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+}
+
+body.customer-address-form .column.main .form-address-edit {
+    width: 100% !important;
+    max-width: 980px !important;
+}
+
+body.customer-address-form .sidebar-main,
+body.customer-address-index .sidebar-main {
+    grid-column: 1 !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    max-width: 280px !important;
+    float: none !important;
+    order: initial !important;
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+}
+
+body.customer-address-form .sidebar-main .block,
+body.customer-address-index .sidebar-main .block {
+    height: 100% !important;
+}
+
+/* Keep sidebar and content in one row on address pages */
+body.customer-address-form .sidebar-main,
+body.customer-address-form .column.main,
+body.customer-address-index .sidebar-main,
+body.customer-address-index .column.main {
+    margin-top: 0 !important;
+}
+
+body.customer-address-form .column.main .form-address-edit .fieldset {
+    margin-bottom: 16px !important;
+}
+
+body.customer-address-form .column.main .form-address-edit .actions-toolbar {
+    margin-top: 8px !important;
+}
+
+/* Ensure success/error messages are visible on customer address pages */
+body.customer-address-form .page.messages,
+body.customer-address-index .page.messages {
+    display: block !important;
+    margin: 0 0 16px !important;
+    clear: both !important;
+}
+
+@media (max-width: 1024px) {
+    body.customer-address-form .columns,
+    body.customer-address-index .columns {
+        display: block !important;
+    }
+
+    body.customer-address-form .column.main,
+    body.customer-address-form .sidebar-main,
+    body.customer-address-index .column.main,
+    body.customer-address-index .sidebar-main {
+        width: 100% !important;
+        min-width: 0 !important;
+        order: initial !important;
+    }
+}
+
+/* ==========================================================================
+   Customer > Add New Address layout fix
+   Keep sidebar + content in one row (25% / 75%) and remove form shrink
+   ========================================================================== */
+body.customer-address-form .page-main .columns {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    align-items: flex-start !important;
+    gap: 24px !important;
+}
+
+body.customer-address-form .page-main .columns .sidebar-main {
+    order: 1 !important;
+    flex: 0 0 25% !important;
+    width: 25% !important;
+    max-width: 25% !important;
+    min-width: 260px !important;
+    float: none !important;
+    clear: none !important;
+    margin: 0 !important;
+}
+
+body.customer-address-form .page-main .columns .column.main {
+    order: 2 !important;
+    flex: 1 1 75% !important;
+    width: 75% !important;
+    max-width: 75% !important;
+    min-width: 0 !important;
+    float: none !important;
+    clear: none !important;
+    margin: 0 !important;
+}
+
+body.customer-address-form .page-main .columns .column.main > form,
+body.customer-address-form .page-main .columns .column.main .form-address-edit {
+    width: 100% !important;
+    max-width: none !important;
+}
+
+@media (max-width: 1024px) {
+    body.customer-address-form .page-main .columns {
+        display: block !important;
+    }
+
+    body.customer-address-form .page-main .columns .sidebar-main,
+    body.customer-address-form .page-main .columns .column.main {
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+    }
+}
+
 body.account .ttk-account-list {
     display: grid !important;
     gap: 14px !important;
@@ -1016,6 +1154,305 @@ body.account .ttk-address-card__actions {
     flex-wrap: wrap !important;
 }
 
+/* Address Book additional entries: keep Magento logic, render as cards */
+body.customer-address-index .block-addresses-list {
+    margin: 0 0 28px !important;
+}
+
+body.customer-address-index .block-addresses-list .block-title {
+    margin: 0 0 16px !important;
+    padding: 0 !important;
+    border: 0 !important;
+}
+
+body.customer-address-index .block-addresses-list .block-title strong {
+    color: #111827 !important;
+    font-size: 40px !important;
+    font-weight: 800 !important;
+    line-height: 1.15 !important;
+}
+
+body.customer-address-index .table-wrapper.additional-addresses {
+    overflow: visible !important;
+    border: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+body.customer-address-index #additional-addresses-table {
+    width: 100% !important;
+    border: 0 !important;
+    margin: 0 !important;
+}
+
+body.customer-address-index #additional-addresses-table .table-caption,
+body.customer-address-index #additional-addresses-table thead {
+    display: none !important;
+}
+
+body.customer-address-index #additional-addresses-table tbody {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 16px !important;
+}
+
+body.customer-address-index #additional-addresses-table tbody tr {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    align-content: flex-start !important;
+    gap: 10px 14px !important;
+    padding: 18px !important;
+    border: 1px solid #f1f5f9 !important;
+    border-radius: 18px !important;
+    background: #ffffff !important;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, .06) !important;
+}
+
+body.customer-address-index #additional-addresses-table tbody td {
+    border: 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+    color: #4b5563 !important;
+    font-size: 14px !important;
+    line-height: 1.65 !important;
+}
+
+body.customer-address-index #additional-addresses-table tbody td:before {
+    display: none !important;
+}
+
+body.customer-address-index #additional-addresses-table tbody td.col.firstname,
+body.customer-address-index #additional-addresses-table tbody td.col.lastname {
+    color: #111827 !important;
+    font-size: 18px !important;
+    font-weight: 800 !important;
+    line-height: 1.2 !important;
+}
+
+body.customer-address-index #additional-addresses-table tbody td.col.streetaddress,
+body.customer-address-index #additional-addresses-table tbody td.col.city,
+body.customer-address-index #additional-addresses-table tbody td.col.country,
+body.customer-address-index #additional-addresses-table tbody td.col.state,
+body.customer-address-index #additional-addresses-table tbody td.col.zip,
+body.customer-address-index #additional-addresses-table tbody td.col.phone {
+    width: 100% !important;
+}
+
+body.customer-address-index #additional-addresses-table tbody td.col.actions {
+    width: 100% !important;
+    margin-top: 6px !important;
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+}
+
+body.customer-address-index #additional-addresses-table .col.actions .action {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-height: 36px !important;
+    padding: 0 14px !important;
+    border: 1px solid #cdd8ee !important;
+    border-radius: 999px !important;
+    color: #1d4ed8 !important;
+    font-size: 14px !important;
+    font-weight: 700 !important;
+    text-decoration: none !important;
+}
+
+body.customer-address-index #additional-addresses-table .col.actions .action.delete {
+    border-color: #fecaca !important;
+    color: #dc2626 !important;
+    background: #fff7f7 !important;
+}
+
+body.customer-address-index .block-addresses-list .actions-toolbar {
+    margin-top: 14px !important;
+    clear: both !important;
+    position: relative !important;
+    z-index: 40 !important;
+    pointer-events: auto !important;
+}
+
+body.customer-address-index .block-addresses-list .actions-toolbar .primary {
+    float: none !important;
+    position: relative !important;
+    z-index: 41 !important;
+    pointer-events: auto !important;
+}
+
+body.customer-address-index .block-addresses-list .actions-toolbar .primary .action.add {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-height: 44px !important;
+    padding: 0 20px !important;
+    border-radius: 999px !important;
+    position: relative !important;
+    z-index: 42 !important;
+    pointer-events: auto !important;
+}
+
+body.customer-address-index .block-addresses-list .actions-toolbar::before,
+body.customer-address-index .block-addresses-list .actions-toolbar::after,
+body.customer-address-index .block-addresses-list .actions-toolbar .primary::before,
+body.customer-address-index .block-addresses-list .actions-toolbar .primary::after {
+    content: none !important;
+    display: none !important;
+}
+
+body.customer-address-index .block-addresses-default .actions-toolbar,
+body.customer-address-index .block-addresses-default .actions-toolbar .primary,
+body.customer-address-index .block-addresses-default .actions-toolbar .primary .action.add,
+body.customer-address-index .column.main .actions-toolbar,
+body.customer-address-index .column.main .actions-toolbar .primary,
+body.customer-address-index .column.main .actions-toolbar .primary .action.add {
+    position: relative !important;
+    z-index: 50 !important;
+    pointer-events: auto !important;
+}
+
+body.customer-address-index .block-addresses-default .actions-toolbar::before,
+body.customer-address-index .block-addresses-default .actions-toolbar::after,
+body.customer-address-index .block-addresses-default .actions-toolbar .primary::before,
+body.customer-address-index .block-addresses-default .actions-toolbar .primary::after {
+    content: none !important;
+    display: none !important;
+}
+
+body.customer-address-index .column.main,
+body.customer-address-index .block-addresses-list,
+body.customer-address-index .block-addresses-default {
+    position: relative !important;
+    z-index: 60 !important;
+}
+
+body.customer-address-index .column.main::before,
+body.customer-address-index .column.main::after,
+body.customer-address-index .block-addresses-list::before,
+body.customer-address-index .block-addresses-list::after,
+body.customer-address-index .block-addresses-default::before,
+body.customer-address-index .block-addresses-default::after {
+    content: none !important;
+    display: none !important;
+}
+
+body.customer-address-index a.action.add,
+body.customer-address-index .action.add,
+body.customer-address-index .actions-toolbar .action.add {
+    pointer-events: auto !important;
+    position: relative !important;
+    z-index: 61 !important;
+}
+
+body.customer-address-index .customer-addresses-toolbar.toolbar.bottom {
+    display: none !important;
+}
+
+@media (max-width: 900px) {
+    body.customer-address-index #additional-addresses-table tbody {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+/* Default Addresses (Magento native markup) - modern card style */
+body.customer-address-index .block-addresses-default {
+    margin: 0 0 28px !important;
+}
+
+body.customer-address-index .block-addresses-default .block-title {
+    margin: 0 0 16px !important;
+    padding: 0 !important;
+    border: 0 !important;
+}
+
+body.customer-address-index .block-addresses-default .block-title strong {
+    color: #111827 !important;
+    font-size: 40px !important;
+    font-weight: 800 !important;
+    line-height: 1.15 !important;
+}
+
+body.customer-address-index .block-addresses-default .block-content {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    align-items: stretch !important;
+    gap: 16px !important;
+}
+
+body.customer-address-index .block-addresses-default .box {
+    flex: 1 1 0 !important;
+    float: none !important;
+    width: auto !important;
+    max-width: none !important;
+    clear: none !important;
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 12px !important;
+    margin: 0 !important;
+    padding: 18px !important;
+    border: 1px solid #f1f5f9 !important;
+    border-radius: 18px !important;
+    background: #ffffff !important;
+    box-shadow: 0 1px 3px rgba(15, 23, 42, .06) !important;
+}
+
+body.customer-address-index .block-addresses-default .box-address-billing,
+body.customer-address-index .block-addresses-default .box-address-shipping,
+body.customer-address-index .block-addresses-default .box-billing-address,
+body.customer-address-index .block-addresses-default .box-shipping-address {
+    float: none !important;
+    clear: none !important;
+    margin: 0 !important;
+}
+
+body.customer-address-index .block-addresses-default .box .box-title {
+    margin: 0 !important;
+    padding: 0 0 12px !important;
+    border-bottom: 1px solid #eef2f7 !important;
+}
+
+body.customer-address-index .block-addresses-default .box .box-title span {
+    color: #111827 !important;
+    font-size: 18px !important;
+    font-weight: 800 !important;
+}
+
+body.customer-address-index .block-addresses-default .box .box-content,
+body.customer-address-index .block-addresses-default .box .box-content address,
+body.customer-address-index .block-addresses-default .box .box-content p {
+    margin: 0 !important;
+    color: #4b5563 !important;
+    font-size: 14px !important;
+    line-height: 1.75 !important;
+    font-style: normal !important;
+}
+
+body.customer-address-index .block-addresses-default .box .box-actions {
+    margin-top: auto !important;
+}
+
+body.customer-address-index .block-addresses-default .box .box-actions .action.edit {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-height: 36px !important;
+    padding: 0 14px !important;
+    border: 1px solid #cdd8ee !important;
+    border-radius: 999px !important;
+    color: #1d4ed8 !important;
+    font-size: 14px !important;
+    font-weight: 700 !important;
+    text-decoration: none !important;
+}
+
+@media (max-width: 900px) {
+    body.customer-address-index .block-addresses-default .block-content {
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+    }
+}
+
 @media (max-width: 900px) {
     body.account .ttk-account-row-card__meta,
     body.account .ttk-address-grid,
@@ -1081,6 +1518,248 @@ body.sales-order-history .table-wrapper.orders-history .table-order-items .col.s
     font-weight: 800 !important;
 }
 
+/* FINAL OVERRIDE: fix broken layout on /customer/address/new */
+body.customer-address-form .page-main .columns {
+    display: grid !important;
+    grid-template-columns: minmax(240px, 25%) minmax(0, 75%) !important;
+    gap: 24px !important;
+    align-items: start !important;
+}
+
+body.customer-address-form .page-main .columns .sidebar-main {
+    grid-column: 1 !important;
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    float: none !important;
+    clear: none !important;
+    margin: 0 !important;
+}
+
+body.customer-address-form .page-main .columns .column.main {
+    grid-column: 2 !important;
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    float: none !important;
+    clear: none !important;
+    margin: 0 !important;
+}
+
+body.customer-address-form .page-main .columns .column.main > form.form-address-edit {
+    width: 100% !important;
+    max-width: none !important;
+}
+
+@media (max-width: 1024px) {
+    body.customer-address-form .page-main .columns {
+        grid-template-columns: 1fr !important;
+    }
+
+    body.customer-address-form .page-main .columns .sidebar-main,
+    body.customer-address-form .page-main .columns .column.main {
+        grid-column: 1 !important;
+    }
+}
+
+    /* Ensure Address Book index uses the same 2-column layout with sticky sidebar */
+    body.customer-address-index .page-main .columns {
+        display: grid !important;
+        grid-template-columns: 260px minmax(0, 1fr) !important;
+        gap: 24px !important;
+        align-items: start !important;
+    }
+
+    body.customer-address-index .page-main .columns .sidebar-main {
+        grid-column: 1 !important;
+        width: 100% !important;
+        max-width: none !important;
+        min-width: 0 !important;
+        float: none !important;
+        clear: none !important;
+        margin: 0 !important;
+        position: static !important;
+        top: auto !important;
+        align-self: start !important;
+    }
+
+    /* Make sidebar sticky for all customer-account pages and ensure it stays within layout */
+    body.customer-account .page-main .columns .sidebar-main,
+    body.customer-account .page-main .columns .sidebar-main .block {
+        box-sizing: border-box !important;
+    }
+
+    body.customer-account .page-main .columns .sidebar-main {
+        position: static !important;
+        top: auto !important;
+        align-self: start !important;
+        z-index: auto !important;
+    }
+
+    /* Ensure the wishlist block in the sidebar doesn't overflow and items layout correctly */
+    .sidebar .block.block-wishlist,
+    .sidebar .block.wishlist {
+        width: 100% !important;
+        max-width: 100% !important;
+        overflow: hidden !important;
+        padding: 12px !important;
+        border-radius: 12px !important;
+        background: #fff !important;
+        box-shadow: 0 1px 4px rgba(15,23,42,0.04) !important;
+    }
+
+    .sidebar .block-wishlist .product-item,
+    .sidebar .block .product-item {
+        display: flex !important;
+        align-items: center !important;
+        gap: 10px !important;
+        padding: 6px 0 !important;
+    }
+
+    .sidebar .block-wishlist .product-item .product-item-photo img,
+    .sidebar .block .product-item-photo img {
+        width: 56px !important;
+        height: 56px !important;
+        object-fit: cover !important;
+        border-radius: 6px !important;
+    }
+
+    .sidebar .block-wishlist .product-item .product-item-details {
+        flex: 1 1 auto !important;
+        min-width: 0 !important;
+    }
+
+    .sidebar .block-wishlist .product-item .product-item-details .product-item-name {
+        display: block !important;
+        font-size: 13px !important;
+        color: #111827 !important;
+        line-height: 1.2 !important;
+    }
+
+    .sidebar .block-wishlist .block-title,
+    .sidebar .block-wishlist .block-title + .block-content {
+        margin: 0 0 8px !important;
+    }
+
+    @media (max-width: 640px) {
+        body.customer-account .page-main .columns .sidebar-main {
+            position: relative !important;
+            top: auto !important;
+            z-index: auto !important;
+        }
+    }
+
+    body.customer-address-index .page-main .columns .column.main {
+        grid-column: 2 !important;
+        width: 100% !important;
+    }
+
+    /* Default addresses: two cards side-by-side */
+    .ttk-address-default-grid {
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 16px !important;
+    }
+
+    /* Additional addresses: responsive card grid */
+    .ttk-address-grid {
+        display: grid !important;
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+        gap: 16px !important;
+        align-items: start !important;
+    }
+
+    @media (max-width: 1024px) {
+        .ttk-address-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        }
+    }
+
+    @media (max-width: 640px) {
+        body.customer-address-index .page-main .columns {
+            grid-template-columns: 1fr !important;
+        }
+        .ttk-address-default-grid,
+        .ttk-address-grid {
+            grid-template-columns: 1fr !important;
+        }
+        body.customer-address-index .page-main .columns .sidebar-main {
+            position: relative !important;
+            top: auto !important;
+        }
+    }
+
+    /* Card styling for equality and spacing */
+    .ttk-address-card {
+        display: flex !important;
+        flex-direction: column !important;
+        min-height: 180px !important;
+        padding: 18px !important;
+        border: 1px solid #f1f5f9 !important;
+        border-radius: 12px !important;
+        background: #fff !important;
+        box-shadow: 0 1px 6px rgba(15,23,42,0.06) !important;
+        gap: 12px !important;
+    }
+
+    .ttk-address-card__title {
+        font-size: 16px !important;
+        font-weight: 800 !important;
+        color: #111827 !important;
+        margin: 0 !important;
+    }
+
+    .ttk-address-card__body {
+        color: #374151 !important;
+        font-size: 15px !important;
+        line-height: 1.6 !important;
+    }
+
+    .ttk-address-card__actions {
+        margin-top: auto !important;
+        display: flex !important;
+        gap: 10px !important;
+        flex-wrap: wrap !important;
+    }
+
+    .ttk-btn {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        min-height: 44px !important;
+        padding: 0 14px !important;
+        border-radius: 10px !important;
+        font-weight: 700 !important;
+        font-size: 14px !important;
+    }
+
+    .ttk-btn--primary {
+        background: #1d4ed8 !important;
+        color: #fff !important;
+        border: 0 !important;
+    }
+
+    .ttk-btn--danger,
+    .ttk-btn--danger.action.delete {
+        background: #fff7f7 !important;
+        color: #dc2626 !important;
+        border: 1px solid #fecaca !important;
+    }
+
+    /* Ensure wishlist/sidebar block has full width and image sizes */
+    .sidebar .block.wishlist,
+    .sidebar .block.block-wishlist {
+        width: 100% !important;
+    }
+
+    .sidebar .block-wishlist .product-item-photo img,
+    .sidebar .block .product-item-photo img {
+        width: 64px !important;
+        height: 64px !important;
+        object-fit: cover !important;
+    }
+
+
 body.sales-order-history .table-wrapper.orders-history .table-order-items .action {
     color: #1d4ed8 !important;
     font-weight: 800 !important;
@@ -1121,6 +1800,70 @@ body.sales-order-history .order-products-toolbar .pages-items .item.current > st
     border-color: #1d4ed8 !important;
     background: #1d4ed8 !important;
     color: #ffffff !important;
+}
+
+/* Wishlist compact mode across customer account pages */
+body.account .sidebar-additional .block-wishlist,
+body.customer-account .sidebar-additional .block-wishlist {
+    overflow: hidden !important;
+}
+
+body.account .sidebar-additional .block-wishlist .product-item,
+body.customer-account .sidebar-additional .block-wishlist .product-item {
+    display: flex !important;
+    align-items: center !important;
+    gap: 10px !important;
+    padding: 8px 0 !important;
+    overflow: hidden !important;
+}
+
+body.account .sidebar-additional .block-wishlist .product-item-photo img,
+body.account .sidebar-additional .block-wishlist .product-image-container,
+body.account .sidebar-additional .block-wishlist .product-image-wrapper,
+body.customer-account .sidebar-additional .block-wishlist .product-item-photo img,
+body.customer-account .sidebar-additional .block-wishlist .product-image-container,
+body.customer-account .sidebar-additional .block-wishlist .product-image-wrapper {
+    width: 44px !important;
+    height: 44px !important;
+    max-width: 44px !important;
+}
+
+body.account .sidebar-additional .block-wishlist .product-item-details,
+body.customer-account .sidebar-additional .block-wishlist .product-item-details {
+    min-width: 0 !important;
+    flex: 1 1 auto !important;
+    overflow: hidden !important;
+}
+
+body.account .sidebar-additional .block-wishlist .product-item-name,
+body.account .sidebar-additional .block-wishlist .product-item-link,
+body.account .sidebar-additional .block-wishlist .price,
+body.customer-account .sidebar-additional .block-wishlist .product-item-name,
+body.customer-account .sidebar-additional .block-wishlist .product-item-link,
+body.customer-account .sidebar-additional .block-wishlist .price {
+    display: block !important;
+    font-size: 13px !important;
+    line-height: 1.35 !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+
+body.account .sidebar-additional .block-wishlist .product-item-actions,
+body.customer-account .sidebar-additional .block-wishlist .product-item-actions {
+    margin-left: auto !important;
+    flex: 0 0 auto !important;
+}
+
+/* Keep account sidebar in normal document flow on desktop */
+@media (min-width: 1025px) {
+    body.account .column.main + .sidebar.sidebar-main,
+    body.account .sidebar.sidebar-main,
+    body.customer-account-index .sidebar.sidebar-main {
+        position: static !important;
+        top: auto !important;
+        align-self: flex-start !important;
+    }
 }
 
 @media (max-width: 768px) {
