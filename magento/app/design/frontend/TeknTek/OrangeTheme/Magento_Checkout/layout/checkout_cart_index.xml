@@ -11,5 +11,6 @@
                 <argument name="template" xsi:type="string">Magento_Checkout::cart/totals.phtml</argument>
             </action>
         </referenceBlock>
+        <move element="checkout.cart.coupon" destination="checkout.cart.container" after="checkout.cart.form"/>
     </body>
 </page>

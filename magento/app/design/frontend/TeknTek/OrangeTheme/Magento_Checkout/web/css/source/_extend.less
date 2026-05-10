@@ -1,3 +1,11 @@
+.checkout-cart-index {
+    .page-title-wrapper {
+        display: none;
+    }
+}
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&display=swap');
+
 .tekntek-cart.container {
     width: min(1240px, calc(100vw - 32px));
     margin: 8px auto 36px;
@@ -10,6 +18,15 @@
     color: #8a8a8a;
     font-size: 14px;
     margin-bottom: 14px;
+}
+
+.tekntek-cart__title {
+    margin: 0 0 18px;
+    font-family: 'DM Serif Display', 'Times New Roman', serif;
+    font-size: clamp(30px, 3.4vw, 42px);
+    font-weight: 400;
+    letter-spacing: 0.4px;
+    color: #1d1d1d;
 }
 
 .tekntek-cart__breadcrumbs a {
@@ -230,6 +247,15 @@
     display: flex;
     flex-direction: column;
     gap: 16px;
+    margin-top: 48px;
+    margin-left: 24px;
+}
+
+@media (max-width: 1024px) {
+    .checkout-cart-index .cart-summary {
+        margin-top: 16px;
+        margin-left: 0;
+    }
 }
 
 .checkout-cart-index .cart-summary > .title {
@@ -273,6 +299,22 @@
 .checkout-cart-index .cart-summary .checkout-methods-items .action.primary.checkout:hover,
 .checkout-cart-index .cart-summary .checkout-methods-items .action.primary.checkout:focus {
     background: #335789;
+}
+
+.checkout-cart-index #block-discount .title strong {
+    color: #3b649e;
+}
+
+.checkout-cart-index #block-discount .field .label {
+    display: none;
+}
+
+.checkout-cart-index #block-discount .field .control {
+    max-width: 320px;
+}
+
+.checkout-cart-index #block-discount .field .control .input-text {
+    width: 100%;
 }
 
 @media (max-width: 860px) {

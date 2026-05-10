@@ -15,6 +15,9 @@ $formatPrice = static function (float $amount, string $currencyCode): string {
         <span class="separator" aria-hidden="true">&gt;</span>
         <span class="current" aria-current="page"><?= $block->escapeHtml(__('Shopping cart')) ?></span>
     </nav>
+    <h1 class="tekntek-cart__title">
+        <?= $block->escapeHtml(__('Shopping Cart')) ?>
+    </h1>
 
     <div class="tekntek-cart__layout">
         <article class="tekntek-cart__items" aria-label="Items"<?= $hasItems ? '' : ' style="display:none;"' ?>>
