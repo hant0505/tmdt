@@ -1,0 +1,91 @@
+<?php
+/** @var \Vendor\Weather\Block\Weather $block */
+$variant = $block->getWidgetVariant();
+$temperature = $block->getTemperature();
+$feelsLike = $block->getFeelsLike();
+$humidity = $block->getHumidity();
+$windSpeed = $block->getWindSpeed();
+$description = $block->getDescription();
+$iconUrl = $block->getIconUrl();
+$error = $block->getError();
+$cityLabel = trim($block->getDisplayCity() . ($block->getCountryCode() ? ', ' . $block->getCountryCode() : ''));
+?>
+
+<?php if ($variant === 'home'): ?>
+    <a class="tekntek-weather tekntek-weather--home"
+       href="<?= $block->escapeUrl($block->getUrl('weather')) ?>"
+       aria-label="<?= $block->escapeHtmlAttr(__('View weather and change location')) ?>">
+        <span class="tekntek-weather-home__temp">
+            <?= $temperature !== null ? $block->escapeHtml((string) $temperature) . '°' : '--°' ?>
+        </span>
+        <span class="tekntek-weather-home__meta">
+            <strong><?= $block->escapeHtml($cityLabel ?: __('Hanoi, VN')) ?></strong>
+            <small><?= $block->escapeHtml($error ? __('Weather') : ($description ?: __('Weather'))) ?></small>
+        </span>
+    </a>
+    <?php return; ?>
+<?php endif; ?>
+
+<section class="tekntek-weather tekntek-weather--<?= $block->escapeHtmlAttr($variant) ?>" aria-label="<?= $block->escapeHtmlAttr(__('Current weather')) ?>">
+    <div class="tekntek-weather__main">
+        <div class="tekntek-weather__topline">
+            <span><?= $block->escapeHtml(__('Weather')) ?></span>
+            <?php if ($iconUrl): ?>
+                <img src="<?= $block->escapeUrl($iconUrl) ?>" alt="" loading="lazy" />
+            <?php endif; ?>
+        </div>
+
+        <div class="tekntek-weather__reading">
+            <strong><?= $temperature !== null ? $block->escapeHtml((string) $temperature) . '°' : '--°' ?></strong>
+            <span><?= $block->escapeHtml($cityLabel ?: __('Hanoi, VN')) ?></span>
+        </div>
+
+        <?php if ($error): ?>
+            <p class="tekntek-weather__error"><?= $block->escapeHtml($error) ?></p>
+        <?php else: ?>
+            <p class="tekntek-weather__desc"><?= $block->escapeHtml($description ?: __('Current conditions')) ?></p>
+            <div class="tekntek-weather__stats">
+                <span>
+                    <small><?= $block->escapeHtml(__('Feels')) ?></small>
+                    <?= $feelsLike !== null ? $block->escapeHtml((string) $feelsLike) . '°C' : '--' ?>
+                </span>
+                <span>
+                    <small><?= $block->escapeHtml(__('Humidity')) ?></small>
+                    <?= $humidity !== null ? $block->escapeHtml((string) $humidity) . '%' : '--' ?>
+                </span>
+                <span>
+                    <small><?= $block->escapeHtml(__('Wind')) ?></small>
+                    <?= $windSpeed !== null ? $block->escapeHtml((string) $windSpeed) . ' m/s' : '--' ?>
+                </span>
+            </div>
+        <?php endif; ?>
+    </div>
+
+    <form class="tekntek-weather__search" action="<?= $block->escapeUrl($block->getSearchActionUrl()) ?>" method="get">
+        <label for="tekntek-weather-city-<?= $block->escapeHtmlAttr($variant) ?>"><?= $block->escapeHtml(__('Choose location')) ?></label>
+        <div class="tekntek-weather__field">
+            <input
+                id="tekntek-weather-city-<?= $block->escapeHtmlAttr($variant) ?>"
+                type="search"
+                name="city"
+                value="<?= $block->escapeHtmlAttr($block->getCity()) ?>"
+                list="tekntek-weather-cities-<?= $block->escapeHtmlAttr($variant) ?>"
+                placeholder="<?= $block->escapeHtmlAttr(__('Search city')) ?>"
+                autocomplete="off"
+            />
+            <button type="submit"><?= $block->escapeHtml(__('Search')) ?></button>
+        </div>
+        <datalist id="tekntek-weather-cities-<?= $block->escapeHtmlAttr($variant) ?>">
+            <?php foreach ($block->getPopularCities() as $cityValue => $cityName): ?>
+                <option value="<?= $block->escapeHtmlAttr($cityValue) ?>"><?= $block->escapeHtml($cityName) ?></option>
+            <?php endforeach; ?>
+        </datalist>
+        <div class="tekntek-weather__popular">
+            <?php foreach ($block->getPopularCities() as $cityValue => $cityName): ?>
+                <button type="submit" name="city" value="<?= $block->escapeHtmlAttr($cityValue) ?>">
+                    <?= $block->escapeHtml($cityName) ?>
+                </button>
+            <?php endforeach; ?>
+        </div>
+    </form>
+</section>

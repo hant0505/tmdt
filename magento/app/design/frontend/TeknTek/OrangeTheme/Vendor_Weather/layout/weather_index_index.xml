@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      layout="1column"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <title>Weather</title>
+        <css src="Vendor_Weather::css/weather-widget.css"/>
+    </head>
+    <body>
+        <referenceBlock name="page.main.title" remove="true"/>
+        <referenceBlock name="weather.block" remove="true"/>
+        <referenceBlock name="wishlist_sidebar" remove="true"/>
+        <referenceBlock name="catalog.compare.sidebar" remove="true"/>
+        <referenceContainer name="sidebar.main" remove="true"/>
+        <referenceContainer name="sidebar.additional" remove="true"/>
+
+        <referenceContainer name="content">
+            <block class="Vendor\Weather\Block\Weather"
+                   name="weather.block.orange"
+                   cacheable="false"
+                   template="Vendor_Weather::weather-widget.phtml"/>
+        </referenceContainer>
+    </body>
+</page>

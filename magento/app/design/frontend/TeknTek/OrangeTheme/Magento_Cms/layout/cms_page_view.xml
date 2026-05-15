@@ -2,6 +2,9 @@
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
       xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd"
       layout="1column">
+    <head>
+        <css src="Vendor_Weather::css/weather-widget.css"/>
+    </head>
     <body>
         <!-- Hide the page title -->
         <referenceBlock name="page.title" remove="true"/>
@@ -32,6 +35,15 @@
                     </argument>
                     <argument name="homepage_category_product_limit" xsi:type="number">4</argument>
                 </arguments>
+                <block class="Vendor\Weather\Block\Weather"
+                       name="tekntek.homepage.weather"
+                       as="homepage.weather"
+                       cacheable="false"
+                       template="Vendor_Weather::weather-widget.phtml">
+                    <arguments>
+                        <argument name="variant" xsi:type="string">home</argument>
+                    </arguments>
+                </block>
             </block>
         </referenceContainer>
     </body>

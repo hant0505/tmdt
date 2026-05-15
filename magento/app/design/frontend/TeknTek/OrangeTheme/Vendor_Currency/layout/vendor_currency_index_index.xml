@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      layout="1column"
+      xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <head>
+        <title>Tỷ giá ngoại tệ Vietcombank</title>
+        <css src="Vendor_Currency::css/currency-widget.css"/>
+    </head>
+    <body>
+        <referenceBlock name="currency.rates" remove="true"/>
+        <referenceBlock name="page.main.title" remove="true"/>
+        <referenceBlock name="wishlist_sidebar" remove="true"/>
+        <referenceBlock name="catalog.compare.sidebar" remove="true"/>
+        <referenceContainer name="sidebar.main" remove="true"/>
+        <referenceContainer name="sidebar.additional" remove="true"/>
+        
+        <referenceContainer name="content">
+            <block class="Vendor\Currency\Block\Rates"
+                   name="currency.rates.widget"
+                   template="Vendor_Currency::currency-widget.phtml" />
+        </referenceContainer>
+    </body>
+</page>
