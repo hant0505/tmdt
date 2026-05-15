@@ -24,6 +24,7 @@ services:
     container_name: magento_nginx
     ports:
       - "80:80"
+      - "443:443" #https
     volumes:
       - ./magento:/var/www/html
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
@@ -34,12 +35,12 @@ services:
     image: mysql:8
     container_name: magento_mysql
     environment:
-      MYSQL_ROOT_PASSWORD: root
+      MYSQL_ROOT_PASSWORD: "Stron#%#$#gMagentoPassword#2026"
       MYSQL_DATABASE: magento
       MYSQL_USER: magento
-      MYSQL_PASSWORD: magento123
-    volumes:
-      - mysql_data:/var/lib/mysql
+      MYSQL_PASSWORD: "StrongMagen$%%$$toPassword#2026"
+    volumes: #bind mount
+      - ./mysql_data:/var/lib/mysql
 
   redis:
     image: redis:7
@@ -60,15 +61,15 @@ services:
       nofile:
         soft: 65536
         hard: 65536
-    ports:
-      - "9200:9200"
-      - "9600:9600"
+    #ports:
+    #  - "9200:9200"
+    #  - "9600:9600"
 
   mailpit:
     image: axllent/mailpit:latest
     container_name: magento_mailpit
     ports:
-      - "1025:1025"
+      # - "1025:1025" nội bộ chưa cần expose internet
       - "8025:8025"
 
 volumes:
