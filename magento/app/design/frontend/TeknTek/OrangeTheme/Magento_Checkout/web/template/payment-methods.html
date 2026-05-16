@@ -1,55 +1,22 @@
 <!--
 /**
- * Custom Payment Methods Section - TeknTek Design
- * Bank Transfer & Cash On Delivery
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
  */
--->
-<div class="tekntek-payment-wrapper">
-    <div class="tekntek-payment-methods">
-        <div class="tekntek-payment-header">
-            <h3 class="tekntek-payment-title">Payment method</h3>
-            <p class="tekntek-payment-subtitle">In the last step you fill in your payment details.</p>
+ -->
+<div if="isPaymentMethodsAvailable()"
+     class="items payment-methods">
+    <div repeat="foreach: paymentGroupsList, item: '$group'"
+         class="payment-group">
+        <div if="regionHasElements($group().displayArea)"
+             translate="getGroupTitle($group)"
+             class="step-title"
+             data-role="title">
         </div>
-
-        <div class="tekntek-payment-content">
-            <!-- Payment Method Cards -->
-            <div class="tekntek-payment-cards">
-                <!-- Bank Transfer Card -->
-                <label class="tekntek-payment-card">
-                    <input type="radio" name="payment-method" value="bank-transfer" class="tekntek-payment-radio">
-                    <div class="tekntek-card-content">
-                        <div class="tekntek-card-icon">
-                            <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <path d="M5 10H35V32C35 33.1046 34.1046 34 33 34H7C5.89543 34 5 33.1046 5 32V10Z" stroke="#3b649e" stroke-width="1.5" fill="none"/>
-                                <path d="M5 15H35" stroke="#3b649e" stroke-width="1.5"/>
-                                <path d="M10 20H30" stroke="#3b649e" stroke-width="1.5" stroke-linecap="round"/>
-                                <path d="M10 25H30" stroke="#3b649e" stroke-width="1.5" stroke-linecap="round"/>
-                            </svg>
-                        </div>
-                        <div class="tekntek-card-info">
-                            <p class="tekntek-card-name">Bank Transfer</p>
-                        </div>
-                    </div>
-                </label>
-
-                <!-- COD Card -->
-                <label class="tekntek-payment-card">
-                    <input type="radio" name="payment-method" value="cashondelivery" class="tekntek-payment-radio">
-                    <div class="tekntek-card-content">
-                        <div class="tekntek-card-icon">
-                            <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                <circle cx="20" cy="18" r="8" stroke="#3b649e" stroke-width="1.5" fill="none"/>
-                                <path d="M8 35C8 28.373 13.373 23 20 23C26.627 23 32 28.373 32 35" stroke="#3b649e" stroke-width="1.5" fill="none"/>
-                                <path d="M20 10V14M24 12L21.5 14.5M16 12L18.5 14.5" stroke="#3b649e" stroke-width="1.5" stroke-linecap="round"/>
-                            </svg>
-                        </div>
-                        <div class="tekntek-card-info">
-                            <p class="tekntek-card-name">Cash On Delivery</p>
-                        </div>
-                    </div>
-                </label>
-            </div>
-        </div>
+        <each args="data: getRegion($group().displayArea), as: 'method'" render=""></each>
     </div>
 </div>
-
+<div ifnot="isPaymentMethodsAvailable()"
+     class="no-payments-block"
+     translate="'No Payment Methods'">
+</div>

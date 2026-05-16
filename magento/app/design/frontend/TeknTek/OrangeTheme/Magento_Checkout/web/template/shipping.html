@@ -5,7 +5,7 @@
  */
 -->
 <li id="shipping" class="checkout-shipping-address" data-bind="fadeVisible: visible()">
-    <div class="step-title" translate="'Delivery details'" data-role="title"></div>
+    <div class="step-title" translate="'Shipping Address'" data-role="title"></div>
     <div id="checkout-step-shipping"
          class="step-content"
          data-role="content">
@@ -16,32 +16,14 @@
 
         <!-- Address form pop up -->
         <if args="!isFormInline">
-            <div id="opc-new-shipping-address"
-                 visible="isFormPopUpVisible()"
-                 render="shippingFormTemplate"></div>
-        </if>
-
-        <if args="isFormInline && !isNewAddressAdded()">
-            <div class="new-address-popup tekntek-new-address-popup tekntek-new-address-popup--top">
+            <div class="new-address-popup">
                 <button type="button"
                         class="action action-show-popup"
-                        click="openNewAddressForm">
-                    <span translate="'Register a new address'"></span>
+                        click="showFormPopUp"
+                        visible="!isNewAddressAdded()">
+                    <span translate="'New Address'"></span>
                 </button>
             </div>
-        </if>
-
-        <if args="!isFormInline || isNewAddressAdded()">
-            <div class="new-address-popup tekntek-new-address-popup tekntek-new-address-popup--bottom">
-                <button type="button"
-                        class="action action-show-popup"
-                        click="openNewAddressForm">
-                    <span translate="'Register a new address'"></span>
-                </button>
-            </div>
-        </if>
-
-        <if args="isFormInline">
             <div id="opc-new-shipping-address"
                  visible="isFormPopUpVisible()"
                  render="shippingFormTemplate"></div>
@@ -49,7 +31,8 @@
 
         <each args="getRegion('before-form')" render="" ></each>
 
-        <!-- Inline address form is intentionally rendered only after click via isFormPopUpVisible() -->
+        <!-- Inline address form -->
+        <render if="isFormInline" args="shippingFormTemplate"></render>
     </div>
 </li>
 

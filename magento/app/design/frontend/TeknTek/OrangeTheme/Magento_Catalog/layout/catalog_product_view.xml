@@ -14,6 +14,7 @@
         <referenceBlock name="product.info.upsell" remove="true"/>
         <referenceBlock name="product.info.additional" remove="true"/>
         <referenceBlock name="require-cookie" remove="true"/>
+        <referenceBlock name="breadcrumbs" remove="true"/>
 
         <referenceContainer name="content">
             <block class="Magento\Framework\View\Element\Template" name="tekntek.custom.pdp" template="Magento_Catalog::product/view/custom-pdp.phtml" cacheable="false"/>

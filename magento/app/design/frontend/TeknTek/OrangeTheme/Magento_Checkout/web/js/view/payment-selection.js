@@ -37,6 +37,10 @@ define(
 
             isCashOnDelivery: function() {
                 return this.selectedMethod() === 'cashondelivery';
+            },
+
+            isCheckmo: function() {
+                return this.selectedMethod() === 'checkmo';
             }
         });
     }
