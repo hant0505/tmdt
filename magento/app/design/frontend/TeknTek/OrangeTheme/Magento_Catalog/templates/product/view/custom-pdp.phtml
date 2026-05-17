@@ -58,7 +58,6 @@ $buyNowUrl = $block->getUrl('checkout/cart/add', [
     'qty' => 1,
     'uenc' => $urlEncoder->encode($block->getUrl('checkout'))
 ]);
-$checkoutUrl = $block->getUrl('checkout');
 $addToCartUrl = $block->getUrl('checkout/cart/add', ['product' => (int) $product->getId()]);
 $wishlistUrl = $block->getUrl('wishlist/index/add', ['product' => (int) $product->getId()]);
 $compareIndexUrl = $block->getUrl('catalog/product_compare/index');
@@ -78,6 +77,7 @@ $reviewAjaxUrl = $block->getUrl('tekntek_suggest/review/submit', ['_secure' => $
 $reviewVoteUrl = $block->getUrl('tekntek_suggest/review/vote', ['_secure' => $block->getRequest()->isSecure()]);
 $reviewDeleteUrl = $block->getUrl('tekntek_suggest/review/delete', ['_secure' => $block->getRequest()->isSecure()]);
 
+
 $breadcrumbCategory = null;
 $categoryCollection = $product->getCategoryCollection()
     ->addAttributeToSelect(['name', 'is_active'])
@@ -95,6 +95,7 @@ foreach ($categoryCollection as $category) {
 $breadcrumbHomeUrl = $block->getUrl('');
 $breadcrumbCategoryName = $breadcrumbCategory ? (string) $breadcrumbCategory->getName() : '';
 $breadcrumbCategoryUrl = $breadcrumbCategory ? (string) $breadcrumbCategory->getUrl() : '';
+
 
 $reviewRatingOptions = [];
 $ratings = $ratingFactory->create()->getResourceCollection()
@@ -921,13 +922,6 @@ $mainCompareItem = [
 .tekntek-compare-remove { width: 22px; height: 22px; border: 1px solid #d1d5db; background: #fff; color: #6b7280; border-radius: 50%; cursor: pointer; line-height: 1; font-size: 14px; display: inline-flex; align-items: center; justify-content: center; }
 .tekntek-vote-btn { border: 0; background: transparent; color: #1f5fbf; cursor: pointer; font-size: 12px; }
 .tekntek-compare-inner #tekntek-compare-link { flex: 0 0 auto; white-space: nowrap; }
-.tekntek-pdp-breadcrumbs { margin: 4px 0 14px; font-size: 14px; color: #64748b; line-height: 1.4; }
-.tekntek-pdp-breadcrumbs ol { margin: 0; padding: 0; list-style: none; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
-.tekntek-pdp-breadcrumbs li { display: inline-flex; align-items: center; gap: 10px; }
-.tekntek-pdp-breadcrumbs li + li::before { content: '>'; color: #94a3b8; font-weight: 600; }
-.tekntek-pdp-breadcrumbs a { color: #1f5fbf; text-decoration: none; }
-.tekntek-pdp-breadcrumbs a:hover { text-decoration: underline; }
-.tekntek-pdp-breadcrumbs .current { color: #475569; }
 #tekntek-compare-link,
 #tekntek-compare-link:visited,
 #tekntek-compare-link:hover,
@@ -937,6 +931,15 @@ $mainCompareItem = [
     text-decoration: none;
     font-weight: 700;
 }
+
+.tekntek-pdp-breadcrumbs { margin: 4px 0 14px; font-size: 14px; color: #64748b; line-height: 1.4; }
+.tekntek-pdp-breadcrumbs ol { margin: 0; padding: 0; list-style: none; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.tekntek-pdp-breadcrumbs li { display: inline-flex; align-items: center; gap: 10px; }
+.tekntek-pdp-breadcrumbs li + li::before { content: '>'; color: #94a3b8; font-weight: 600; }
+.tekntek-pdp-breadcrumbs a { color: #1f5fbf; text-decoration: none; }
+.tekntek-pdp-breadcrumbs a:hover { text-decoration: underline; }
+.tekntek-pdp-breadcrumbs .current { color: #475569; }
+
 @media (max-width: 980px) {
   .tekntek-hero, .tekntek-info-specs, .tekntek-reviews { grid-template-columns: 1fr; }
   .tekntek-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -1000,13 +1003,12 @@ $mainCompareItem = [
             </div>
 
             <div class="tekntek-cta">
-                <form id="tekntek-buy-now-form" action="<?= $escaper->escapeUrl($buyNowUrl) ?>" method="post">
+                <form action="<?= $escaper->escapeUrl($addToCartUrl) ?>" method="post" class="tekntek-buy-now-form">
                     <input type="hidden" name="form_key" value="<?= $escaper->escapeHtmlAttr($formKey) ?>" />
                     <input type="hidden" name="product" value="<?= (int) $product->getId() ?>" />
                     <input type="hidden" name="qty" value="1" />
-                    <input type="hidden" name="return_url" value="<?= $escaper->escapeUrl($checkoutUrl) ?>" />
-                    <input type="hidden" name="uenc" value="<?= $escaper->escapeHtmlAttr($urlEncoder->encode($checkoutUrl)) ?>" />
-                    <button class="tekntek-btn tekntek-btn-buy buy-now" type="submit">Buy now</button>
+                    <input type="hidden" name="uenc" value="<?= $escaper->escapeHtmlAttr($urlEncoder->encode($block->getUrl('checkout'))) ?>" />
+                    <button class="tekntek-btn tekntek-btn-buy" type="submit">Buy now</button>
                 </form>
                 <form action="<?= $escaper->escapeUrl($addToCartUrl) ?>" method="post">
                     <input type="hidden" name="form_key" value="<?= $escaper->escapeHtmlAttr($formKey) ?>" />
@@ -1210,7 +1212,6 @@ $mainCompareItem = [
     function redirectToLogin() {
         window.location.href = loginUrl;
     }
-
     var reviewSubmit = payload.reviewSubmit || {};
     var compareState = [];
     var visibleReviews = 2;
@@ -1474,26 +1475,8 @@ $mainCompareItem = [
         renderCompare();
     }
 
-    function buildCompareIndexUrl() {
-        var ids = compareState.map(function (item) {
-            return Number(item.id);
-        }).filter(function (id, index, list) {
-            return id > 0 && list.indexOf(id) === index;
-        });
-        var nextUrl = new URL(compareLink.getAttribute('href') || window.location.href, window.location.origin);
-
-        if (ids.length) {
-            nextUrl.searchParams.set('ids', ids.join(','));
-        } else {
-            nextUrl.searchParams.delete('ids');
-        }
-
-        return nextUrl.toString();
-    }
-
     function renderCompare() {
         compareBar.style.display = compareState.length > 0 ? 'block' : 'none';
-        compareLink.href = buildCompareIndexUrl();
         compareItemsWrap.innerHTML = compareState.map(function (item) {
             return '<div class="tekntek-compare-item">' +
                 '<div class="tekntek-compare-item-main">' +
@@ -1996,6 +1979,14 @@ $mainCompareItem = [
         });
     }
 
+    renderCards();
+    renderReviewSummary();
+    renderReviews();
+    compareState = loadCompareState();
+    bindGallery();
+    bindAddReview();
+    bindViewMore();
+
     if (!isLoggedIn) {
         document.querySelectorAll('.tekntek-cta form').forEach(function (formNode) {
             formNode.addEventListener('submit', function (event) {
@@ -2004,14 +1995,6 @@ $mainCompareItem = [
             });
         });
     }
-
-    renderCards();
-    renderReviewSummary();
-    renderReviews();
-    compareState = loadCompareState();
-    bindGallery();
-    bindAddReview();
-    bindViewMore();
     addMainCompareBtn.addEventListener('click', function () {
         if (!isLoggedIn) {
             redirectToLogin();
@@ -2041,10 +2024,12 @@ $mainCompareItem = [
             window.location.href = compareLink.href;
             return;
         }
-        var nextUrl = buildCompareIndexUrl();
+        var ids = compareState.map(function (item) { return Number(item.id); }).filter(function (id) { return id > 0; });
+        var nextUrl = new URL(compareLink.href, window.location.origin);
+        nextUrl.searchParams.set('ids', ids.join(','));
         setCompareError('');
         syncMagentoCompare().finally(function () {
-            window.location.href = nextUrl;
+            window.location.href = nextUrl.toString();
         });
     });
     renderCompare();
