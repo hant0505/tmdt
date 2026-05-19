@@ -368,6 +368,7 @@ return [
         'PayPal_BraintreeReward' => 1,
         'Recommendation_SimilarPic' => 1,
         'Shipping_GHN' => 1,
+        'Shipping_GHTK' => 1,
         'TeknTek_AccountDashboard' => 1,
         'TeknTek_CatalogTweaks' => 1,
         'TeknTek_Homepage' => 1,

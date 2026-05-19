@@ -12,6 +12,10 @@
         <css src="Vendor_BusinessNews::css/businessnews.css"/>
     </head>
     <body>
+        <!-- Remove My Wish List and Compare Products sidebars for BusinessNews page -->
+        <referenceBlock name="wishlist_sidebar" remove="true"/>
+        <referenceBlock name="catalog.compare.sidebar" remove="true"/>
+        
         <referenceContainer name="sidebar.main">
             <block class="Vendor\BusinessNews\Block\BusinessNews"
                    name="businessnews.sidebar"

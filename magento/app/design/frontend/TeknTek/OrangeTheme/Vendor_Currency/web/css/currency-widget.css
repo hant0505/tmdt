@@ -1,0 +1,438 @@
+:root {
+    --vc-orange: #e05c28;
+    --vc-orange-dark: #c44d1e;
+    --vc-ink: #111827;
+    --vc-muted: #6b7280;
+    --vc-soft: #f5f7fa;
+    --vc-line: #e5e7eb;
+    --vc-blue: #1d4ed8;
+    --vc-green: #047857;
+    --vc-white: #ffffff;
+    --vc-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+}
+
+body.currency-index-index .page-main,
+body.vendor-currency-index-index .page-main {
+    width: min(1240px, calc(100vw - 32px));
+    max-width: none;
+    margin: 0 auto;
+    padding: 28px 0 52px;
+}
+
+body.currency-index-index .columns,
+body.vendor-currency-index-index .columns {
+    display: block;
+}
+
+body.currency-index-index .sidebar-main,
+body.currency-index-index .sidebar-additional,
+body.vendor-currency-index-index .sidebar-main,
+body.vendor-currency-index-index .sidebar-additional {
+    display: none !important;
+}
+
+.vendor-currency-page,
+.vendor-currency-page * {
+    box-sizing: border-box;
+}
+
+.vendor-currency-page {
+    color: var(--vc-ink);
+    font-family: "Inter", "Segoe UI", Roboto, Arial, sans-serif;
+}
+
+.currency-hero {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(320px, 460px);
+    gap: 24px;
+    align-items: stretch;
+    margin-bottom: 22px;
+    border: 1px solid var(--vc-line);
+    border-radius: 8px;
+    background:
+        linear-gradient(135deg, rgba(224, 92, 40, 0.1), rgba(29, 78, 216, 0.08)),
+        var(--vc-white);
+    box-shadow: var(--vc-shadow);
+    overflow: hidden;
+}
+
+.currency-hero__content {
+    padding: 30px 32px;
+}
+
+.currency-hero__eyebrow {
+    display: inline-flex;
+    align-items: center;
+    min-height: 28px;
+    padding: 0 12px;
+    border-radius: 999px;
+    background: rgba(224, 92, 40, 0.12);
+    color: var(--vc-orange-dark);
+    font-size: 12px;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.currency-hero h1 {
+    margin: 14px 0 10px;
+    color: var(--vc-ink);
+    font-size: 34px;
+    line-height: 1.18;
+    font-weight: 800;
+}
+
+.currency-hero p {
+    max-width: 680px;
+    margin: 0;
+    color: #4b5563;
+    font-size: 15px;
+    line-height: 1.65;
+}
+
+.currency-summary {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0;
+    margin: 0;
+    border-left: 1px solid rgba(229, 231, 235, 0.95);
+    background: rgba(255, 255, 255, 0.78);
+}
+
+.currency-summary div {
+    min-height: 76px;
+    padding: 16px 20px;
+    border-bottom: 1px solid rgba(229, 231, 235, 0.95);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.currency-summary div:last-child {
+    border-bottom: 0;
+}
+
+.currency-summary dt {
+    margin: 0 0 5px;
+    color: var(--vc-muted);
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.currency-summary dd {
+    margin: 0;
+    color: var(--vc-ink);
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.35;
+}
+
+.currency-table-shell {
+    border: 1px solid var(--vc-line);
+    border-radius: 8px;
+    background: var(--vc-white);
+    box-shadow: var(--vc-shadow);
+    overflow: hidden;
+}
+
+.currency-table-toolbar {
+    min-height: 64px;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    border-bottom: 1px solid var(--vc-line);
+    background: #ffffff;
+}
+
+.currency-table-toolbar h2 {
+    margin: 0;
+    color: var(--vc-ink);
+    font-size: 20px;
+    line-height: 1.25;
+    font-weight: 800;
+}
+
+.currency-table-toolbar span {
+    color: var(--vc-muted);
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.currency-table-scroll {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.currency-rates-table {
+    width: 100%;
+    min-width: 860px;
+    border-collapse: separate;
+    border-spacing: 0;
+    background: var(--vc-white);
+}
+
+.currency-rates-table caption {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+}
+
+.currency-rates-table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    padding: 14px 18px;
+    border-bottom: 1px solid #d1d5db;
+    background: #f3f4f6;
+    color: #374151;
+    font-size: 12px;
+    font-weight: 800;
+    line-height: 1.3;
+    text-align: left;
+    text-transform: uppercase;
+    white-space: nowrap;
+}
+
+.currency-rates-table tbody td {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--vc-line);
+    color: #1f2937;
+    font-size: 14px;
+    line-height: 1.4;
+    vertical-align: middle;
+}
+
+.currency-rates-table tbody tr:nth-child(even) td {
+    background: #fafafa;
+}
+
+.currency-rates-table tbody tr:hover td {
+    background: #fff7ed;
+}
+
+.currency-rates-table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.currency-rates-table__number {
+    text-align: right !important;
+}
+
+.currency-code {
+    min-width: 190px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.currency-code strong {
+    display: block;
+    color: var(--vc-ink);
+    font-size: 15px;
+    letter-spacing: 0;
+}
+
+.currency-code small {
+    display: block;
+    margin-top: 2px;
+    color: var(--vc-muted);
+    font-size: 12px;
+    line-height: 1.25;
+}
+
+.currency-flag {
+    width: 36px;
+    height: 28px;
+    flex: 0 0 36px;
+    border: 1px solid #d1d5db;
+    border-radius: 4px;
+    background: #ffffff;
+    box-shadow: 0 3px 8px rgba(15, 23, 42, 0.08);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.currency-flag img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+}
+
+.currency-flag__fallback {
+    font-size: 18px;
+    line-height: 1;
+}
+
+.currency-name {
+    color: #374151;
+    font-weight: 650;
+}
+
+.currency-rate {
+    min-width: 92px;
+    display: inline-block;
+    color: var(--vc-green);
+    font-family: "Roboto Mono", "Courier New", monospace;
+    font-size: 14px;
+    font-weight: 800;
+    line-height: 1.35;
+    white-space: nowrap;
+}
+
+.currency-rate--sell {
+    color: var(--vc-blue);
+}
+
+.currency-rate--empty {
+    color: #9ca3af;
+}
+
+.currency-error {
+    padding: 18px 20px;
+    border: 1px solid #fecaca;
+    border-radius: 8px;
+    background: #fff1f2;
+    color: #991b1b;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    flex-direction: column;
+    box-shadow: var(--vc-shadow);
+}
+
+.currency-error strong {
+    font-size: 16px;
+}
+
+.currency-error span {
+    color: #7f1d1d;
+}
+
+@media (max-width: 900px) {
+    .currency-hero {
+        grid-template-columns: 1fr;
+    }
+
+    .currency-summary {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        border-left: 0;
+        border-top: 1px solid rgba(229, 231, 235, 0.95);
+    }
+
+    .currency-summary div {
+        border-right: 1px solid rgba(229, 231, 235, 0.95);
+        border-bottom: 0;
+    }
+
+    .currency-summary div:last-child {
+        border-right: 0;
+    }
+}
+
+@media (max-width: 640px) {
+    body.currency-index-index .page-main,
+    body.vendor-currency-index-index .page-main {
+        width: min(100% - 20px, 1240px);
+        padding: 16px 0 34px;
+    }
+
+    .currency-hero__content {
+        padding: 22px 18px;
+    }
+
+    .currency-hero h1 {
+        font-size: 26px;
+    }
+
+    .currency-summary {
+        grid-template-columns: 1fr;
+    }
+
+    .currency-summary div {
+        min-height: auto;
+        border-right: 0;
+        border-bottom: 1px solid rgba(229, 231, 235, 0.95);
+    }
+
+    .currency-table-toolbar {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 4px;
+    }
+
+    .currency-table-scroll {
+        overflow-x: visible;
+    }
+
+    .currency-rates-table {
+        min-width: 0;
+    }
+
+    .currency-rates-table thead {
+        display: none;
+    }
+
+    .currency-rates-table,
+    .currency-rates-table tbody,
+    .currency-rates-table tr,
+    .currency-rates-table td {
+        display: block;
+        width: 100%;
+    }
+
+    .currency-rates-table tbody tr {
+        padding: 14px 14px 12px;
+        border-bottom: 1px solid var(--vc-line);
+    }
+
+    .currency-rates-table tbody tr:nth-child(even) td,
+    .currency-rates-table tbody tr:hover td {
+        background: transparent;
+    }
+
+    .currency-rates-table tbody td {
+        padding: 8px 0;
+        border-bottom: 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        text-align: right !important;
+    }
+
+    .currency-rates-table tbody td::before {
+        content: attr(data-label);
+        color: var(--vc-muted);
+        font-size: 12px;
+        font-weight: 800;
+        text-align: left;
+        text-transform: uppercase;
+    }
+
+    .currency-rates-table tbody td:first-child {
+        padding-top: 0;
+        justify-content: flex-start;
+    }
+
+    .currency-rates-table tbody td:first-child::before {
+        display: none;
+    }
+
+    .currency-code {
+        min-width: 0;
+    }
+
+    .currency-name {
+        max-width: 58%;
+    }
+}
