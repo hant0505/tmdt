@@ -5,7 +5,7 @@
  */
 -->
 <li id="shipping" class="checkout-shipping-address" data-bind="fadeVisible: visible()">
-    <div class="step-title" translate="'Delivery details'" data-role="title"></div>
+    <div class="step-title" translate="'Shipping Address'" data-role="title"></div>
     <div id="checkout-step-shipping"
          class="step-content"
          data-role="content">
@@ -39,7 +39,8 @@
 
         <each args="getRegion('before-form')" render="" ></each>
 
-        <!-- Inline address form is intentionally rendered only after click via isFormPopUpVisible() -->
+        <!-- Inline address form BÊN DEV ko có-->
+        <!-- <render if="isFormInline" args="shippingFormTemplate"></render> -->
     </div>
 </li>
 

@@ -77,6 +77,26 @@ $reviewAjaxUrl = $block->getUrl('tekntek_suggest/review/submit', ['_secure' => $
 $reviewVoteUrl = $block->getUrl('tekntek_suggest/review/vote', ['_secure' => $block->getRequest()->isSecure()]);
 $reviewDeleteUrl = $block->getUrl('tekntek_suggest/review/delete', ['_secure' => $block->getRequest()->isSecure()]);
 
+
+$breadcrumbCategory = null;
+$categoryCollection = $product->getCategoryCollection()
+    ->addAttributeToSelect(['name', 'is_active'])
+    ->addAttributeToFilter('is_active', 1);
+
+$selectedLevel = -1;
+foreach ($categoryCollection as $category) {
+    $level = (int) $category->getLevel();
+    if ($level > $selectedLevel) {
+        $breadcrumbCategory = $category;
+        $selectedLevel = $level;
+    }
+}
+
+$breadcrumbHomeUrl = $block->getUrl('');
+$breadcrumbCategoryName = $breadcrumbCategory ? (string) $breadcrumbCategory->getName() : '';
+$breadcrumbCategoryUrl = $breadcrumbCategory ? (string) $breadcrumbCategory->getUrl() : '';
+
+
 $reviewRatingOptions = [];
 $ratings = $ratingFactory->create()->getResourceCollection()
     ->addEntityFilter('product')
@@ -829,15 +849,16 @@ $mainCompareItem = [
 .tekntek-gallery-thumb.is-active { border-color: #1f5fbf; box-shadow: 0 0 0 2px rgba(31, 95, 191, 0.12); }
 .tekntek-gallery-thumb img { width: 100%; height: 100%; object-fit: contain; display: block; }
 .tekntek-compare-bar { display: none; position: fixed; left: 0; right: 0; bottom: 0; background: #fff; border-top: 1px solid #e5e7eb; box-shadow: 0 -8px 20px rgba(0, 0, 0, 0.06); z-index: 80; }
-.tekntek-compare-inner { width: min(1240px, calc(100vw - 32px)); margin: 0 auto; min-height: 72px; display: flex; gap: 12px; align-items: center; justify-content: space-between; }
-.tekntek-compare-items { display: flex; gap: 10px; align-items: center; }
-.tekntek-compare-item { display: flex; gap: 8px; align-items: center; border: 1px solid #e5e7eb; border-radius: 8px; padding: 6px 8px; background: #fafafa; min-width: 180px; }
-.tekntek-compare-item img { width: 34px; height: 34px; object-fit: contain; }
+.tekntek-compare-inner { width: min(1240px, calc(100vw - 32px)); margin: 0 auto; min-height: 76px; display: flex; gap: 12px; align-items: center; justify-content: space-between; }
+.tekntek-compare-items { flex: 1; min-width: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; align-items: stretch; }
+.tekntek-compare-item { display: flex; gap: 8px; align-items: center; border: 1px solid #e5e7eb; border-radius: 8px; padding: 6px 8px; background: #fafafa; min-width: 0; height: 58px; box-sizing: border-box; }
+.tekntek-compare-item img { width: 34px; height: 34px; object-fit: contain; flex: 0 0 34px; }
 .tekntek-compare-item-main { display: flex; gap: 8px; align-items: center; min-width: 0; flex: 1; }
-.tekntek-compare-title { font-size: 11px; line-height: 1.2; }
-.tekntek-compare-price { font-size: 11px; color: #6b7280; }
+.tekntek-compare-title { font-size: 11px; line-height: 1.2; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.tekntek-compare-price { font-size: 11px; color: #6b7280; white-space: nowrap; }
 .tekntek-compare-remove { width: 22px; height: 22px; border: 1px solid #d1d5db; background: #fff; color: #6b7280; border-radius: 50%; cursor: pointer; line-height: 1; font-size: 14px; display: inline-flex; align-items: center; justify-content: center; }
 .tekntek-vote-btn { border: 0; background: transparent; color: #1f5fbf; cursor: pointer; font-size: 12px; }
+.tekntek-compare-inner #tekntek-compare-link { flex: 0 0 auto; white-space: nowrap; }
 #tekntek-compare-link,
 #tekntek-compare-link:visited,
 #tekntek-compare-link:hover,
@@ -847,12 +868,32 @@ $mainCompareItem = [
     text-decoration: none;
     font-weight: 700;
 }
+
+.tekntek-pdp-breadcrumbs { margin: 4px 0 14px; font-size: 14px; color: #64748b; line-height: 1.4; }
+.tekntek-pdp-breadcrumbs ol { margin: 0; padding: 0; list-style: none; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.tekntek-pdp-breadcrumbs li { display: inline-flex; align-items: center; gap: 10px; }
+.tekntek-pdp-breadcrumbs li + li::before { content: '>'; color: #94a3b8; font-weight: 600; }
+.tekntek-pdp-breadcrumbs a { color: #1f5fbf; text-decoration: none; }
+.tekntek-pdp-breadcrumbs a:hover { text-decoration: underline; }
+.tekntek-pdp-breadcrumbs .current { color: #475569; }
+
 @media (max-width: 980px) {
   .tekntek-hero, .tekntek-info-specs, .tekntek-reviews { grid-template-columns: 1fr; }
   .tekntek-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .tekntek-compare-item { min-width: 140px; }
+  .tekntek-compare-items { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; }
+  .tekntek-compare-item { min-width: 180px; flex: 0 0 180px; height: 56px; }
 }
 </style>
+
+<nav class="tekntek-pdp-breadcrumbs" aria-label="Breadcrumb">
+    <ol>
+        <li><a href="<?= $escaper->escapeUrl($breadcrumbHomeUrl) ?>">Home</a></li>
+        <?php if ($breadcrumbCategoryName !== '' && $breadcrumbCategoryUrl !== ''): ?>
+            <li><a href="<?= $escaper->escapeUrl($breadcrumbCategoryUrl) ?>"><?= $escaper->escapeHtml($breadcrumbCategoryName) ?></a></li>
+        <?php endif; ?>
+        <li><span class="current"><?= $escaper->escapeHtml($name) ?></span></li>
+    </ol>
+</nav>
 
 <div class="tekntek-pdp-wrap">
     <section class="tekntek-hero">
@@ -899,7 +940,13 @@ $mainCompareItem = [
             </div>
 
             <div class="tekntek-cta">
-                <a class="tekntek-btn tekntek-btn-buy" href="<?= $escaper->escapeUrl($buyNowUrl) ?>">Buy now</a>
+                <form action="<?= $escaper->escapeUrl($addToCartUrl) ?>" method="post" class="tekntek-buy-now-form">
+                    <input type="hidden" name="form_key" value="<?= $escaper->escapeHtmlAttr($formKey) ?>" />
+                    <input type="hidden" name="product" value="<?= (int) $product->getId() ?>" />
+                    <input type="hidden" name="qty" value="1" />
+                    <input type="hidden" name="uenc" value="<?= $escaper->escapeHtmlAttr($urlEncoder->encode($block->getUrl('checkout'))) ?>" />
+                    <button class="tekntek-btn tekntek-btn-buy" type="submit">Buy now</button>
+                </form>
                 <form action="<?= $escaper->escapeUrl($addToCartUrl) ?>" method="post">
                     <input type="hidden" name="form_key" value="<?= $escaper->escapeHtmlAttr($formKey) ?>" />
                     <input type="hidden" name="product" value="<?= (int) $product->getId() ?>" />
@@ -1085,6 +1132,10 @@ $mainCompareItem = [
     var auth = payload.auth || {};
     var isLoggedIn = !!auth.isLoggedIn;
     var loginUrl = auth.loginUrl || '/customer/account/login';
+
+    function redirectToLogin() {
+        window.location.href = loginUrl;
+    }
     var reviewSubmit = payload.reviewSubmit || {};
     var compareState = [];
     var visibleReviews = 2;
@@ -1859,7 +1910,20 @@ $mainCompareItem = [
     bindAddReview();
     bindViewMore();
 
+    if (!isLoggedIn) {
+        document.querySelectorAll('.tekntek-cta form').forEach(function (formNode) {
+            formNode.addEventListener('submit', function (event) {
+                event.preventDefault();
+                redirectToLogin();
+            });
+        });
+    }
     addMainCompareBtn.addEventListener('click', function () {
+        if (!isLoggedIn) {
+            redirectToLogin();
+            return;
+        }
+
         if (!mainProduct || !mainProduct.id) {
             return;
         }
@@ -1873,6 +1937,12 @@ $mainCompareItem = [
     });
     compareLink.addEventListener('click', function (event) {
         event.preventDefault();
+
+        if (!isLoggedIn) {
+            redirectToLogin();
+            return;
+        }
+
         if (!compareState.length) {
             window.location.href = compareLink.href;
             return;

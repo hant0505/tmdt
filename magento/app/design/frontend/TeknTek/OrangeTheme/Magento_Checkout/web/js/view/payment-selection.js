@@ -381,6 +381,7 @@ define(
             isCashOnDelivery: function() {
                 return this.selectedMethod() === 'cashondelivery';
             }
+
         });
     }
 );

@@ -5,5 +5,5 @@ magento/generated/
 magento/pub/static/
 magento/pub/media/
 magento/app/etc/env.php
-mysql_data/
+# mysql_data/
 .env

@@ -2,6 +2,12 @@
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
       xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
-        <referenceBlock name="page.title" remove="true"/>
+        <referenceContainer name="content">
+            <block class="Magento\Framework\View\Element\Template"
+                   name="tekntek.compare.redirect"
+                   template="Magento_Catalog::product/compare/redirect.phtml"
+                   before="catalog.compare.list"
+                   cacheable="false"/>
+        </referenceContainer>
     </body>
 </page>

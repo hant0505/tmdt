@@ -1,0 +1,128 @@
+<?php
+/**
+ * Fallback for the custom compare bar.
+ *
+ * Magento's native compare page can render without the compare list block when the
+ * server-side compare collection is empty. The theme compare bar stores selected
+ * products in localStorage, so this block redirects to the same page with product
+ * ids in the query string before the compare table template runs.
+ *
+ * @var $block \Magento\Framework\View\Element\Template
+ */
+?>
+<script>
+(function () {
+    'use strict';
+
+    var storageKey = 'tekntek_compare_v2';
+    var maxProducts = 4;
+
+    function currentUrl() {
+        try {
+            return new URL(window.location.href);
+        } catch (error) {
+            return null;
+        }
+    }
+
+    function normalizeId(value) {
+        var id = parseInt(value, 10);
+        return id > 0 ? id : null;
+    }
+
+    function getItemId(item) {
+        if (!item || typeof item !== 'object') {
+            return null;
+        }
+
+        return normalizeId(item.id || item.product_id || item.productId || item.entity_id || item.item_id);
+    }
+
+    function uniqueIds(items) {
+        var seen = {};
+        var ids = [];
+
+        if (!Array.isArray(items)) {
+            return ids;
+        }
+
+        items.forEach(function (item) {
+            var id = getItemId(item);
+
+            if (id && !seen[id] && ids.length < maxProducts) {
+                seen[id] = true;
+                ids.push(id);
+            }
+        });
+
+        return ids;
+    }
+
+    function parseJson(value, fallback) {
+        try {
+            return JSON.parse(value || '');
+        } catch (error) {
+            return fallback;
+        }
+    }
+
+    function idsFromThemeStorage() {
+        return uniqueIds(parseJson(window.localStorage.getItem(storageKey), []));
+    }
+
+    function idsFromMageCacheStorage() {
+        var cache = parseJson(window.localStorage.getItem('mage-cache-storage'), {});
+        var section = cache && cache['compare-products'];
+        var items = section && section.items;
+
+        if (!items) {
+            return [];
+        }
+
+        if (!Array.isArray(items) && typeof items === 'object') {
+            items = Object.keys(items).map(function (key) {
+                return items[key];
+            });
+        }
+
+        return uniqueIds(items);
+    }
+
+    function redirect(ids) {
+        var url = currentUrl();
+
+        if (!url || !ids.length || url.searchParams.get('ids')) {
+            return false;
+        }
+
+        url.searchParams.set('ids', ids.join(','));
+        window.location.replace(url.toString());
+        return true;
+    }
+
+    function tryRedirect() {
+        return redirect(idsFromThemeStorage()) || redirect(idsFromMageCacheStorage());
+    }
+
+    if (tryRedirect()) {
+        return;
+    }
+
+    if (window.require) {
+        window.require(['Magento_Customer/js/customer-data'], function (customerData) {
+            customerData.reload(['compare-products'], true).always(function () {
+                var section = customerData.get('compare-products')() || {};
+                var items = section.items || [];
+
+                if (!Array.isArray(items) && typeof items === 'object') {
+                    items = Object.keys(items).map(function (key) {
+                        return items[key];
+                    });
+                }
+
+                redirect(uniqueIds(items));
+            });
+        });
+    }
+}());
+</script>

@@ -1,0 +1,38 @@
+<script>
+require(['jquery'], function ($) {
+    'use strict';
+
+    function enhanceAddAddressButton() {
+        var btn = $('.customer-address-index .actions-toolbar .action.add').first();
+
+        if (!btn.length) {
+            return;
+        }
+
+        var href = btn.attr('href') || '/customer/address/new/';
+
+        btn.css({
+            position: 'relative',
+            zIndex: 9999,
+            pointerEvents: 'auto'
+        });
+
+        btn.parents('.actions-toolbar, .primary, .column.main, .block').css({
+            position: 'relative',
+            zIndex: 9998,
+            pointerEvents: 'auto'
+        });
+
+        btn.off('click.tekntekAddFix').on('click.tekntekAddFix', function (event) {
+            event.preventDefault();
+            event.stopPropagation();
+            window.location.href = href;
+        });
+    }
+
+    $(document).ready(enhanceAddAddressButton);
+    $(window).on('load', enhanceAddAddressButton);
+    setTimeout(enhanceAddAddressButton, 300);
+    setTimeout(enhanceAddAddressButton, 1200);
+});
+</script>

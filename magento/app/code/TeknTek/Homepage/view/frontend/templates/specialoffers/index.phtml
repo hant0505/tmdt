@@ -1,0 +1,154 @@
+<?php /** @var \TeknTek\Homepage\Block\SpecialOffers $block */
+$collection = $block->getLoadedProductCollection();
+$selectedCategoryKeys = $block->getSelectedCategoryKeys();
+$currentSort = $block->getCurrentSort();
+$currentLimit = $block->getCurrentLimit();
+$baseUrl = $block->getUrl('special-offers');
+$totalItems = (int) $collection->getSize();
+$currentPage = max(1, (int) $collection->getCurPage());
+$pageSize = max(1, (int) $collection->getPageSize());
+$firstItemNumber = $totalItems > 0 ? (($currentPage - 1) * $pageSize) + 1 : 0;
+$lastItemNumber = $totalItems > 0 ? min($totalItems, $currentPage * $pageSize) : 0;
+
+$qs = [
+    'cat' => implode(',', $selectedCategoryKeys),
+    'limit' => $currentLimit,
+    'p' => 1,
+];
+?>
+<style>
+.special-offers-review-inline{margin:6px 0 10px;font-size:13px;line-height:1.35;color:#64748b}
+.special-offers-review-inline .stars{color:#f59e0b;letter-spacing:1px;margin-right:6px}
+.special-offers-review-inline.is-empty .stars{color:#cbd5e1}
+.special-offers-price-inline{display:flex;align-items:baseline;gap:8px;margin:4px 0 8px}
+.special-offers-price-inline .old-price{color:#9ca3af;text-decoration:line-through;font-size:13px}
+.special-offers-price-inline .final-price{color:#dc2626;font-weight:800;font-size:18px}
+.special-offers-toolbar-top .controls{display:flex;align-items:center;gap:8px;flex-wrap:nowrap}
+.special-offers-toolbar-top .controls select{width:auto;min-width:120px;max-width:170px;padding-right:28px}
+.special-offers-page .product-item-actions .actions-primary{text-align:initial}
+.special-offers-page .product-item-actions .action.tocart.primary{display:inline-flex !important;align-items:center;justify-content:center;width:100% !important}
+.special-offers-bottom-toolbar .toolbar{margin-top:16px;clear:both}
+.special-offers-bottom-toolbar .toolbar-amount{display:none !important}
+</style>
+<section class="special-offers-page catalog-category-view catalogsearch-result-index">
+
+<section class="special-offers-page">
+    <div class="special-offers-toolbar-top">
+        <div class="meta"><?= $block->escapeHtml(__('Items %1-%2 of %3', $firstItemNumber, $lastItemNumber, $totalItems)) ?></div>
+        <div class="controls">
+            <label for="so-sort"><?= $block->escapeHtml(__('Sort by')) ?></label>
+            <select id="so-sort" onchange="location.href=this.value;">
+                <?php
+                $sortOptions = [
+                    'discount_desc' => __('Discount ↓'),
+                    'discount_asc' => __('Discount ↑'),
+                    'price_asc' => __('Price ↑'),
+                    'price_desc' => __('Price ↓'),
+                    'newest' => __('Newest'),
+                ];
+                foreach ($sortOptions as $key => $label):
+                    $params = $qs;
+                    $params['sort'] = $key;
+                    $url = $baseUrl . '?' . http_build_query($params);
+                ?>
+                    <option value="<?= $block->escapeUrl($url) ?>"<?= $currentSort === $key ? ' selected' : '' ?>><?= $block->escapeHtml($label) ?></option>
+                <?php endforeach; ?>
+            </select>
+        </div>
+    </div>
+
+    <?php if (count($collection) === 0): ?>
+        <div class="message info empty"><div><?= $block->escapeHtml(__('No discounted products found.')) ?></div></div>
+    <?php else: ?>
+        <div class="products wrapper grid products-grid">
+            <ol class="products list items product-items">
+                <?php foreach ($collection as $product): ?>
+                    <?php
+                    $regular = (float) $product->getPrice();
+                    $final = (float) $block->getEffectiveFinalPrice($product);
+                    $discount = $block->getDiscountPercent($product);
+                    $ratingSummary = (int) $product->getData('rating_summary');
+                    $reviewsCount = (int) $product->getData('reviews_count');
+                    $ratingValue = $ratingSummary > 0 ? number_format($ratingSummary / 20, 1) : '0.0';
+                    $filledStars = max(0, min(5, (int) round($ratingSummary / 20)));
+                    ?>
+                    <li class="item product product-item">
+                        <div class="product-item-info" id="product-item-info_<?= (int) $product->getId() ?>" data-container="product-grid">
+                            <a href="<?= $block->escapeUrl($product->getProductUrl()) ?>" class="product photo product-item-photo" tabindex="-1">
+                                <?php if ($discount > 0): ?>
+                                    <span class="tekntek-product-badges"><span class="tekntek-product-badge tekntek-product-badge--sale">SALE -<?= (int) $discount ?>%</span></span>
+                                <?php endif; ?>
+                                <span class="product-image-container">
+                                    <span class="product-image-wrapper">
+                                        <img class="product-image-photo"
+                                             src="<?= $block->escapeUrl($block->getImageUrl($product)) ?>"
+                                             alt="<?= $block->escapeHtmlAttr((string) $product->getName()) ?>"
+                                             loading="lazy">
+                                    </span>
+                                </span>
+                            </a>
+
+                            <div class="product details product-item-details">
+                                <strong class="product name product-item-name">
+                                    <a class="product-item-link" href="<?= $block->escapeUrl($product->getProductUrl()) ?>">
+                                        <?= $block->escapeHtml((string) $product->getName()) ?>
+                                    </a>
+                                </strong>
+
+                                <div class="special-offers-price-inline">
+                                    <?php if ($final < $regular): ?>
+                                        <span class="old-price"><?= $block->escapeHtml($block->formatPrice($regular)) ?></span>
+                                    <?php endif; ?>
+                                    <span class="final-price"><?= $block->escapeHtml($block->formatPrice($final)) ?></span>
+                                </div>
+
+                                <?php if ($reviewsCount > 0): ?>
+                                    <div class="special-offers-review-inline">
+                                        <span class="stars"><?= str_repeat('★', $filledStars) . str_repeat('☆', 5 - $filledStars) ?></span>
+                                        <span><?= $block->escapeHtml($ratingValue) ?></span>
+                                        <span><?= $block->escapeHtml('(' . $reviewsCount . ' reviews)') ?></span>
+                                    </div>
+                                <?php else: ?>
+                                    <div class="special-offers-review-inline is-empty">
+                                        <span class="stars">☆☆☆☆☆</span>
+                                        <span><?= $block->escapeHtml(__('No reviews yet')) ?></span>
+                                    </div>
+                                <?php endif; ?>
+
+                                <div class="product-item-inner">
+                                    <div class="product actions product-item-actions">
+                                        <div class="actions-primary">
+                                            <?php
+                                                $postParams = [
+                                                    'action' => $block->getUrl('checkout/cart/add'),
+                                                    'data' => [
+                                                        'product' => (int) $product->getId(),
+                                                        '\uenc' => $block->getUrl('*/*/*', ['_current' => true, '_use_rewrite' => true]),
+                                                    ],
+                                                ];
+                                            ?>
+                                            <form action="<?= $block->escapeUrl($postParams['action']) ?>"
+                                                  method="post"
+                                                  data-mage-init='{"catalogAddToCart":{}}'>
+                                                <input type="hidden" name="product" value="<?= (int) $product->getId() ?>">
+                                                <input type="hidden" name="<?= \Magento\Framework\App\Action\Action::PARAM_NAME_URL_ENCODED ?>" value="<?= $block->escapeHtmlAttr($postParams['data']['\uenc']) ?>">
+                                                <?= $block->getBlockHtml('formkey') ?: '<input type="hidden" name="form_key" value="' . $block->escapeHtmlAttr($block->getFormKey()) . '" />' ?>
+                                                <button type="submit" title="<?= $block->escapeHtmlAttr(__('Add to Cart')) ?>" class="action tocart primary">
+                                                    <span><?= $block->escapeHtml(__('Add to Cart')) ?></span>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                <?php endforeach; ?>
+            </ol>
+        </div>
+
+        <div class="special-offers-bottom-toolbar">
+            <?= /* @noEscape */ $block->getPagerHtml() ?>
+        </div>
+    <?php endif; ?>
+</section>

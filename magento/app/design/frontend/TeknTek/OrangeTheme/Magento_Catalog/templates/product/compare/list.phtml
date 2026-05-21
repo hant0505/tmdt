@@ -5,16 +5,27 @@
  * @var $block \Magento\Catalog\Block\Product\Compare\ListCompare
  */
 
-$items = $block->getItems();
-$total = $items->getSize();
 $compareHelper = $this->helper(Magento\Catalog\Helper\Product\Compare::class);
 $outputHelper = $this->helper(Magento\Catalog\Helper\Output::class);
 $om = \Magento\Framework\App\ObjectManager::getInstance();
 $mediaConfig = $om->get(\Magento\Catalog\Model\Product\Media\Config::class);
 
 $itemsList = [];
-foreach ($items as $item) {
-    $itemsList[] = $item;
+$total = 0;
+
+try {
+    $items = $block->getItems();
+    foreach ($items as $item) {
+        $itemId = (int) $item->getId();
+        if ($itemId > 0) {
+            $itemsList[$itemId] = $item;
+        }
+    }
+    $itemsList = array_values($itemsList);
+    $total = count($itemsList);
+} catch (\Throwable $exception) {
+    $itemsList = [];
+    $total = 0;
 }
 
 $tableRows = [];
@@ -66,6 +77,10 @@ if (!empty($descriptionRows)) {
     }
 }
 
+$compareLabelWidth = 220;
+$compareProductWidth = 240;
+$compareTableWidth = $compareLabelWidth + ($compareProductWidth * max(1, $total));
+
 $getCompareProductImageUrl = static function ($product) use ($mediaConfig): string {
     $image = (string) $product->getImage();
     if ($image !== '' && $image !== 'no_selection') {
@@ -86,50 +101,65 @@ $getCompareProductImageUrl = static function ($product) use ($mediaConfig): stri
 };
 ?>
 
-<?php if ($total): ?>
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&display=swap');
-
-.catalog-product_compare-index .page-title-wrapper {
-    margin-bottom: 14px;
+.catalog-product_compare-index {
+    --compare-label-width: 220px;
+    --compare-product-width: 240px;
+    --compare-gap: 0px;
 }
 
-.catalog-product_compare-index .page-title-wrapper .page-title,
-.catalog-product_compare-index .page-title-wrapper .base {
-    font-family: "Space Grotesk", "Segoe UI", Roboto, sans-serif;
-    font-weight: 600;
-    font-size: clamp(24px, 3.2vw, 40px);
-    line-height: 1.05;
-    letter-spacing: -0.02em;
-    color: #0f172a;
-    margin: 6px 0 10px;
+.catalog-product_compare-index .table-wrapper.comparison {
+    width: fit-content;
+    max-width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
 }
 
-.catalog-product_compare-index .table-wrapper.comparison { overflow-x: auto; }
-.catalog-product_compare-index .ttk-compare-wrap { margin-top: 10px; }
+.catalog-product_compare-index .ttk-compare-wrap {
+    width: fit-content;
+    max-width: 100%;
+    margin: 6px auto 0;
+}
+
 .catalog-product_compare-index .ttk-compare-head {
     display: grid;
-    grid-template-columns: 250px repeat(var(--ttk-count, 1), minmax(0, 1fr));
-    gap: 16px;
-    margin-bottom: 16px;
+    grid-template-columns: var(--compare-label-width) repeat(var(--ttk-count, 1), var(--compare-product-width));
+    gap: 0;
     align-items: stretch;
+    margin: 0 auto 10px;
 }
+
 .catalog-product_compare-index .ttk-compare-head-spacer {
     min-height: 1px;
+    width: var(--compare-label-width);
 }
+
 .catalog-product_compare-index .ttk-compare-cards {
     display: grid;
-    grid-template-columns: repeat(var(--ttk-count, 1), minmax(0, 1fr));
-    gap: 16px;
+    grid-template-columns: repeat(var(--ttk-count, 1), var(--compare-product-width));
+    gap: 0;
     grid-column: 2 / -1;
+    align-items: stretch;
 }
-.catalog-product_compare-index .ttk-compare-card {
+
+.catalog-product_compare-index .ttk-compare-card.product-item {
     position: relative;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
     border: 1px solid #e5e7eb;
     border-radius: 10px;
     background: #fff;
-    padding: 16px 14px 12px;
+    padding: 11px 12px 10px;
+    width: var(--compare-product-width);
+    max-width: var(--compare-product-width);
+    min-width: var(--compare-product-width);
+    height: 100%;
 }
+
 .catalog-product_compare-index .ttk-compare-remove {
     position: absolute;
     top: 8px;
@@ -146,17 +176,24 @@ $getCompareProductImageUrl = static function ($product) use ($mediaConfig): stri
     font-size: 12px;
     background: #fff;
 }
+
 .catalog-product_compare-index .ttk-compare-photo {
-    height: 150px;
+    height: 96px;
     display: flex;
     align-items: center;
     justify-content: center;
     margin-bottom: 10px;
+    flex: 0 0 auto;
 }
+
 .catalog-product_compare-index .ttk-compare-photo img {
-    max-height: 140px;
+    max-width: 100%;
+    max-height: 88px;
     width: auto;
+    height: auto;
+    object-fit: contain;
 }
+
 .catalog-product_compare-index .ttk-compare-badge {
     position: absolute;
     left: 10px;
@@ -168,49 +205,79 @@ $getCompareProductImageUrl = static function ($product) use ($mediaConfig): stri
     font-size: 10px;
     font-weight: 700;
 }
+
 .catalog-product_compare-index .ttk-compare-name {
     margin: 0 0 6px;
     font-size: 13px;
     line-height: 1.35;
-    min-height: 36px;
+    min-height: 32px;
+    flex: 0 0 auto;
 }
+
 .catalog-product_compare-index .ttk-compare-name a {
     color: #1f2937;
     text-decoration: none;
 }
-.catalog-product_compare-index .ttk-compare-price { margin-top: 5px; }
-.catalog-product_compare-index .ttk-compare-price .price { font-size: 16px; font-weight: 700; }
+
+.catalog-product_compare-index .ttk-compare-price {
+    margin-top: 2px;
+}
+
+.catalog-product_compare-index .ttk-compare-price .price {
+    font-size: 16px;
+    font-weight: 700;
+}
+
 .catalog-product_compare-index .ttk-compare-table {
     width: 100%;
+    min-width: 0;
     border-collapse: collapse;
     border: 1px solid #d1d5db;
     border-radius: 10px;
     overflow: hidden;
     background: #fff;
+    table-layout: fixed;
+    margin: 0 auto;
 }
-.catalog-product_compare-index .ttk-compare-table th,
-.catalog-product_compare-index .ttk-compare-table td {
+
+.catalog-product_compare-index .ttk-compare-table .cell {
     border-bottom: 1px solid #e5e7eb;
     border-right: 1px solid #e5e7eb;
     vertical-align: top;
-    padding: 12px 14px;
-    font-size: 13px;
+    padding: 10px 12px;
+    font-size: 14px;
+    line-height: 1.45;
+    min-width: 0;
+    width: var(--compare-product-width);
+    box-sizing: border-box;
 }
-.catalog-product_compare-index .ttk-compare-table tr:last-child th,
-.catalog-product_compare-index .ttk-compare-table tr:last-child td {
-    border-bottom: 0;
-}
-.catalog-product_compare-index .ttk-compare-table th {
-    width: 250px;
+
+.catalog-product_compare-index .ttk-compare-table th.cell {
+    width: var(--compare-label-width);
+    min-width: var(--compare-label-width);
+    max-width: var(--compare-label-width);
     background: #f8fafc;
     color: #374151;
     font-weight: 700;
+    box-sizing: border-box;
 }
-.catalog-product_compare-index .ttk-compare-table td:last-child,
-.catalog-product_compare-index .ttk-compare-table th:last-child {
+
+.catalog-product_compare-index .ttk-compare-table td.cell {
+    width: var(--compare-product-width);
+    min-width: var(--compare-product-width);
+    max-width: var(--compare-product-width);
+    box-sizing: border-box;
+}
+
+.catalog-product_compare-index .ttk-compare-table tr:last-child .cell {
+    border-bottom: 0;
+}
+
+.catalog-product_compare-index .ttk-compare-table .cell:last-child {
     border-right: 0;
 }
-.catalog-product_compare-index .ttk-compare-table .ttk-compare-group th {
+
+.catalog-product_compare-index .ttk-compare-table .ttk-compare-group .cell {
     background: #eef2ff;
     color: #1e3a8a;
     font-size: 12px;
@@ -218,37 +285,74 @@ $getCompareProductImageUrl = static function ($product) use ($mediaConfig): stri
     letter-spacing: .05em;
     border-right: 0;
 }
-.catalog-product_compare-index .ttk-compare-table .ttk-row-same td {
+
+.catalog-product_compare-index .ttk-compare-table .ttk-row-same .cell {
     background: #fafafa;
     color: #6b7280;
 }
+
 .catalog-product_compare-index .ttk-compare-value {
     color: #374151;
     line-height: 1.55;
     white-space: normal;
     word-break: break-word;
 }
+
+.catalog-product_compare-index .ttk-compare-empty {
+    margin: 24px 0;
+}
+
+.catalog-product_compare-index .ttk-compare-empty .message.info {
+    max-width: none;
+}
+
+.catalog-product_compare-index .ttk-compare-empty #ttk-compare-empty-msg {
+    font-size: 16px;
+    line-height: 1.5;
+}
+
 @media (max-width: 900px) {
     .catalog-product_compare-index .ttk-compare-head {
         grid-template-columns: 1fr;
         gap: 12px;
+        width: 100%;
     }
+
     .catalog-product_compare-index .ttk-compare-head-spacer {
         display: none;
     }
+
     .catalog-product_compare-index .ttk-compare-cards {
         grid-template-columns: 1fr;
         grid-column: auto;
+        width: 100%;
     }
-    .catalog-product_compare-index .ttk-compare-table th {
+
+    .catalog-product_compare-index .ttk-compare-table th.cell {
         width: 140px;
+        min-width: 140px;
+        max-width: 140px;
+    }
+
+    .catalog-product_compare-index .ttk-compare-table td.cell {
+        width: 140px;
+        min-width: 140px;
+        max-width: 140px;
+    }
+
+    .catalog-product_compare-index {
+        --compare-label-width: 140px;
+        --compare-product-width: 140px;
+        --compare-gap: 8px;
     }
 }
 </style>
 
+<?php if ($total): ?>
+
 <div class="ttk-compare-wrap">
-    <div class="ttk-compare-head" style="--ttk-count:<?= (int) $total ?>;">
-        <div class="ttk-compare-head-spacer" aria-hidden="true"></div>
+    <div class="ttk-compare-head" style="--ttk-count:<?= (int) $total ?>; width: <?= (int) $compareTableWidth ?>px;">
+        <div class="ttk-compare-head-spacer" aria-hidden="true" style="width: <?= (int) $compareLabelWidth ?>px;"></div>
         <div class="ttk-compare-cards">
             <?php foreach ($itemsList as $item): ?>
                 <?php
@@ -259,7 +363,7 @@ $getCompareProductImageUrl = static function ($product) use ($mediaConfig): stri
                     $percent = (int) round((($regular - $final) / $regular) * 100);
                 }
                 ?>
-                <article class="ttk-compare-card"
+                <article class="ttk-compare-card product-item"
                          data-product-id="<?= (int) $item->getId() ?>"
                          data-remove-url="<?= $block->escapeHtmlAttr($compareHelper->getPostDataRemove($item)) ?>">
                     <?php if ($percent > 0): ?>
@@ -295,7 +399,14 @@ $getCompareProductImageUrl = static function ($product) use ($mediaConfig): stri
 
     <div class="table-wrapper comparison">
         <table class="ttk-compare-table" id="product-comparison"
-               data-mage-init='{"compareList":{"windowPrintSelector":".action.print"}}'>
+               data-mage-init='{"compareList":{"windowPrintSelector":".action.print"}}'
+               style="width: <?= (int) $compareTableWidth ?>px;">
+            <colgroup>
+                <col style="width: <?= (int) $compareLabelWidth ?>px;" />
+                <?php foreach ($itemsList as $item): ?>
+                    <col style="width: <?= (int) $compareProductWidth ?>px;" />
+                <?php endforeach; ?>
+            </colgroup>
             <tbody>
                 <?php foreach ($tableRows as $row): ?>
                     <?php
@@ -306,9 +417,9 @@ $getCompareProductImageUrl = static function ($product) use ($mediaConfig): stri
                     $isSame = count(array_unique($normalized)) <= 1;
                     ?>
                     <tr class="<?= $isSame ? 'ttk-row-same' : '' ?>">
-                        <th scope="row"><?= $block->escapeHtml($row['label']) ?></th>
+                        <th scope="row" class="cell headings"><?= $block->escapeHtml($row['label']) ?></th>
                         <?php foreach ($rowValues as $displayValue): ?>
-                            <td>
+                            <td class="cell">
                                 <div class="ttk-compare-value"><?= $block->escapeHtml($displayValue) ?></div>
                             </td>
                         <?php endforeach; ?>
@@ -321,37 +432,84 @@ $getCompareProductImageUrl = static function ($product) use ($mediaConfig): stri
 <?php else: ?>
     <div class="message info empty ttk-compare-empty"><div id="ttk-compare-empty-msg"><?= $block->escapeHtml(__('You have no items to compare.')) ?></div></div>
     <script>
-    (function () {
+    require(['Magento_Customer/js/customer-data'], function (customerData) {
         'use strict';
 
         var storageKey = 'tekntek_compare_v2';
         var currentUrl = new URL(window.location.href);
+        var maxAttempts = 12;
+        var attempts = 0;
+
+        function normalizeId(value) {
+            var id = Number(value);
+            return id > 0 ? id : null;
+        }
+
+        function uniqueIds(items) {
+            return items.map(function (item) {
+                return normalizeId(item && item.id);
+            }).filter(function (id, index, list) {
+                return id && list.indexOf(id) === index;
+            }).slice(0, 4);
+        }
+
+        function redirect(ids) {
+            if (!ids.length) {
+                return false;
+            }
+
+            currentUrl.searchParams.set('ids', ids.join(','));
+            window.location.replace(currentUrl.toString());
+            return true;
+        }
+
+        function readCustomerDataIds() {
+            var section = customerData.get('compare-products')() || {};
+            var rawItems = Array.isArray(section.items) ? section.items : [];
+
+            if (!rawItems.length && section.items && typeof section.items === 'object') {
+                rawItems = Object.keys(section.items).map(function (key) {
+                    return section.items[key];
+                });
+            }
+
+            return uniqueIds(rawItems);
+        }
+
+        function readLocalStorageIds() {
+            try {
+                var items = JSON.parse(window.localStorage.getItem(storageKey) || '[]');
+                if (!Array.isArray(items)) {
+                    return [];
+                }
+
+                return uniqueIds(items);
+            } catch (error) {
+                return [];
+            }
+        }
+
+        function tryRedirect() {
+            return redirect(readCustomerDataIds()) || redirect(readLocalStorageIds());
+        }
 
         if (currentUrl.searchParams.get('ids')) {
             return;
         }
 
-        try {
-            var items = JSON.parse(window.localStorage.getItem(storageKey) || '[]');
-            if (!Array.isArray(items)) {
+        customerData.reload(['compare-products'], true).always(function () {
+            if (tryRedirect()) {
                 return;
             }
 
-            var ids = items.map(function (item) {
-                return Number(item && item.id);
-            }).filter(function (id, index, list) {
-                return id > 0 && list.indexOf(id) === index;
-            }).slice(0, 4);
-
-            if (!ids.length) {
-                return;
-            }
-
-            currentUrl.searchParams.set('ids', ids.join(','));
-            window.location.replace(currentUrl.toString());
-        } catch (error) {
-            // Keep Magento's native empty state when localStorage is unavailable.
-        }
-    })();
+            var timer = window.setInterval(function () {
+                attempts += 1;
+                if (tryRedirect() || attempts >= maxAttempts) {
+                    window.clearInterval(timer);
+                }
+            }, 300);
+        });
+    });
     </script>
+
 <?php endif; ?>

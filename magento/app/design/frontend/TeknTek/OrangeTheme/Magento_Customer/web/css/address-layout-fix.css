@@ -1,0 +1,282 @@
+/* =========================================================
+   Address pages hard reset to stable Magento 2-column layout
+   ========================================================= */
+
+/* Main 2-column frame */
+body.customer-address-index .page-main .columns,
+body.customer-address-form .page-main .columns {
+    display: grid !important;
+    grid-template-columns: 260px minmax(0, 1fr) !important;
+    column-gap: 24px !important;
+    row-gap: 16px !important;
+    align-items: start !important;
+}
+
+/* Left sidebar blocks */
+body.customer-address-index .page-main .columns > .sidebar-main,
+body.customer-address-index .page-main .columns > .sidebar-additional,
+body.customer-address-form .page-main .columns > .sidebar-main,
+body.customer-address-form .page-main .columns > .sidebar-additional {
+    grid-column: 1 !important;
+    width: 100% !important;
+    max-width: 260px !important;
+    min-width: 260px !important;
+    float: none !important;
+    clear: both !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    transform: none !important;
+    position: relative !important;
+    z-index: 1 !important;
+}
+
+/* Sidebar order on address index */
+body.customer-address-index .page-main .columns > .sidebar-main {
+    grid-row: 1 !important;
+    position: static !important;
+    top: auto !important;
+    z-index: auto !important;
+}
+
+body.customer-address-index .page-main .columns > .sidebar-additional {
+    grid-row: 2 !important;
+}
+
+/* Sidebar order on address form */
+body.customer-address-form .page-main .columns > .sidebar-main {
+    grid-row: 1 !important;
+}
+
+/* Right content */
+body.customer-address-index .page-main .columns > .column.main,
+body.customer-address-form .page-main .columns > .column.main {
+    grid-column: 2 !important;
+    grid-row: 1 / span 2 !important;
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    float: none !important;
+    clear: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    transform: none !important;
+    position: relative !important;
+    z-index: 20 !important;
+}
+
+/* Remove random width-collapse issues */
+body.customer-address-index .page-main .columns > .sidebar-main .block,
+body.customer-address-index .page-main .columns > .sidebar-additional .block,
+body.customer-address-form .page-main .columns > .sidebar-main .block {
+    width: 100% !important;
+    max-width: 100% !important;
+    overflow: hidden !important;
+    border-radius: 16px !important;
+}
+
+/* Keep wishlist sidebar on address page consistent with other account pages */
+body.customer-address-index .sidebar-additional [data-role="tekntek-wishlist-sidebar"] {
+    width: 100% !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+}
+
+body.customer-address-index .sidebar-additional [data-role="tekntek-wishlist-sidebar"] .block-title {
+    margin: 0 0 12px !important;
+}
+
+body.customer-address-index .sidebar-additional [data-role="tekntek-wishlist-sidebar"] .block-title strong {
+    font-size: 15px !important;
+    font-weight: 800 !important;
+    line-height: 1.35 !important;
+}
+
+body.customer-address-index .sidebar-additional [data-role="tekntek-wishlist-sidebar"] .counter {
+    margin-left: auto !important;
+    font-size: 12px !important;
+    white-space: nowrap !important;
+}
+
+body.customer-address-index .sidebar-additional [data-role="tekntek-wishlist-sidebar"] .product-item-info {
+    display: flex !important;
+    align-items: center !important;
+    gap: 12px !important;
+    min-height: 74px !important;
+    padding: 12px 0 !important;
+}
+
+body.customer-address-index .sidebar-additional [data-role="tekntek-wishlist-sidebar"] .product-item-photo {
+    width: 56px !important;
+    height: 56px !important;
+    flex: 0 0 56px !important;
+    border-radius: 10px !important;
+}
+
+body.customer-address-index .sidebar-additional [data-role="tekntek-wishlist-sidebar"] .product-item-details {
+    min-width: 0 !important;
+}
+
+body.customer-address-index .sidebar-additional [data-role="tekntek-wishlist-sidebar"] .product-item-link {
+    display: -webkit-box !important;
+    -webkit-line-clamp: 2 !important;
+    -webkit-box-orient: vertical !important;
+    overflow: hidden !important;
+    line-clamp: 2 !important;
+    white-space: normal !important;
+}
+
+/* Typography and spacing of content */
+body.customer-address-index .column.main .page-title-wrapper {
+    margin: 0 0 18px !important;
+}
+
+body.customer-address-index .column.main .page-title,
+body.customer-address-form .column.main .page-title {
+    font-size: 40px !important;
+    font-weight: 800 !important;
+    line-height: 1.15 !important;
+}
+
+/* Ensure form uses right width */
+body.customer-address-form .column.main .form-address-edit {
+    width: 100% !important;
+    max-width: none !important;
+}
+
+/* Address cards clean hierarchy */
+body.customer-address-index .ttk-address-default-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 16px !important;
+}
+
+body.customer-address-index .ttk-address-grid {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 16px !important;
+}
+
+body.customer-address-index .ttk-address-card {
+    display: flex !important;
+    flex-direction: column !important;
+    min-height: 100% !important;
+    gap: 12px !important;
+    padding: 20px !important;
+    border: 1px solid #e7ecf3 !important;
+    border-radius: 16px !important;
+    background: #fff !important;
+}
+
+body.customer-address-index .ttk-address-card__title {
+    margin: 0 !important;
+    padding-bottom: 10px !important;
+    border-bottom: 1px solid #edf1f7 !important;
+    font-size: 30px !important;
+    font-weight: 800 !important;
+    line-height: 1.25 !important;
+}
+
+body.customer-address-index .ttk-address-card__body,
+body.customer-address-index .ttk-address-card__empty {
+    margin: 0 !important;
+    font-size: 15px !important;
+    line-height: 1.8 !important;
+}
+
+body.customer-address-index .ttk-address-card__actions {
+    margin-top: auto !important;
+    display: flex !important;
+    gap: 10px !important;
+    flex-wrap: wrap !important;
+}
+
+body.customer-address-index .ttk-btn {
+    min-height: 40px !important;
+    padding: 0 16px !important;
+    border-radius: 12px !important;
+    font-size: 14px !important;
+    font-weight: 700 !important;
+}
+
+body.customer-address-index .ttk-btn--danger {
+    border-color: #fecaca !important;
+    color: #dc2626 !important;
+    background: #fff5f5 !important;
+}
+
+/* toolbar under cards must not overlap sidebar */
+body.customer-address-index .ttk-address-actions-toolbar {
+    margin-top: 16px !important;
+    clear: both !important;
+}
+
+/* hide native table pager if present */
+body.customer-address-index .customer-addresses-toolbar.toolbar.bottom {
+    display: none !important;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+    body.customer-address-index .page-main .columns,
+    body.customer-address-form .page-main .columns {
+        grid-template-columns: 1fr !important;
+        row-gap: 16px !important;
+    }
+
+    body.customer-address-index .page-main .columns > .sidebar-main,
+    body.customer-address-index .page-main .columns > .sidebar-additional,
+    body.customer-address-index .page-main .columns > .column.main,
+    body.customer-address-form .page-main .columns > .sidebar-main,
+    body.customer-address-form .page-main .columns > .column.main {
+        grid-column: 1 !important;
+        grid-row: auto !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+    }
+
+    body.customer-address-index .page-main .columns > .sidebar-main {
+        position: static !important;
+    }
+
+    body.customer-address-index .ttk-address-default-grid,
+    body.customer-address-index .ttk-address-grid {
+        grid-template-columns: 1fr !important;
+    }
+}
+
+/* Address page: keep left sidebar in normal document flow */
+body.customer-address-index .page-main .columns > .sidebar-main {
+    position: static !important;
+    top: auto !important;
+    align-self: start !important;
+    z-index: auto !important;
+}
+
+/* Address CTA click safety */
+body.customer-address-index .column.main,
+body.customer-address-index .block-addresses-default,
+body.customer-address-index .block-addresses-list {
+    position: relative !important;
+    z-index: 40 !important;
+}
+
+body.customer-address-index .column.main::before,
+body.customer-address-index .column.main::after,
+body.customer-address-index .block-addresses-default::before,
+body.customer-address-index .block-addresses-default::after,
+body.customer-address-index .block-addresses-list::before,
+body.customer-address-index .block-addresses-list::after,
+body.customer-address-index .actions-toolbar::before,
+body.customer-address-index .actions-toolbar::after {
+    content: none !important;
+    display: none !important;
+}
+
+body.customer-address-index .actions-toolbar,
+body.customer-address-index .actions-toolbar .primary,
+body.customer-address-index .actions-toolbar .action.add,
+body.customer-address-index a.action.add {
+    position: relative !important;
+    z-index: 41 !important;
+    pointer-events: auto !important;
+}

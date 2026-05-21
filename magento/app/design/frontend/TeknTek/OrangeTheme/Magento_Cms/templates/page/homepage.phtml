@@ -652,29 +652,31 @@ nav.navigation,
 }
 
 #tekntek-home-v2 .ttk-offers .ttk-card {
-    padding: 10px;
-    border-radius: 8px;
+    padding: 12px;
+    border-radius: 14px;
+    min-height: 100%;
 }
 
 #tekntek-home-v2 .ttk-offers .ttk-card-image {
-    height: 112px;
+    height: 144px;
 }
 
 #tekntek-home-v2 .ttk-offers .ttk-card-image img {
-    max-height: 100px;
+    max-height: 128px;
+    width: auto;
 }
 
 #tekntek-home-v2 .ttk-offers .ttk-card-title {
-    font-size: 11px;
-    min-height: 30px;
+    font-size: 13px;
+    min-height: 38px;
 }
 
 #tekntek-home-v2 .ttk-offers .ttk-card-price {
-    font-size: 10px;
+    font-size: 13px;
 }
 
 #tekntek-home-v2 .ttk-offers .ttk-card-rating {
-    font-size: 9px;
+    font-size: 11px;
 }
 
 #tekntek-home-v2 .ttk-banners {
@@ -809,6 +811,7 @@ nav.navigation,
     max-width: 90%;
     max-height: 116px;
     object-fit: contain;
+    z-index: 1;
     transition: opacity .25s ease, transform .28s ease;
 }
 
@@ -818,6 +821,7 @@ nav.navigation,
 
 #tekntek-home-v2 .ttk-card-image .ttk-card-image-secondary {
     opacity: 0;
+    z-index: 2;
 }
 
 #tekntek-home-v2 .ttk-card--has-secondary:hover .ttk-card-image .ttk-card-image-primary {
@@ -832,11 +836,13 @@ nav.navigation,
     position: absolute;
     top: 5px;
     left: 5px;
+    z-index: 5;
+    pointer-events: none;
     background: #ff5b2e;
     color: #fff;
-    border-radius: 3px;
-    padding: 2px 4px;
-    font-size: 10px;
+    border-radius: 999px;
+    padding: 4px 8px;
+    font-size: 11px;
     font-weight: 700;
 }
 
@@ -865,7 +871,7 @@ nav.navigation,
 }
 
 #tekntek-home-v2 .ttk-card-new {
-    color: #c99600;
+    color: #dc2626;
     font-weight: 700;
 }
 
@@ -1261,7 +1267,7 @@ nav.navigation,
     </section>
 
     <section class="ttk-section">
-      <div class="ttk-heading"><h2>Special offers</h2><a href="#">View all ⓘ</a></div>
+      <div class="ttk-heading"><h2>Special offers</h2><a href="<?= $block->escapeUrl($block->getUrl('special-offers')) ?>">View all ⓘ</a></div>
       <div id="ttk-offers" class="ttk-offers"></div>
       <div class="ttk-banners">
                                 <article class="ttk-banner ttk-banner--macbook">
@@ -1656,7 +1662,7 @@ $homepageData = [
     }
 
     function cardTemplate(item) {
-        var badge = item.discount ? '<span class="ttk-badge">' + item.discount + '</span>' : '';
+        var badge = item.discount ? '<span class="ttk-badge">SALE ' + item.discount + '</span>' : '';
         var openLink = item.url ? '<a class="ttk-card-link" href="' + item.url + '">' : '';
         var closeLink = item.url ? '</a>' : '';
         var secondaryImage = item.secondary_image ? '<img class="ttk-card-image-secondary" src="' + item.secondary_image + '" alt="' + item.name + '" loading="lazy"/>' : '';
@@ -1676,12 +1682,19 @@ $homepageData = [
                 '</form>' +
             '</div>'
             : '';
+        var ratingSummary = Number(item && item.rating_summary ? item.rating_summary : 0);
+        var ratingValue = ratingSummary > 0 ? (ratingSummary / 20).toFixed(1) : '0.0';
+        var reviewsCount = Number(item && item.reviews ? item.reviews : 0);
+        var reviewsHtml = reviewsCount > 0
+            ? '<div class="ttk-card-rating">' + stars(item) + ' (' + ratingValue + ') <span>(' + reviewsCount + ' reviews)</span></div>'
+            : '<div class="ttk-card-rating">No reviews yet</div>';
+
         return '<article class="' + cardClass + '">' +
             openLink +
             '<div class="ttk-card-image">' + badge + '<img class="ttk-card-image-primary" src="' + item.image + '" alt="' + item.name + '" loading="lazy"/>' + secondaryImage + '</div>' +
             '<div class="ttk-card-title">' + item.name + '</div>' +
             '<div class="ttk-card-price"><span class="ttk-card-old">' + item.old + '</span><span class="ttk-card-new">' + item.price + '</span></div>' +
-            '<div class="ttk-card-rating">' + stars(item) + ' (' + (item.reviews || 0) + ')</div>' +
+            reviewsHtml +
             closeLink +
             cartBar +
             '</article>';
