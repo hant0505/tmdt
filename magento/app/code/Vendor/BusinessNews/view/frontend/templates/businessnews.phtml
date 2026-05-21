@@ -1,24 +1,38 @@
-<div class="business-news-section">
-    <h2 class="title">Bản tin Kinh doanh - VnExpress</h2>
-    <div class="news-list">
-        <?php foreach ($block->getNewsList() as $item): ?>
-            <div class="news-item">
-                <a href="<?= $block->escapeUrl($item['link']) ?>" target="_blank" class="news-title">
-                    <?= $block->escapeHtml($item['title']) ?>
-                </a>
-                <span class="news-date"><?= $item['pubDate'] ?></span>
-                <p class="news-desc"><?= $block->escapeHtml($item['description']) ?></p>
-            </div>
-        <?php endforeach; ?>
+<?php
+/**
+ * Default Business News Template (Module)
+ * This is a simple template with basic styling.
+ * 
+ * For custom styling and layout, override in your theme:
+ * app/design/frontend/YourVendor/YourTheme/Vendor_BusinessNews/
+ * 
+ * @var $block Magento\Framework\View\Element\Template
+ */
+?>
+<div class="business-news-wrapper">
+    <h2><?= $block->escapeHtml(__('Bản tin Kinh doanh')) ?></h2>
+    
+    <div class="business-news-items">
+        <?php $newsList = $block->getNewsList(); ?>
+        <?php if (!empty($newsList)): ?>
+            <?php foreach ($newsList as $news): ?>
+                <div class="business-news-item">
+                    <div class="business-news-image">
+                        <img src="<?= $block->escapeUrl($news['image']) ?>" alt="<?= $block->escapeHtml($news['title']) ?>" />
+                    </div>
+                    <div class="business-news-content">
+                        <p class="business-news-date"><?= $block->escapeHtml($news['date']) ?></p>
+                        <h3 class="business-news-title">
+                            <a href="<?= $block->escapeUrl($news['link']) ?>" target="_blank">
+                                <?= $block->escapeHtml($news['title']) ?>
+                            </a>
+                        </h3>
+                        <p class="business-news-desc"><?= $block->escapeHtml($news['description']) ?></p>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        <?php else: ?>
+            <p><?= $block->escapeHtml(__('Chưa có bài báo nào')) ?></p>
+        <?php endif; ?>
     </div>
-    <a href="https://vnexpress.net/kinh-doanh" target="_blank" class="view-more">Xem thêm trên VnExpress →</a>
 </div>
-
-<style>
-.business-news-section { margin: 20px 0; }
-.news-item { margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid #eee; }
-.news-title { font-weight: bold; color: #0066cc; display: block; margin-bottom: 5px; }
-.news-date { font-size: 13px; color: #888; }
-.news-desc { color: #555; }
-.view-more { color: #0066cc; font-weight: bold; }
-</style>

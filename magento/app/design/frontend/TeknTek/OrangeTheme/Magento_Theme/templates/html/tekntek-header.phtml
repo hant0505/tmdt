@@ -36,8 +36,8 @@ $ttkCategoryUrls = [
     'smartwatches' => $block->getUrl($ttkUrlKeyMap['smartwatches']),
     'headphones' => $block->getUrl($ttkUrlKeyMap['headphones']),
     'tablets' => $block->getUrl($ttkUrlKeyMap['tablets']),
-    'exchange_rates' => '#',
-    'news' => '#'
+    'exchange_rates' => 'http://localhost/currency',
+    'news' => 'http://localhost/businessnews'
 ];
 
 try {
@@ -685,7 +685,7 @@ body.catalog-category-view .tekntek-isolated-header .ttk-icon-nav a:hover .ttk-i
                 <?php else: ?>
                     <a href="<?= $block->escapeUrl($block->getUrl('customer/account/login')) ?>"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/></svg>Login</a>
                 <?php endif; ?>
-                <a href="<?= $block->escapeUrl($block->getUrl('checkout/cart')) ?>"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="20" r="1.5"/><circle cx="17" cy="20" r="1.5"/><path d="M3 4h2l2.4 11.2a1 1 0 0 0 1 .8h8.8a1 1 0 0 0 1-.8L20 8H7"/></svg>Cart</a>
+                <?= $block->getChildHtml('minicart') ?>
             </div>
         </div>
     </header>

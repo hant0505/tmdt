@@ -17,7 +17,7 @@ class Index implements HttpGetActionInterface
     public function execute()
     {
         $resultPage = $this->pageFactory->create();
-        $resultPage->getConfig()->getTitle()->set(__('Bản tin Kinh doanh - VnExpress'));
+        // $resultPage->getConfig()->getTitle()->set(__('Bản tin Kinh doanh - VnExpress'));
         return $resultPage;
     }
 }

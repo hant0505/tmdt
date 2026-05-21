@@ -10,7 +10,7 @@
     <div class="tekntek-checkout-addresses__title" translate="'Delivery and billing address'"></div>
     <div class="control">
         <div class="shipping-address-items">
-            <!-- ko foreach: { data: elems, as: 'element' } -->
+            <!-- ko foreach: { data: getSingleAddressRenderers(), as: 'element' } -->
             <!-- ko template: element.getTemplate() --><!-- /ko -->
             <!-- /ko -->
         </div>

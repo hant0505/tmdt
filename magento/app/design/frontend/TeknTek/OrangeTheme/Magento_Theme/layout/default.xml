@@ -11,6 +11,10 @@
         <referenceContainer name="footer" remove="true"/>
         <referenceBlock name="catalog.compare.sidebar" remove="true"/>
 
+        <referenceContainer name="before.body.end">
+            <block class="Magento\Framework\View\Element\Template" name="crisp.chat" template="Magento_Theme::html/crisp.phtml"/>
+        </referenceContainer>
+
         <referenceContainer name="header.container">
             <block class="Magento\Framework\View\Element\Template"
                    name="tekntek.header"

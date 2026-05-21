@@ -1,7 +1,9 @@
-
+mysql_data/
 magento/vendor/
 magento/var/
 magento/generated/
 magento/pub/static/
 magento/pub/media/
 magento/app/etc/env.php
+# mysql_data/
+.env

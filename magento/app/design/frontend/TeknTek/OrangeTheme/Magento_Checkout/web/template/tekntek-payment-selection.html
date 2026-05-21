@@ -12,7 +12,7 @@
     <div class="tekntek-payment-options-wrapper">
         <label class="tekntek-payment-option-card">
             <input type="radio" name="payment_method_selection" value="vnpay"
-                   class="payment-method-radio" data-bind="checked: selectedMethod">
+                   class="payment-method-radio" data-bind="checked: selectedMethod, enable: isVnpayAvailable">
             <div class="payment-option-content">
                 <span class="payment-option-title">VNPay</span>
                 <span class="payment-option-desc">Pay securely via VNPay gateway</span>
@@ -21,7 +21,7 @@
 
         <label class="tekntek-payment-option-card">
             <input type="radio" name="payment_method_selection" value="cashondelivery"
-                   class="payment-method-radio" data-bind="checked: selectedMethod">
+                   class="payment-method-radio" data-bind="checked: selectedMethod, enable: isCashOnDeliveryAvailable">
             <div class="payment-option-content">
                 <span class="payment-option-title">Cash On Delivery (COD)</span>
                 <span class="payment-option-desc">Pay when you receive your order</span>
@@ -84,10 +84,11 @@
         </div>
     </div>
 
-    <div class="payment-details-section" data-bind="visible: isCheckmo()">
-        <div class="cod-info-box">
-            <p>Pay by Check / Money Order.</p>
-            <p>Order will be processed after payment verification.</p>
-        </div>
+    <div class="tekntek-payment-actions">
+        <button type="button"
+                class="action primary checkout tekntek-place-order-button"
+                data-bind="click: placeOrder, enable: canPlaceOrder, css: {disabled: !canPlaceOrder()}">
+            <span data-bind="i18n: 'Place Order'"></span>
+        </button>
     </div>
 </div>

@@ -1,17 +1,15 @@
 define([], function () {
     'use strict';
 
-    var uniqueCounter = 0;
+    var SINGLE_CHECKOUT_ADDRESS_KEY = 'new-customer-address-single';
 
     return function (originalFactory) {
         return function (addressData) {
-            var address = originalFactory(addressData),
-                uniqueKey = 'new-customer-address-' + Date.now() + '-' + (++uniqueCounter);
+            var address = originalFactory(addressData);
 
-            // Keep each newly created address distinct AND stable for selection state checks.
-            // Using getCacheKey() directly may change when address data mutates during checkout.
+            // Single-address checkout mode: edit should update the same address entry.
             address.getKey = function () {
-                return uniqueKey;
+                return SINGLE_CHECKOUT_ADDRESS_KEY;
             };
 
             return address;

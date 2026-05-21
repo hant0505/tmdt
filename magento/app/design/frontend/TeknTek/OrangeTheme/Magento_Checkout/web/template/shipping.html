@@ -16,14 +16,22 @@
 
         <!-- Address form pop up -->
         <if args="!isFormInline">
-            <div class="new-address-popup">
+            <div id="opc-new-shipping-address"
+                 visible="isFormPopUpVisible()"
+                 render="shippingFormTemplate"></div>
+        </if>
+
+        <if args="canAddNewAddress && canAddNewAddress()">
+            <div class="new-address-popup tekntek-new-address-popup tekntek-new-address-popup--top">
                 <button type="button"
                         class="action action-show-popup"
-                        click="showFormPopUp"
-                        visible="!isNewAddressAdded()">
+                        click="showFormPopUp">
                     <span translate="'New Address'"></span>
                 </button>
             </div>
+        </if>
+
+        <if args="isFormInline">
             <div id="opc-new-shipping-address"
                  visible="isFormPopUpVisible()"
                  render="shippingFormTemplate"></div>

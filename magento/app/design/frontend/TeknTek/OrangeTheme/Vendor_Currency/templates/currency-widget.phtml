@@ -1,0 +1,121 @@
+<?php
+/** @var \Vendor\Currency\Block\Rates $block */
+$ratesData = $block->getRatesData();
+$rates = $ratesData['rates'] ?? [];
+$updatedAt = $ratesData['datetime'] ?? '';
+$source = $ratesData['source'] ?? 'Vietcombank';
+?>
+
+<section class="vendor-currency-page" aria-labelledby="currency-page-title">
+    <div class="currency-hero">
+        <div class="currency-hero__content">
+            <span class="currency-hero__eyebrow"><?= $block->escapeHtml(__('Vietcombank exchange rates')) ?></span>
+            <h1 id="currency-page-title"><?= $block->escapeHtml(__('Tỷ giá ngoại tệ Vietcombank')) ?></h1>
+            <p>
+                <?= $block->escapeHtml(__('Theo dõi tỷ giá mua tiền mặt, chuyển khoản và bán ra được cập nhật từ nguồn Vietcombank.')) ?>
+            </p>
+        </div>
+
+        <?php if (!isset($ratesData['error'])): ?>
+            <dl class="currency-summary" aria-label="<?= $block->escapeHtmlAttr(__('Thông tin tỷ giá')) ?>">
+                <div>
+                    <dt><?= $block->escapeHtml(__('Cập nhật')) ?></dt>
+                    <dd><?= $block->escapeHtml($updatedAt) ?></dd>
+                </div>
+                <div>
+                    <dt><?= $block->escapeHtml(__('Nguồn')) ?></dt>
+                    <dd><?= $block->escapeHtml($source) ?></dd>
+                </div>
+                <div>
+                    <dt><?= $block->escapeHtml(__('Số tiền tệ')) ?></dt>
+                    <dd><?= $block->escapeHtml((string) count($rates)) ?></dd>
+                </div>
+            </dl>
+        <?php endif; ?>
+    </div>
+
+    <?php if (isset($ratesData['error'])): ?>
+        <div class="currency-error" role="alert">
+            <strong><?= $block->escapeHtml(__('Không thể tải tỷ giá')) ?></strong>
+            <span><?= $block->escapeHtml($ratesData['error']) ?></span>
+        </div>
+    <?php else: ?>
+        <div class="currency-table-shell">
+            <div class="currency-table-toolbar">
+                <h2><?= $block->escapeHtml(__('Bảng tỷ giá')) ?></h2>
+                <span><?= $block->escapeHtml(__('Đơn vị: VND')) ?></span>
+            </div>
+
+            <div class="currency-table-scroll">
+                <table class="currency-rates-table">
+                    <caption><?= $block->escapeHtml(__('Tỷ giá ngoại tệ Vietcombank')) ?></caption>
+                    <thead>
+                        <tr>
+                            <th scope="col"><?= $block->escapeHtml(__('Mã tiền tệ')) ?></th>
+                            <th scope="col"><?= $block->escapeHtml(__('Tên tiền tệ')) ?></th>
+                            <th scope="col" class="currency-rates-table__number"><?= $block->escapeHtml(__('Mua tiền mặt')) ?></th>
+                            <th scope="col" class="currency-rates-table__number"><?= $block->escapeHtml(__('Chuyển khoản')) ?></th>
+                            <th scope="col" class="currency-rates-table__number"><?= $block->escapeHtml(__('Bán ra')) ?></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach ($rates as $rate): ?>
+                            <?php
+                                $code = $rate['code'] ?? '';
+                                $countryName = $rate['country_name'] ?? '';
+                                $flagUrl = $rate['flag_url'] ?? '';
+                                $flagEmoji = $rate['flag'] ?? '';
+                                $isBuyUnavailable = ($rate['buy'] ?? '-') === '-';
+                                $isTransferUnavailable = ($rate['transfer'] ?? '-') === '-';
+                                $isSellUnavailable = ($rate['sell'] ?? '-') === '-';
+                            ?>
+                            <tr>
+                                <td data-label="<?= $block->escapeHtmlAttr(__('Mã tiền tệ')) ?>">
+                                    <div class="currency-code">
+                                        <span class="currency-flag" aria-hidden="true">
+                                            <?php if ($flagUrl): ?>
+                                                <img
+                                                    src="<?= $block->escapeUrl($flagUrl) ?>"
+                                                    alt=""
+                                                    loading="lazy"
+                                                    onerror="this.hidden=true;this.nextElementSibling.hidden=false"
+                                                />
+                                            <?php endif; ?>
+                                            <span class="currency-flag__fallback" <?= $flagUrl ? 'hidden' : '' ?>>
+                                                <?= $block->escapeHtml($flagEmoji ?: '¤') ?>
+                                            </span>
+                                        </span>
+                                        <span>
+                                            <strong><?= $block->escapeHtml($code) ?></strong>
+                                            <?php if ($countryName): ?>
+                                                <small><?= $block->escapeHtml($countryName) ?></small>
+                                            <?php endif; ?>
+                                        </span>
+                                    </div>
+                                </td>
+                                <td data-label="<?= $block->escapeHtmlAttr(__('Tên tiền tệ')) ?>">
+                                    <span class="currency-name"><?= $block->escapeHtml($rate['name'] ?? '') ?></span>
+                                </td>
+                                <td data-label="<?= $block->escapeHtmlAttr(__('Mua tiền mặt')) ?>" class="currency-rates-table__number">
+                                    <span class="currency-rate <?= $isBuyUnavailable ? 'currency-rate--empty' : '' ?>">
+                                        <?= $block->formatCurrencyValue($rate['buy'] ?? '-') ?>
+                                    </span>
+                                </td>
+                                <td data-label="<?= $block->escapeHtmlAttr(__('Chuyển khoản')) ?>" class="currency-rates-table__number">
+                                    <span class="currency-rate <?= $isTransferUnavailable ? 'currency-rate--empty' : '' ?>">
+                                        <?= $block->formatCurrencyValue($rate['transfer'] ?? '-') ?>
+                                    </span>
+                                </td>
+                                <td data-label="<?= $block->escapeHtmlAttr(__('Bán ra')) ?>" class="currency-rates-table__number">
+                                    <span class="currency-rate currency-rate--sell <?= $isSellUnavailable ? 'currency-rate--empty' : '' ?>">
+                                        <?= $block->formatCurrencyValue($rate['sell'] ?? '-') ?>
+                                    </span>
+                                </td>
+                            </tr>
+                        <?php endforeach; ?>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    <?php endif; ?>
+</section>

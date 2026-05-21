@@ -600,75 +600,12 @@ $toCardData = function ($item, $tag = '') use ($imageHelper) {
     ];
 };
 
+// Similar products are now rendered by Recommendation\SimilarPic module
 $similarData = [];
-$similarIds = [];
-foreach ($related as $item) {
-    $itemId = (int) $item->getId();
-    if ($itemId <= 0 || isset($similarIds[$itemId])) {
-        continue;
-    }
-    $similarIds[$itemId] = true;
-    $similarData[] = $toCardData($item);
-}
 
-if (count($similarData) < 4) {
-    $productCollectionFactory = $om->get(\Magento\Catalog\Model\ResourceModel\Product\CollectionFactory::class);
-    $similarCollection = $productCollectionFactory->create();
-    $similarCollection->addAttributeToSelect(['name', 'small_image', 'price', 'final_price', 'short_description', 'visibility']);
-    $similarCollection->addAttributeToFilter('status', \Magento\Catalog\Model\Product\Attribute\Source\Status::STATUS_ENABLED);
-    $similarCollection->addAttributeToFilter('entity_id', ['neq' => (int) $product->getId()]);
-    $similarCollection->addAttributeToFilter(
-        'visibility',
-        ['in' => [
-            \Magento\Catalog\Model\Product\Visibility::VISIBILITY_IN_CATALOG,
-            \Magento\Catalog\Model\Product\Visibility::VISIBILITY_IN_SEARCH,
-            \Magento\Catalog\Model\Product\Visibility::VISIBILITY_BOTH
-        ]]
-    );
-    $similarCollection->setPageSize(12);
-    $similarCollection->setCurPage(1);
-    $similarCollection->load();
 
-    foreach ($similarCollection as $item) {
-        if (count($similarData) >= 4) {
-            break;
-        }
-        $itemId = (int) $item->getId();
-        if ($itemId <= 0 || isset($similarIds[$itemId])) {
-            continue;
-        }
-        $similarIds[$itemId] = true;
-        $similarData[] = $toCardData($item);
-    }
-}
-
-if (empty($similarData)) {
-    $similarData = [
-        ['id' => 9001, 'name' => 'Everyday Laptop 14"', 'url' => '#', 'image' => (string) $imageHelper->init($product, 'product_small_image')->getUrl(), 'config' => 'Intel i5, 8GB RAM, 512GB SSD', 'price' => 499, 'tag' => ''],
-        ['id' => 9002, 'name' => 'Creator Laptop 15.6"', 'url' => '#', 'image' => (string) $imageHelper->init($product, 'product_small_image')->getUrl(), 'config' => 'Intel i7, 16GB RAM, 1TB SSD', 'price' => 799, 'tag' => ''],
-        ['id' => 9003, 'name' => 'Student Laptop 13.3"', 'url' => '#', 'image' => (string) $imageHelper->init($product, 'product_small_image')->getUrl(), 'config' => 'Intel i3, 8GB RAM, 256GB SSD', 'price' => 399, 'tag' => ''],
-        ['id' => 9004, 'name' => 'Business Laptop 16"', 'url' => '#', 'image' => (string) $imageHelper->init($product, 'product_small_image')->getUrl(), 'config' => 'Intel i7, 32GB RAM, 1TB SSD', 'price' => 999, 'tag' => '']
-    ];
-}
-
-if (count($similarData) > 4) {
-    $similarData = array_slice($similarData, 0, 4);
-}
-
-$accessoryData = [];
-foreach ($upsell as $item) {
-    $accessoryData[] = $toCardData($item, '15%');
-}
-
-if (empty($accessoryData)) {
-    $placeholder = $block->getViewFileUrl('Magento_Catalog::images/product/placeholder/small_image.jpg');
-    $accessoryData = [
-        ['id' => 9101, 'name' => 'Wireless Mouse', 'url' => '#', 'image' => $placeholder, 'config' => '2.4G, silent click', 'price' => 19.99, 'tag' => '15%'],
-        ['id' => 9102, 'name' => 'Laptop Sleeve 15.6"', 'url' => '#', 'image' => $placeholder, 'config' => 'Water-resistant, padded', 'price' => 24.99, 'tag' => '15%'],
-        ['id' => 9103, 'name' => 'USB-C Hub 7-in-1', 'url' => '#', 'image' => $placeholder, 'config' => 'HDMI + USB 3.0 + PD', 'price' => 29.99, 'tag' => '15%'],
-        ['id' => 9104, 'name' => 'Cooling Pad', 'url' => '#', 'image' => $placeholder, 'config' => 'Dual fan, adjustable angle', 'price' => 34.99, 'tag' => '15%']
-    ];
-}
+// Similar Pic products are now handled by the Recommendation\SimilarPic module
+// No accessories section needed anymore
 
 $reviewData = [];
 $resource = $om->get(\Magento\Framework\App\ResourceConnection::class);
@@ -1133,20 +1070,11 @@ $mainCompareItem = [
         </div>
     </section>
 
-    <section class="tekntek-section">
-        <div class="tekntek-sec-head"><h2>Similar picks for you</h2><a class="tekntek-sec-link" href="#">View all</a></div>
-        <div class="tekntek-grid" id="tekntek-similar-grid"></div>
-    </section>
-
-    <section class="tekntek-section">
-        <div class="tekntek-sec-head"><h2>Add these accessories to your order</h2><a class="tekntek-sec-link" href="#">View all</a></div>
-        <div class="tekntek-grid" id="tekntek-accessory-grid"></div>
-    </section>
+    <!-- Similar Pic section is rendered by Recommendation\SimilarPic module -->
 </div>
 
 <script type="application/json" id="tekntek-mock-json"><?= /* @noEscape */ json_encode([
     'similar' => $similarData,
-    'accessories' => $accessoryData,
     'reviews' => $reviewData,
     'compareSeed' => $compareSeed,
     'mainProduct' => $mainCompareItem,
@@ -1178,8 +1106,6 @@ $mainCompareItem = [
 <script>
 (function () {
     var dataNode = document.getElementById('tekntek-mock-json');
-    var similarGrid = document.getElementById('tekntek-similar-grid');
-    var accessoryGrid = document.getElementById('tekntek-accessory-grid');
     var reviewSummary = document.getElementById('tekntek-review-summary');
     var reviewList = document.getElementById('tekntek-review-list');
     var viewMoreBtn = document.getElementById('tekntek-view-more');
@@ -1193,15 +1119,13 @@ $mainCompareItem = [
     var galleryNext = document.getElementById('tekntek-gallery-next');
     var galleryThumbButtons = Array.prototype.slice.call(document.querySelectorAll('[data-gallery-index]'));
 
-    if (!dataNode || !similarGrid || !accessoryGrid || !reviewSummary || !reviewList || !compareBar || !compareItemsWrap || !compareLink || !viewMoreBtn || !addMainCompareBtn || !compareError) {
+    if (!dataNode || !reviewSummary || !reviewList || !compareBar || !compareItemsWrap || !compareLink || !viewMoreBtn || !addMainCompareBtn || !compareError) {
         return;
     }
 
     var payload = JSON.parse(dataNode.textContent || '{}');
     var compareStoreKey = 'tekntek_compare_v2';
     var reviews = Array.isArray(payload.reviews) ? payload.reviews : [];
-    var similar = Array.isArray(payload.similar) ? payload.similar : [];
-    var accessories = Array.isArray(payload.accessories) ? payload.accessories : [];
     var mainProduct = payload.mainProduct || null;
     var compareAddBaseUrl = payload.compareAddBaseUrl || '/catalog/product_compare/add/';
     var compareClearUrl = payload.compareClearUrl || '/catalog/product_compare/clear/';
@@ -1550,8 +1474,7 @@ $mainCompareItem = [
     }
 
     function renderCards() {
-        similarGrid.innerHTML = similar.map(function (item) { return cardTemplate(item, false); }).join('');
-        accessoryGrid.innerHTML = accessories.map(function (item) { return cardTemplate(item, true); }).join('');
+        // Similar products carousel is now rendered by Recommendation\SimilarPic module
     }
 
     function bindGallery() {

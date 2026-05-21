@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:App/Config/etc/config.xsd">
+    <default>
+        <carriers>
+            <ghtk>
+                <model>Shipping\GHTK\Model\Carrier\Ghtk</model>
+                <active>0</active>
+                <title>Giao Hàng Tiết Kiệm</title>
+                <sandbox_mode>1</sandbox_mode>
+            </ghtk>
+        </carriers>
+    </default>
+</config>

@@ -522,37 +522,6 @@ nav.navigation,
     line-height: 1.5;
 }
 
-#tekntek-home-v2 .ttk-weather {
-    position: absolute;
-    right: 18px;
-    bottom: 16px;
-    z-index: 2;
-    min-width: 116px;
-    padding: 12px 14px 10px;
-    border: 1px solid rgba(229, 231, 235, 0.95);
-    background: rgba(255, 255, 255, 0.95);
-    border-radius: 16px;
-    box-shadow: 0 10px 24px rgba(17, 24, 39, 0.2);
-    text-align: center;
-    color: #111827;
-}
-
-#tekntek-home-v2 .ttk-weather-temp {
-    display: block;
-    font-size: 34px;
-    line-height: 1;
-    font-weight: 600;
-    letter-spacing: -0.02em;
-}
-
-#tekntek-home-v2 .ttk-weather-city {
-    display: block;
-    margin-top: 4px;
-    font-size: 11px;
-    line-height: 1.2;
-    color: #4b5563;
-}
-
 #tekntek-home-v2 .ttk-section {
     margin-top: 16px;
 }
@@ -1256,10 +1225,7 @@ nav.navigation,
                 <h1>Introducing the Next Generation of Sound</h1>
                 <p>Experience pure, immersive sound like never before with powerful bass, refined noise control, and all-day listening comfort.</p>
       </div>
-            <div class="ttk-weather" aria-label="Current weather in Ho Chi Minh City">
-                <span class="ttk-weather-temp">28°</span>
-                <span class="ttk-weather-city">Ho Chi Minh City</span>
-            </div>
+            <?= $block->getChildHtml('homepage.weather') ?>
     </section>
 
     <section class="ttk-benefits" aria-label="Store trust bar">
@@ -1309,7 +1275,7 @@ nav.navigation,
           <div class="ttk-banner-content"><strong>MacBook Pro</strong><small>Now with Apple M3 for mind-blowing speed.</small></div>
         </article>
                 <article class="ttk-banner ttk-banner--speaker">
-                                        <img src="<?= $block->escapeUrl($block->getBaseUrl() . 'media/tekntek/speaker-banner-v4.jpg?v=20260406-2') ?>" alt="Speakers" style="width:100%;height:100%;object-fit:contain;object-position:center center;background:#0f172a;" />
+                                        <img src="<?= $block->escapeUrl($block->getViewFileUrl('css/images/banner_img.jpg')) ?>" alt="Speakers" style="width:100%;height:100%;object-fit:contain;object-position:center center;background:#0f172a;" />
           <div class="ttk-banner-content"><strong>Speakers</strong><small>The ultimate listening experience.</small></div>
         </article>
       </div>
