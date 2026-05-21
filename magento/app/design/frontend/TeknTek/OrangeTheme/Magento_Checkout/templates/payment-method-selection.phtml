@@ -29,15 +29,6 @@
                 <span class="payment-option-desc">Pay when you receive your order</span>
             </div>
         </label>
-
-        <!-- Check / Money Order -->
-        <label class="tekntek-payment-option-card">
-            <input type="radio" name="selected_payment_method" value="checkmo" class="payment-radio">
-            <div class="payment-option-content">
-                <span class="payment-option-title">Check / Money Order</span>
-                <span class="payment-option-desc">Offline payment confirmation by admin</span>
-            </div>
-        </label>
     </div>
 
     <!-- Bank Transfer Details Section -->
@@ -84,14 +75,6 @@
             <p>Please have the exact change ready.</p>
         </div>
     </div>
-
-    <!-- Check/Money Order Details Section -->
-    <div id="checkmo-details" class="payment-details-section" style="display: none;">
-        <div class="cod-info-box">
-            <p>Pay by Check / Money Order.</p>
-            <p>Order will be processed after payment verification.</p>
-        </div>
-    </div>
 </div>
 
 <script>
@@ -131,22 +114,14 @@ require(['jquery', 'uiComponent'], function($) {
         if (method === 'bank_transfer') {
             $('#bank-transfer-details').slideDown(300);
             $('#cod-details').slideUp(300);
-            $('#checkmo-details').slideUp(300);
         } else if (method === 'cashondelivery') {
             $('#bank-transfer-details').slideUp(300);
             $('#cod-details').slideDown(300);
-            $('#checkmo-details').slideUp(300);
-        } else if (method === 'checkmo') {
-            $('#bank-transfer-details').slideUp(300);
-            $('#cod-details').slideUp(300);
-            $('#checkmo-details').slideDown(300);
-        }
     });
 
     // Initialize with Bank Transfer checked
     $('#bank-transfer-details').show();
     $('#cod-details').hide();
-    $('#checkmo-details').hide();
 });
 </script>
     </div>
