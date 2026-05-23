@@ -1,0 +1,257 @@
+// ============================================
+// Coupon Modal Styling (Payment + Cart)
+// ============================================
+// UNIFIED: Exact same styling for Payment and Cart modals
+// Payment selectors: .checkout-index-index #payment .payment-option.discount-code
+// Cart selectors: .checkout-cart-index #block-discount.active
+
+// ===== OVERLAY =====
+.tekntek-coupon-modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(17, 24, 39, 0.45);
+    backdrop-filter: blur(2px);
+    z-index: 1000;
+}
+
+body.tekntek-coupon-modal-open .tekntek-coupon-modal-overlay {
+    display: block;
+}
+
+body.tekntek-coupon-modal-open {
+    overflow: hidden;
+}
+
+// ===== MODAL CONTAINER =====
+.checkout-index-index #payment .payment-option.discount-code .payment-option-content,
+.checkout-cart-index #block-discount.active .content {
+    padding: 26px 28px !important;
+    width: min(520px, calc(100vw - 32px)) !important;
+    border-radius: 16px;
+    background: #f4f5f7;
+    border: 1px solid #e5e7eb;
+    box-shadow: 0 16px 32px rgba(15, 23, 42, 0.16);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.checkout-index-index #payment .payment-option.discount-code .payment-option-content,
+.checkout-cart-index #block-discount.active .content {
+    position: relative;
+}
+
+.checkout-index-index #payment .payment-option.discount-code._active .payment-option-content,
+.checkout-index-index #payment .payment-option.discount-code .payment-option-content,
+.checkout-cart-index #block-discount.active .content {
+    background: #f4f5f7 !important;
+    border: 1px solid #e5e7eb !important;
+    box-shadow: 0 16px 32px rgba(15, 23, 42, 0.16) !important;
+}
+
+.checkout-index-index #payment .payment-option.discount-code._active .payment-option-content,
+.checkout-cart-index #block-discount.active .content {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1001;
+}
+
+// ===== MODAL TITLE =====
+.checkout-index-index #payment .payment-option.discount-code .payment-option-content::before,
+.checkout-cart-index #block-discount.active .content::before {
+    content: "Apply Coupon Code";
+    font-size: 18px;
+    font-weight: 700;
+    color: #111827;
+    display: block;
+    padding-right: 44px;
+}
+
+// ===== CLOSE BUTTON =====
+.checkout-index-index #payment .payment-option.discount-code .payment-option-content .tekntek-coupon-modal-close,
+.checkout-cart-index #block-discount.active .content .tekntek-coupon-modal-close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    width: 32px;
+    height: 32px;
+    border: 0;
+    border-radius: 999px;
+    background: rgba(17, 24, 39, 0.08);
+    color: #111827;
+    font-size: 24px;
+    line-height: 32px;
+    font-weight: 400;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 2;
+    transition: background 0.2s ease, transform 0.2s ease;
+    padding: 0;
+}
+
+.checkout-index-index #payment .payment-option.discount-code .payment-option-content .tekntek-coupon-modal-close:hover,
+.checkout-index-index #payment .payment-option.discount-code .payment-option-content .tekntek-coupon-modal-close:focus,
+.checkout-cart-index #block-discount.active .content .tekntek-coupon-modal-close:hover,
+.checkout-cart-index #block-discount.active .content .tekntek-coupon-modal-close:focus {
+    background: rgba(17, 24, 39, 0.16);
+    transform: scale(1.05);
+    outline: none;
+}
+
+// ===== FORM CONTAINER & FIELDSET =====
+.checkout-index-index #payment .payment-option.discount-code .form-discount .fieldset,
+.checkout-cart-index #block-discount.active .fieldset {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.checkout-cart-index #block-discount.active .fieldset::before {
+    content: "";
+    display: block;
+    height: 22px;
+    flex: 0 0 22px;
+}
+// ===== FORM FIELD =====
+.checkout-index-index #payment .payment-option.discount-code .form-discount .field,
+.checkout-cart-index #block-discount.active .field {
+    flex: 1 1 auto;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+// ===== LABEL (Payment: show via ::before, Cart: hide) =====
+// Payment label
+.checkout-index-index #payment .payment-option.discount-code .form-discount .field .label {
+    display: block;
+    margin-bottom: 6px !important;
+    font-weight: 600;
+    color: #374151;
+    font-size: 0;
+    line-height: 0;
+}
+
+.checkout-index-index #payment .payment-option.discount-code .form-discount .field .label span {
+    font-size: 0;
+}
+
+.checkout-index-index #payment .payment-option.discount-code .form-discount .field .label::before {
+    content: "Coupon Code:";
+    font-size: 13px;
+    line-height: normal;
+    display: block;
+}
+
+// Cart label (hide completely)
+.checkout-cart-index #block-discount.active .field .label {
+    display: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    font-size: 0 !important;
+    line-height: 0 !important;
+    height: 0 !important;
+}
+
+// ===== INPUT CONTROL =====
+.checkout-index-index #payment .payment-option.discount-code .form-discount .control,
+.checkout-cart-index #block-discount.active .control {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+// ===== INPUT TEXT =====
+.checkout-index-index #payment .payment-option.discount-code .form-discount .control .input-text,
+.checkout-cart-index #block-discount.active .control .input-text {
+    height: 44px;
+    border: 1px solid #cbd5f5;
+    border-radius: 10px;
+    padding: 0 12px;
+    line-height: 44px;
+    background: #fff;
+    width: 100% !important;
+    font-size: 14px;
+    color: #1f2937;
+    box-sizing: border-box;
+}
+
+.checkout-index-index #payment .payment-option.discount-code .form-discount .control .input-text::placeholder,
+.checkout-cart-index #block-discount.active .control .input-text::placeholder {
+    color: #9ca3af;
+}
+
+.checkout-index-index #payment .payment-option.discount-code .form-discount .control .input-text:focus,
+.checkout-cart-index #block-discount.active .control .input-text:focus {
+    border-color: #3b649e;
+    box-shadow: 0 0 0 3px rgba(59, 100, 158, 0.18);
+    outline: none;
+}
+
+// ===== ACTIONS TOOLBAR =====
+.checkout-index-index #payment .payment-option.discount-code .form-discount .actions-toolbar,
+.checkout-cart-index #block-discount.active .actions-toolbar {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100%;
+}
+
+// ===== PRIMARY ACTION WRAPPER =====
+.checkout-index-index #payment .payment-option.discount-code .form-discount .actions-toolbar .primary,
+.checkout-cart-index #block-discount.active .actions-toolbar .primary {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 100%;
+    flex: 1;
+}
+
+// ===== BUTTON STYLING =====
+.checkout-index-index #payment .payment-option.discount-code .form-discount .actions-toolbar .action,
+.checkout-cart-index #block-discount.active .actions-toolbar .action {
+    height: 44px;
+    padding: 0 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    border: 0;
+    background: #22c55e;
+    color: #fff;
+    line-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    box-shadow: 0 10px 18px rgba(34, 197, 94, 0.22);
+    width: 100%;
+    max-width: 360px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    margin: 0 !important;
+}
+
+.checkout-index-index #payment .payment-option.discount-code .form-discount .actions-toolbar .action:hover,
+.checkout-index-index #payment .payment-option.discount-code .form-discount .actions-toolbar .action:focus,
+.checkout-cart-index #block-discount.active .actions-toolbar .action:hover,
+.checkout-cart-index #block-discount.active .actions-toolbar .action:focus {
+    background: #16a34a;
+    box-shadow: 0 12px 24px rgba(34, 197, 94, 0.32);
+    transform: translateY(-1px);
+}
+
+.checkout-index-index #payment .payment-option.discount-code .form-discount .actions-toolbar .action:active,
+.checkout-cart-index #block-discount.active .actions-toolbar .action:active {
+    transform: translateY(0);
+    box-shadow: 0 8px 16px rgba(34, 197, 94, 0.22);
+}

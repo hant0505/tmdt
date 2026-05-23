@@ -5,6 +5,7 @@
 }
 
 @import url('https://fonts.googleapis.com/css2?family=DM+Serif+Display&display=swap');
+@import '_coupon-modal.less';
 
 .tekntek-cart.container {
     width: min(1240px, calc(100vw - 32px));
@@ -282,89 +283,29 @@
     background: #335789;
 }
 
+.checkout-cart-index #block-discount {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+}
+
 .checkout-cart-index #block-discount .title strong {
     color: #3b649e;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 600;
+    font-size: 14px;
+    cursor: pointer;
 }
 
-.checkout-cart-index #block-discount {
-    padding: 16px;
-    border: 1px solid #e5e7eb;
-    border-radius: 12px;
-    background: #f9fafb;
-}
-
-.checkout-cart-index #block-discount .field .label {
+.checkout-cart-index #block-discount .content {
     display: none;
 }
 
-.checkout-cart-index #block-discount .field .control {
-    max-width: 320px;
-}
-
-.checkout-cart-index #block-discount .field .control .input-text {
-    width: 100%;
-}
-
-.checkout-cart-index #block-discount .fieldset {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex-wrap: wrap;
-}
-
-.checkout-cart-index #block-discount .field {
-    flex: 1 1 260px;
-    margin: 0;
-}
-
-.checkout-cart-index #block-discount .field .control .input-text {
-    height: 44px;
-    border: 1px solid #d1d5db;
-    border-radius: 10px;
-    padding: 0 12px;
-    line-height: 44px;
-    box-sizing: border-box;
-    background: #fff;
-}
-
-.checkout-cart-index #block-discount .field .control .input-text:focus {
-    border-color: #3b649e;
-    box-shadow: 0 0 0 3px rgba(59, 100, 158, 0.18);
-}
-
-.checkout-cart-index #block-discount .actions-toolbar,
-.checkout-cart-index #block-discount .actions-toolbar .primary {
-    margin: 0;
-}
-
-.checkout-cart-index #block-discount .actions-toolbar .action {
-    height: 44px;
-    padding: 0 14px;
-    border-radius: 10px;
-    font-weight: 600;
-    border: 0;
-    background: #3b649e;
-    color: #fff;
-    line-height: 44px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    box-sizing: border-box;
-    box-shadow: 0 8px 16px rgba(59, 100, 158, 0.18);
-}
-
-.checkout-cart-index #block-discount .actions-toolbar .action:hover,
-.checkout-cart-index #block-discount .actions-toolbar .action:focus {
-    background: #335789;
-}
-
-.checkout-cart-index #block-discount {
-    box-shadow: 0 8px 18px rgba(17, 24, 39, 0.06);
-}
-
-.checkout-cart-index #block-discount .actions-toolbar .primary {
-    display: flex;
-    align-items: center;
+.checkout-cart-index #block-discount.active .content {
+    display: block; /* visual/display switch; positioning & styling live in _coupon-modal.less */
 }
 
 @media (max-width: 860px) {
@@ -1728,170 +1669,6 @@ body {
     background: transparent !important;
     padding: 0 !important;
     margin: 0 !important;
-}
-
-/* Apply Coupon modal (checkout payment only) */
-.checkout-index-index #payment .payment-option.discount-code {
-    margin-top: 16px;
-    padding: 0;
-    border: 0;
-    background: transparent;
-}
-
-.checkout-index-index #payment .payment-option.discount-code .payment-option-title .action-toggle {
-    font-weight: 600;
-    color: #2563eb;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 14px;
-    text-transform: none;
-    padding: 0;
-    border: 0;
-    background: transparent;
-    box-shadow: none;
-    cursor: pointer;
-}
-
-.checkout-index-index #payment .payment-option.discount-code .payment-option-title .action-toggle:hover,
-.checkout-index-index #payment .payment-option.discount-code .payment-option-title .action-toggle:focus {
-    color: #1d4ed8;
-}
-
-.checkout-index-index .tekntek-coupon-modal-overlay {
-    display: none;
-    position: fixed;
-    inset: 0;
-    background: rgba(17, 24, 39, 0.45);
-    backdrop-filter: blur(2px);
-    z-index: 1000;
-}
-
-body.tekntek-coupon-modal-open .tekntek-coupon-modal-overlay {
-    display: block;
-}
-
-body.tekntek-coupon-modal-open {
-    overflow: hidden;
-}
-
-.checkout-index-index #payment .payment-option.discount-code .payment-option-content {
-    padding: 26px 28px;
-    width: min(520px, calc(100vw - 32px));
-    border-radius: 16px;
-    background: #f4f5f7;
-    border: 1px solid #e5e7eb;
-    box-shadow: 0 16px 32px rgba(15, 23, 42, 0.16);
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-}
-
-.checkout-index-index #payment .payment-option.discount-code._active .payment-option-content,
-.checkout-index-index #payment .payment-option.discount-code .payment-option-content {
-    background: #f4f5f7 !important;
-    border: 1px solid #e5e7eb !important;
-    box-shadow: 0 16px 32px rgba(15, 23, 42, 0.16) !important;
-}
-
-.checkout-index-index #payment .payment-option.discount-code._active .payment-option-content {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 1001;
-}
-
-.checkout-index-index #payment .payment-option.discount-code .tekntek-coupon-modal-close {
-    display: none;
-}
-
-.checkout-index-index #payment .payment-option.discount-code .payment-option-content::before {
-    content: "Apply Coupon Code";
-    font-size: 18px;
-    font-weight: 700;
-    color: #111827;
-}
-
-.checkout-index-index #payment .payment-option.discount-code .form-discount .fieldset {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 12px;
-}
-
-.checkout-index-index #payment .payment-option.discount-code .form-discount .field .label {
-    display: block;
-    margin-bottom: 6px !important;
-    font-weight: 600;
-    color: #374151;
-}
-
-.checkout-index-index #payment .payment-option.discount-code .form-discount .field .label span {
-    font-size: 0;
-}
-
-.checkout-index-index #payment .payment-option.discount-code .form-discount .field .label::before {
-    content: "Coupon Code:";
-    font-size: 13px;
-}
-
-.checkout-index-index #payment .payment-option.discount-code .form-discount .field {
-    flex: 1 1 auto;
-}
-
-.checkout-index-index #payment .payment-option.discount-code .form-discount .control .input-text {
-    height: 44px;
-    border: 1px solid #cbd5f5;
-    border-radius: 10px;
-    padding: 0 12px;
-    line-height: 44px;
-    background: #fff;
-}
-
-.checkout-index-index #payment .payment-option.discount-code .form-discount .control .input-text:focus {
-    border-color: #3b649e;
-    box-shadow: 0 0 0 3px rgba(59, 100, 158, 0.18);
-}
-
-.checkout-index-index #payment .payment-option.discount-code .form-discount .actions-toolbar,
-.checkout-index-index #payment .payment-option.discount-code .form-discount .actions-toolbar .primary {
-    margin: 0;
-    width: 100%;
-}
-
-.checkout-index-index #payment .payment-option.discount-code .form-discount .actions-toolbar {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.checkout-index-index #payment .payment-option.discount-code .form-discount .actions-toolbar .primary {
-    display: flex;
-    justify-content: center;
-    width: 100%;
-}
-
-.checkout-index-index #payment .payment-option.discount-code .form-discount .actions-toolbar .action {
-    height: 44px;
-    padding: 0 20px;
-    border-radius: 8px;
-    font-weight: 600;
-    border: 0;
-    background: #22c55e;
-    color: #fff;
-    line-height: 44px;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    box-sizing: border-box;
-    box-shadow: 0 10px 18px rgba(34, 197, 94, 0.22);
-    min-width: 150px;
-}
-
-.checkout-index-index #payment .payment-option.discount-code .form-discount .actions-toolbar .action:hover,
-.checkout-index-index #payment .payment-option.discount-code .form-discount .actions-toolbar .action:focus {
-    background: #16a34a;
 }
 
 /* Keep Place Order visible after payment cleanup - use simple layout rules only */
