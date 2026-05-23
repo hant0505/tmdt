@@ -14,7 +14,7 @@ if ($signupSession->hasVerifiedEmail()) {
 
 $prefilledEmail = $signupSession->getEmail();
 $expiresAt = $signupSession->getExpiresAt();
-$registerBackgroundUrl = $block->getViewFileUrl('images/auth-login-figma-bg.png');
+        background: #ececec !important;
 $signupInit = [
     'TeknTek_SignupFlow/js/signup-flow' => [
         'sendUrl' => $block->getUrl('tekntek_signup/code/send'),
@@ -75,17 +75,14 @@ $signupInit = [
         position: relative;
         display: block;
         min-height: 740px;
-        background: #ffffff url('<?= $escaper->escapeUrl($registerBackgroundUrl) ?>') 100% 50% / cover no-repeat;
+        background: #ececec !important;
         border-radius: 28px;
         overflow: hidden;
     }
 
     .customer-account-create .tekntek-auth__stage::before {
-        content: "";
-        position: absolute;
-        inset: 0;
-        background: linear-gradient(90deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.92) 28%, rgba(255, 255, 255, 0.58) 44%, rgba(255, 255, 255, 0) 62%);
-        pointer-events: none;
+        content: none !important;
+        display: none !important;
     }
 
     .customer-account-create .tekntek-auth__panel--register {
@@ -629,6 +626,10 @@ $signupInit = [
                             <span class="tekntek-register__timer" data-role="countdown">05:00</span>
                         </div>
 
+                        <button type="button" class="tekntek-register__resend" data-role="edit-email">
+                            <?= $escaper->escapeHtml(__('Use a different email')) ?>
+                        </button>
+
                         <button type="submit" class="tekntek-register__button">
                             <span><?= $escaper->escapeHtml(__('Continue')) ?></span>
                         </button>
@@ -684,6 +685,10 @@ $signupInit = [
                     </form>
                 </div>
             </section>
+
+            <aside class="tekntek-auth__visual" aria-hidden="true">
+                <img class="tekntek-auth__visual-art" src="<?= $block->escapeUrl($block->getViewFileUrl('images/signinpic.png')) ?>" alt="" loading="eager" />
+            </aside>
         </div>
     </div>
 </div>
@@ -704,6 +709,7 @@ document.addEventListener('DOMContentLoaded', function () {
         var digits = Array.prototype.slice.call(root.querySelectorAll('[data-role="code-digit"]'));
         var countdown = root.querySelector('[data-role="countdown"]');
         var resend = root.querySelector('[data-role="resend-code"]');
+        var editEmailButton = root.querySelector('[data-role="edit-email"]');
         var verifyForm = root.querySelector('[data-role="verify-form"]');
         var emailForm = root.querySelector('[data-role="email-form"]');
         var profileForm = root.querySelector('[data-role="profile-form"]');
@@ -1203,6 +1209,29 @@ document.addEventListener('DOMContentLoaded', function () {
                 }).finally(function () {
                     resend.setAttribute('data-submitting', '0');
                 });
+            });
+        }
+
+        if (editEmailButton) {
+            editEmailButton.addEventListener('click', function () {
+                showMessage('Please update your email and request a new verification code.', 'success');
+                if (timerId) {
+                    window.clearInterval(timerId);
+                    timerId = null;
+                }
+                expiresAt = 0;
+                if (countdown) {
+                    countdown.textContent = '05:00';
+                }
+                if (resend) {
+                    resend.disabled = false;
+                }
+                resetCodeInputs();
+                setStep('email');
+                if (emailInput) {
+                    emailInput.focus();
+                    emailInput.select();
+                }
             });
         }
 
