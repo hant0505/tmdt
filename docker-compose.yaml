@@ -38,7 +38,7 @@ services:
       MYSQL_ROOT_PASSWORD: "Stron#HTnsngMagentoPassword#2026"
       MYSQL_DATABASE: magento
       MYSQL_USER: magento
-      MYSQL_PASSWORD: "StrongMagen#Han$toPassword#2026"
+      MYSQL_PASSWORD: "StrongMagen#HantoPassword#2026"
     volumes: #bind mount
       - mysql_data:/var/lib/mysql
 

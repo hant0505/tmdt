@@ -18,6 +18,9 @@ var config = {
             },
             'Magento_OfflinePayments/js/view/payment/method-renderer/cashondelivery-method': {
                 'Magento_Checkout/js/view/payment/cashondelivery-mixin': true
+            },
+            'Magento_SalesRule/js/view/payment/discount': {
+                'Magento_Checkout/js/view/payment/discount-modal-mixin': true
             }
         }
     }
