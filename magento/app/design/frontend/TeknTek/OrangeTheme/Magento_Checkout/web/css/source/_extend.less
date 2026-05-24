@@ -300,6 +300,24 @@
     cursor: pointer;
 }
 
+.checkout-index-index #payment .payment-option.discount-code .payment-option-title .action-toggle::after,
+.checkout-cart-index #block-discount .title strong::after {
+    content: '';
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-top: 2px solid #3b649e !important;
+    border-right: 2px solid #3b649e !important;
+    transform: rotate(45deg);
+    margin-left: 8px;
+    transition: transform 0.2s ease;
+}
+
+.checkout-index-index #payment .payment-option.discount-code._active .payment-option-title .action-toggle::after,
+.checkout-cart-index #block-discount.active .title strong::after {
+    transform: rotate(-135deg);
+}
+
 .checkout-cart-index #block-discount .content {
     display: none;
 }
@@ -1059,8 +1077,6 @@ body {
 .tekntek-payment-title {
     margin: 0;
     font-family: 'Roboto', sans-serif;
-    font-size: 24px;
-    font-weight: 500;
     color: #272727;
     line-height: 1;
 }
@@ -1434,6 +1450,11 @@ body {
     color: #272727;
     display: block;
     margin: 0;
+}
+
+/* Remove unwanted top border on payment option title (overrides other rules) */
+.checkout-index-index .checkout-payment-method .payment-option-title {
+    border-top: none !important;
 }
 
 .payment-option-desc {

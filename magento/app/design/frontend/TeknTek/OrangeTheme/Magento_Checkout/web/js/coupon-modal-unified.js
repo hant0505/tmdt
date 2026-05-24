@@ -13,7 +13,6 @@ define([
     'use strict';
 
     var overlayClass = 'tekntek-coupon-modal-overlay';
-    var closeButtonClass = 'tekntek-coupon-modal-close';
     var openClass = 'tekntek-coupon-modal-open';
     var initialized = false;
 
@@ -71,27 +70,6 @@ define([
     }
 
     /**
-     * Ensure close button exists in both modal variants
-     */
-    function ensureCloseButtons() {
-        var buttonHtml = '<button type="button" class="' + closeButtonClass + '" aria-label="Close modal">&times;</button>';
-
-        $('#payment .payment-option.discount-code .payment-option-content').each(function () {
-            var $content = $(this);
-            if (!$content.find('.' + closeButtonClass).length) {
-                $content.prepend(buttonHtml);
-            }
-        });
-
-        $('#block-discount.active .content').each(function () {
-            var $content = $(this);
-            if (!$content.find('.' + closeButtonClass).length) {
-                $content.prepend(buttonHtml);
-            }
-        });
-    }
-
-    /**
      * Initialize global event handlers (run once)
      */
     function initGlobalHandlers() {
@@ -100,18 +78,10 @@ define([
         }
 
         ensureOverlay();
-        ensureCloseButtons();
         syncModalState();
 
         // Overlay click - close all modals
         $(document).on('click', '.' + overlayClass, function () {
-            closeAllModals();
-            window.setTimeout(syncModalState, 0);
-        });
-
-        $(document).on('click', '.' + closeButtonClass, function (event) {
-            event.preventDefault();
-            event.stopPropagation();
             closeAllModals();
             window.setTimeout(syncModalState, 0);
         });
@@ -132,11 +102,9 @@ define([
      */
     function initPaymentModal() {
         initGlobalHandlers();
-        ensureCloseButtons();
         
         // Payment modal toggle handler
         $(document).on('click', '#payment .payment-option.discount-code .payment-option-title .action-toggle', function () {
-            window.setTimeout(ensureCloseButtons, 0);
             window.setTimeout(syncModalState, 0);
         });
     }
@@ -146,11 +114,9 @@ define([
      */
     function initCartModal() {
         initGlobalHandlers();
-        ensureCloseButtons();
         
         // Cart modal toggle handler
         $(document).on('click', '#block-discount .title', function () {
-            window.setTimeout(ensureCloseButtons, 0);
             window.setTimeout(syncModalState, 0);
         });
     }
@@ -159,7 +125,6 @@ define([
         initPaymentModal: initPaymentModal,
         initCartModal: initCartModal,
         syncModalState: syncModalState,
-        closeAllModals: closeAllModals,
-        ensureCloseButtons: ensureCloseButtons
+        closeAllModals: closeAllModals
     };
 });
