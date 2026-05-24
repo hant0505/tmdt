@@ -12,7 +12,7 @@
     <div class="tekntek-payment-options-wrapper">
         <label class="tekntek-payment-option-card">
             <input type="radio" name="payment_method_selection" value="vnpay"
-                   class="payment-method-radio" data-bind="checked: selectedMethod, enable: isVnpayAvailable">
+                   class="payment-method-radio" data-bind="checked: selectedMethod, enable: isVnpayEnabled">
             <div class="payment-option-content">
                 <span class="payment-option-title">VNPay</span>
                 <span class="payment-option-desc">Pay securely via VNPay gateway</span>
@@ -21,7 +21,7 @@
 
         <label class="tekntek-payment-option-card">
             <input type="radio" name="payment_method_selection" value="cashondelivery"
-                   class="payment-method-radio" data-bind="checked: selectedMethod, enable: isCashOnDeliveryAvailable">
+                   class="payment-method-radio" data-bind="checked: selectedMethod, enable: isCashOnDeliveryEnabled">
             <div class="payment-option-content">
                 <span class="payment-option-title">Cash On Delivery (COD)</span>
                 <span class="payment-option-desc">Pay when you receive your order</span>

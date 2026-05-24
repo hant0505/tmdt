@@ -39,13 +39,29 @@
             </div>
 
             <div class="tekntek-minicart-item__bottom">
-                <div class="tekntek-minicart-item__meta">
-                    <span class="qty" data-bind="text: '×' + qty"></span>
-                    <!-- ko if: options.length -->
-                    <span class="option" data-bind="text: options[0].value"></span>
-                    <!-- /ko -->
+                <div class="tekntek-minicart-item__qty-stepper">
+                    <button type="button"
+                            class="tekntek-minicart-item__qty-btn tekntek-minicart-item__qty-btn--minus"
+                            data-action="qty-minus"
+                            data-bind="attr: { 'data-cart-item': item_id, title: $t('Decrease quantity') }">−</button>
+                    <input data-bind="attr: {
+                           id: 'cart-item-'+item_id+'-qty',
+                           'data-cart-item': item_id,
+                           'data-item-qty': qty,
+                           'data-cart-item-id': product_sku
+                           }, value: qty"
+                           type="number"
+                           min="1"
+                           size="4"
+                           class="item-qty cart-item-qty tekntek-minicart-item__qty-input">
+                    <button type="button"
+                            class="tekntek-minicart-item__qty-btn tekntek-minicart-item__qty-btn--plus"
+                            data-action="qty-plus"
+                            data-bind="attr: { 'data-cart-item': item_id, title: $t('Increase quantity') }">+</button>
                 </div>
-                <span class="shipping" translate="'Free shipping'"></span>
+                <a href="#"
+                   class="action delete tekntek-minicart-item__remove"
+                   data-bind="attr: { 'data-cart-item': item_id, title: $t('Remove item') }">×</a>
             </div>
         </div>
     </div>

@@ -65,6 +65,18 @@ define(
                     return self.isAvailableMethodCode(code);
                 });
 
+                this.methodsLoaded = ko.pureComputed(function () {
+                    return self.getMethodList().length > 0;
+                });
+
+                this.isCashOnDeliveryEnabled = ko.pureComputed(function () {
+                    return !self.methodsLoaded() || self.isCashOnDeliveryAvailable();
+                });
+
+                this.isVnpayEnabled = ko.pureComputed(function () {
+                    return !self.methodsLoaded() || self.isVnpayAvailable();
+                });
+
                 // Watch for changes in selected payment method
                 this.selectedMethod.subscribe(function(newValue) {
                     self.showVnpayDetails(newValue === 'vnpay');
