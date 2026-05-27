@@ -11,6 +11,11 @@
 <div data-block="minicart" class="minicart-wrapper tekntek-minicart-wrapper">
     <a class="action showcart" href="<?= $block->escapeUrl($block->getShoppingCartUrl()) ?>"
        data-bind="scope: 'minicart_content'">
+        <svg class="tekntek-minicart-icon" viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="9" cy="19" r="1.6"/>
+            <circle cx="17" cy="19" r="1.6"/>
+            <path d="M3 4h2l2.2 10.5a2 2 0 0 0 2 1.6h7.6a2 2 0 0 0 1.9-1.4l1.8-6.3H7.2"/>
+        </svg>
         <span class="text"><?= $block->escapeHtml(__('Cart')) ?></span>
         <span class="counter qty empty"
               data-bind="css: { empty: !!getCartParam('summary_count') == false && !isLoading() },

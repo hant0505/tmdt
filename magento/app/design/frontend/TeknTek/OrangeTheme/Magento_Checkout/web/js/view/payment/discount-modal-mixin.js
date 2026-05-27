@@ -4,15 +4,14 @@
  * Uses unified coupon modal handler
  */
 define([
-    'jquery',
-    'Magento_Checkout/js/coupon-modal-unified'
-], function ($, couponHandler) {
+    'jquery'
+], function ($) {
     'use strict';
 
     return function (target) {
         target.initialize = function () {
             this._super();
-            couponHandler.initPaymentModal();
+            // No-op: use native collapsible inline behavior for payment coupon.
             return this;
         };
 

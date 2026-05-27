@@ -1,14 +1,13 @@
 /**
- * Shopping Cart Coupon Modal Handler
- * Uses unified coupon modal handler for consistent behavior with payment page
+ * Shopping Cart Coupon Handler
+ * Cart coupon uses the native collapsible inline behavior.
  */
 define([
-    'jquery',
-    'Magento_Checkout/js/coupon-modal-unified'
-], function ($, couponHandler) {
+    'jquery'
+], function ($) {
     'use strict';
 
     $(function () {
-        couponHandler.initCartModal();
+        // No-op: the cart coupon block already toggles via Magento's collapsible widget.
     });
 });
