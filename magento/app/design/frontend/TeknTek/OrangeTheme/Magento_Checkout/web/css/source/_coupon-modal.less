@@ -49,58 +49,45 @@ body.tekntek-coupon-modal-open {
 
 // ===== PAYMENT MODAL CONTAINER =====
 .checkout-index-index #payment .payment-option.discount-code .payment-option-content {
-    /* Stack under title (vertical) */
-    padding: 8px 0 !important;
-    width: 100% !important;
+    padding: 0 !important;
+    width: auto !important;
     border-radius: 0 !important;
     background: transparent !important;
     border: 0 !important;
     box-shadow: none !important;
-    display: none;
+    display: inline-block !important;
 }
 
 .checkout-index-index #payment .payment-option.discount-code._active .payment-option-content {
-    display: block !important;
-    padding-top: 8px !important;
+    display: inline-block !important;
+    padding-top: 0 !important;
 }
 
 .checkout-index-index #payment .payment-option.discount-code .payment-option-content::before {
     content: none;
 }
 
+.checkout-index-index #payment .payment-option.discount-code .payment-option-title {
+    display: none !important;
+}
+
 .checkout-index-index #payment .payment-option.discount-code .form-discount .fieldset {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
+    display: inline-flex;
+    flex-direction: row;
+    align-items: center;
     gap: 8px;
     margin: 0 !important;
     padding: 0 !important;
 }
 
 .checkout-index-index #payment .payment-option.discount-code .form-discount .field {
-    flex: 1 1 auto;
+    flex: 0 0 auto;
     margin: 0 !important;
     padding: 0 !important;
 }
 
 .checkout-index-index #payment .payment-option.discount-code .form-discount .field .label {
-    display: block;
-    margin-bottom: 6px !important;
-    font-weight: 600;
-    color: #374151;
-    font-size: 0;
-    line-height: 0;
-}
-
-.checkout-index-index #payment .payment-option.discount-code .form-discount .field .label span {
-    font-size: 0;
-}
-
-.checkout-index-index #payment .payment-option.discount-code .form-discount .field .label::before {
-    content: "Coupon Code:";
-    font-size: 13px;
-    line-height: normal;
-    display: block;
+    display: none !important;
 }
 
 .checkout-index-index #payment .payment-option.discount-code .form-discount .control {
@@ -109,14 +96,15 @@ body.tekntek-coupon-modal-open {
 }
 
 .checkout-index-index #payment .payment-option.discount-code .form-discount .control .input-text {
-    height: 38px;
-    border: 1px solid #cbd5f5;
-    border-radius: 8px;
-    padding: 0 10px;
-    line-height: 38px;
-    background: #fff;
-    width: 100% !important;
-    max-width: 520px;
+    height: 32px;
+    border: 0;
+    border-bottom: 1px solid #3b82f6;
+    border-radius: 0;
+    padding: 0 2px;
+    line-height: 32px;
+    background: transparent;
+    width: 200px !important;
+    max-width: none;
     font-size: 13px;
     color: #1f2937;
     box-sizing: border-box;
@@ -127,47 +115,47 @@ body.tekntek-coupon-modal-open {
 }
 
 .checkout-index-index #payment .payment-option.discount-code .form-discount .control .input-text:focus {
-    border-color: #3b649e;
-    box-shadow: 0 0 0 3px rgba(59, 100, 158, 0.18);
+    border-bottom-color: #1d4ed8;
+    box-shadow: none;
     outline: none;
 }
 
 .checkout-index-index #payment .payment-option.discount-code .form-discount .actions-toolbar {
-    display: flex;
-    justify-content: center;
+    display: inline-flex;
+    justify-content: flex-start;
     align-items: center;
     margin: 0 !important;
     padding: 0 !important;
-    width: 100%;
+    width: auto;
 }
 
 .checkout-index-index #payment .payment-option.discount-code .form-discount .actions-toolbar .primary {
-    display: flex;
-    justify-content: center;
+    display: inline-flex;
+    justify-content: flex-start;
     align-items: center;
     margin: 0 !important;
     padding: 0 !important;
-    width: 100%;
-    flex: 1;
+    width: auto;
+    flex: 0 0 auto;
 }
 
 .checkout-index-index #payment .payment-option.discount-code .form-discount .actions-toolbar .action {
-    height: 38px;
-    padding: 0 14px;
-    border-radius: 7px;
+    height: 32px;
+    padding: 0 10px;
+    border-radius: 6px;
     font-weight: 600;
-    font-size: 13px;
-    border: 0;
-    background: #3b649e;
-    color: #fff;
-    line-height: 38px;
+    font-size: 12px;
+    border: 1px solid #22c55e;
+    background: transparent;
+    color: #16a34a;
+    line-height: 32px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     box-sizing: border-box;
-    box-shadow: 0 10px 18px rgba(59, 100, 158, 0.22);
-    width: 100% !important;
-    max-width: 360px;
+    box-shadow: none;
+    width: auto;
+    max-width: none;
     cursor: pointer;
     transition: all 0.2s ease;
     margin: 0 !important;
@@ -175,14 +163,16 @@ body.tekntek-coupon-modal-open {
 
 .checkout-index-index #payment .payment-option.discount-code .form-discount .actions-toolbar .action:hover,
 .checkout-index-index #payment .payment-option.discount-code .form-discount .actions-toolbar .action:focus {
-    background: #3b649e;
-    box-shadow: 0 12px 24px rgba(59, 100, 158, 0.32);
-    transform: translateY(-1px);
+    background: #22c55e;
+    color: #ffffff;
+    border-color: #22c55e;
+    box-shadow: none;
+    transform: none;
 }
 
 .checkout-index-index #payment .payment-option.discount-code .form-discount .actions-toolbar .action:active {
-    transform: translateY(0);
-    box-shadow: 0 8px 16px rgba(34, 197, 94, 0.22);
+    transform: none;
+    box-shadow: none;
 }
 
 // ===== CART INLINE TOGGLE =====
@@ -208,8 +198,11 @@ body.tekntek-coupon-modal-open {
 }
 
 .checkout-cart-index #block-discount {
-    margin: 0 !important;
+    margin: 6px 0 0 !important;
     padding: 0 !important;
+    width: 100% !important;
+    max-width: 820px;
+    clear: both;
 }
 
 .checkout-cart-index #block-discount .content form,
@@ -240,10 +233,11 @@ body.tekntek-coupon-modal-open {
 }
 
 .checkout-cart-index #block-discount .content {
-    display: inline-block !important;
+    display: block !important;
     padding-top: 0 !important;
     margin-top: 0 !important;
     margin-left: 0 !important;
+    width: 100% !important;
 }
 
 .checkout-cart-index #block-discount .title {
@@ -273,7 +267,7 @@ body.tekntek-coupon-modal-open {
 }
 
 .checkout-cart-index #block-discount .fieldset {
-    display: inline-flex;
+    display: flex;
     flex-direction: row;
     gap: 8px;
     align-items: center;

@@ -68,6 +68,7 @@ $formatPrice = static function (float $amount, string $currencyCode): string {
                     </div>
                 </div>
             <?php endforeach; ?>
+            <?= $block->getChildHtml('coupon') ?>
         </article>
         <div class="tekntek-cart__empty" aria-live="polite"<?= $hasItems ? ' style="display:none;"' : '' ?>>
             <?= $block->escapeHtml(__('Your shopping cart is empty.')) ?>
