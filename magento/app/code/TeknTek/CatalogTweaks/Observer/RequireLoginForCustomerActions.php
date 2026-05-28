@@ -7,6 +7,7 @@ namespace TeknTek\CatalogTweaks\Observer;
 use Magento\Customer\Model\Session as CustomerSession;
 use Magento\Framework\App\Action\Action;
 use Magento\Framework\App\ActionFlag;
+use Magento\Framework\App\RequestInterface;
 use Magento\Framework\App\Response\RedirectInterface;
 use Magento\Framework\Event\Observer;
 use Magento\Framework\Event\ObserverInterface;
@@ -18,9 +19,10 @@ class RequireLoginForCustomerActions implements ObserverInterface
      * @var string[]
      */
     private array $protectedActions = [
+        'checkout_cart_add',
+        'review_product_post',
+        'tekntek_suggest_review_submit',
         'wishlist_index_add',
-        'catalog_product_compare_add',
-        // 'checkout_index_index',
     ];
 
     public function __construct(
@@ -49,8 +51,26 @@ class RequireLoginForCustomerActions implements ObserverInterface
             return;
         }
 
-        $this->customerSession->setBeforeAuthUrl($this->urlBuilder->getCurrentUrl());
+        $this->customerSession->setBeforeAuthUrl($this->resolveBeforeAuthUrl($request));
         $this->actionFlag->set('', Action::FLAG_NO_DISPATCH, true);
         $this->redirect->redirect($controllerAction->getResponse(), 'customer/account/login');
+    }
+
+    private function resolveBeforeAuthUrl(RequestInterface $request): string
+    {
+        $refererUrl = (string) $this->redirect->getRefererUrl();
+        if ($refererUrl !== '') {
+            return $refererUrl;
+        }
+
+        $uenc = (string) $request->getParam(Action::PARAM_NAME_URL_ENCODED, '');
+        if ($uenc !== '') {
+            $decoded = base64_decode(strtr($uenc, '-_,', '+/='), true);
+            if (is_string($decoded) && $decoded !== '') {
+                return $decoded;
+            }
+        }
+
+        return $this->urlBuilder->getCurrentUrl();
     }
 }

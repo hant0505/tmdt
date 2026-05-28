@@ -1743,6 +1743,11 @@ $mainCompareItem = [
             return;
         }
         btn.addEventListener('click', function () {
+            if (!isLoggedIn) {
+                redirectToLogin();
+                return;
+            }
+
             if (!form) {
                 return;
             }
@@ -1755,6 +1760,11 @@ $mainCompareItem = [
 
         form.addEventListener('submit', function (event) {
             event.preventDefault();
+
+            if (!isLoggedIn) {
+                redirectToLogin();
+                return;
+            }
             var starNode = document.getElementById('tekntek-review-stars');
             var titleNode = document.getElementById('tekntek-review-title');
             var contentNode = document.getElementById('tekntek-review-content');

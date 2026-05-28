@@ -524,6 +524,66 @@ $signupInit = [
         color: #374151;
     }
 }
+    .customer-account-create .tekntek-register__password-wrap {
+        position: relative;
+        display: block;
+    }
+
+    .customer-account-create .tekntek-register__password-wrap input {
+        padding-right: 76px;
+    }
+
+    .customer-account-create .tekntek-register__password-toggle {
+        position: absolute;
+        top: 50%;
+        right: 10px;
+        transform: translateY(-50%);
+        border: 0;
+        background: transparent;
+        color: #365fd6;
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 1;
+        padding: 4px 6px;
+        cursor: pointer;
+    }
+
+    .customer-account-create .tekntek-register__password-rules {
+        display: grid;
+        gap: 6px;
+        margin-top: -4px;
+    }
+
+    .customer-account-create .tekntek-register__password-rule-list {
+        list-style: none;
+        margin: 0;
+        padding: 0;
+        display: grid;
+        gap: 5px;
+    }
+
+    .customer-account-create .tekntek-register__password-rule {
+        color: #9d2d2d;
+        font-size: 12px;
+        line-height: 1.35;
+    }
+
+    .customer-account-create .tekntek-register__password-rule::before {
+        content: 'x';
+        display: inline-block;
+        width: 14px;
+        margin-right: 6px;
+        font-weight: 700;
+        text-transform: uppercase;
+    }
+
+    .customer-account-create .tekntek-register__password-rule.is-valid {
+        color: #1f7a38;
+    }
+
+    .customer-account-create .tekntek-register__password-rule.is-valid::before {
+        content: '✓';
+    }
 </style>
 <div class="tekntek-auth tekntek-auth--register"
      data-role="tekntek-signup-root"
@@ -670,13 +730,27 @@ $signupInit = [
                         </label>
 
                         <label class="tekntek-register__field">
-                            <input type="password" name="password" placeholder="<?= $escaper->escapeHtmlAttr(__('Password')) ?>" autocomplete="new-password" required>
+                            <span class="tekntek-register__password-wrap">
+                                <input type="password" name="password" placeholder="<?= $escaper->escapeHtmlAttr(__('Password')) ?>" autocomplete="new-password" required data-role="register-password">
+                                <button type="button" class="tekntek-register__password-toggle" data-role="toggle-password" data-target="register-password" aria-label="<?= $escaper->escapeHtmlAttr(__('Show password')) ?>"><?= $escaper->escapeHtml(__('Show')) ?></button>
+                            </span>
                         </label>
 
-                        <p class="tekntek-register__hint"><?= $escaper->escapeHtml(__('Password must be at least 8 characters, start with an uppercase letter, and contain at least one number.')) ?></p>
+                        <div class="tekntek-register__password-rules" data-role="password-rules" aria-live="polite">
+                            <p class="tekntek-register__hint"><?= $escaper->escapeHtml(__('Password requirements:')) ?></p>
+                            <ul class="tekntek-register__password-rule-list">
+                                <li class="tekntek-register__password-rule" data-rule="length"><?= $escaper->escapeHtml(__('At least 8 characters')) ?></li>
+                                <li class="tekntek-register__password-rule" data-rule="uppercase"><?= $escaper->escapeHtml(__('Starts with an uppercase letter')) ?></li>
+                                <li class="tekntek-register__password-rule" data-rule="number"><?= $escaper->escapeHtml(__('Contains at least 1 number')) ?></li>
+                                <li class="tekntek-register__password-rule" data-rule="match"><?= $escaper->escapeHtml(__('Repeated password matches')) ?></li>
+                            </ul>
+                        </div>
 
                         <label class="tekntek-register__field">
-                            <input type="password" name="password_confirmation" placeholder="<?= $escaper->escapeHtmlAttr(__('Repeat password')) ?>" autocomplete="new-password" required>
+                            <span class="tekntek-register__password-wrap">
+                                <input type="password" name="password_confirmation" placeholder="<?= $escaper->escapeHtmlAttr(__('Repeat password')) ?>" autocomplete="new-password" required data-role="register-password-confirmation">
+                                <button type="button" class="tekntek-register__password-toggle" data-role="toggle-password" data-target="register-password-confirmation" aria-label="<?= $escaper->escapeHtmlAttr(__('Show repeated password')) ?>"><?= $escaper->escapeHtml(__('Show')) ?></button>
+                            </span>
                         </label>
 
                         <button type="submit" class="tekntek-register__button">
@@ -719,12 +793,98 @@ document.addEventListener('DOMContentLoaded', function () {
         var emailInput = root.querySelector('[data-role="email-input"]');
         var verifyCopy = root.querySelector('[data-role="verify-copy"]');
         var messageBox = root.querySelector('[data-role="message"]');
+        var passwordInput = profileForm ? profileForm.querySelector('input[name="password"]') : null;
+        var confirmInput = profileForm ? profileForm.querySelector('input[name="password_confirmation"]') : null;
+        var passwordRuleNodes = profileForm ? Array.prototype.slice.call(profileForm.querySelectorAll('[data-role="password-rules"] [data-rule]')) : [];
+        var passwordToggleButtons = profileForm ? Array.prototype.slice.call(profileForm.querySelectorAll('[data-role="toggle-password"]')) : [];
         var registerPanel = root.querySelector('.tekntek-auth__panel--register');
         var steps = Array.prototype.slice.call(root.querySelectorAll('[data-step]'));
         var progressSteps = Array.prototype.slice.call(root.querySelectorAll('[data-role="progress-step"]'));
         var initialStep = root.getAttribute('data-initial-step') || 'email';
         var expiresAt = parseInt(root.getAttribute('data-initial-expires-at') || '0', 10) || 0;
         var timerId = null;
+
+        function getPasswordState() {
+            var password = passwordInput ? String(passwordInput.value || '') : '';
+            var passwordConfirmation = confirmInput ? String(confirmInput.value || '') : '';
+
+            return {
+                password: password,
+                passwordConfirmation: passwordConfirmation,
+                rules: [
+                    {
+                        key: 'length',
+                        valid: password.length >= 8,
+                        message: 'Password must be at least 8 characters.'
+                    },
+                    {
+                        key: 'uppercase',
+                        valid: /^[A-Z]/.test(password),
+                        message: 'Password must start with an uppercase letter.'
+                    },
+                    {
+                        key: 'number',
+                        valid: /\d/.test(password),
+                        message: 'Password must contain at least 1 number.'
+                    },
+                    {
+                        key: 'match',
+                        valid: password !== '' && password === passwordConfirmation,
+                        message: 'Password confirmation does not match.'
+                    }
+                ]
+            };
+        }
+
+        function renderPasswordRules() {
+            var state = getPasswordState();
+
+            passwordRuleNodes.forEach(function (node) {
+                var ruleKey = node.getAttribute('data-rule') || '';
+                var matchedRule = state.rules.find(function (rule) {
+                    return rule.key === ruleKey;
+                });
+
+                if (!matchedRule) {
+                    return;
+                }
+
+                node.classList.toggle('is-valid', !!matchedRule.valid);
+            });
+
+            return state;
+        }
+
+        function bindPasswordAssist() {
+            [passwordInput, confirmInput].forEach(function (input) {
+                if (!input) {
+                    return;
+                }
+
+                input.addEventListener('input', function () {
+                    renderPasswordRules();
+                });
+            });
+
+            passwordToggleButtons.forEach(function (button) {
+                button.addEventListener('click', function () {
+                    var target = button.getAttribute('data-target') || '';
+                    var input = profileForm ? profileForm.querySelector('[data-role="' + target + '"]') : null;
+                    var isPassword;
+
+                    if (!input) {
+                        return;
+                    }
+
+                    isPassword = input.getAttribute('type') === 'password';
+                    input.setAttribute('type', isPassword ? 'text' : 'password');
+                    button.textContent = isPassword ? 'Hide' : 'Show';
+                    button.setAttribute('aria-label', isPassword ? 'Hide password' : 'Show password');
+                });
+            });
+
+            renderPasswordRules();
+        }
 
         function showMessage(text, type) {
             if (!messageBox) {
@@ -1064,31 +1224,17 @@ document.addEventListener('DOMContentLoaded', function () {
                     return;
                 }
                 
-                var passwordInput = profileForm.querySelector('input[name="password"]');
-                var confirmInput = profileForm.querySelector('input[name="password_confirmation"]');
-                var password = passwordInput ? (passwordInput.value || '').trim() : '';
-                var passwordConfirmation = confirmInput ? (confirmInput.value || '').trim() : '';
+                var passwordState = renderPasswordRules();
+                var password = passwordState.password;
+                var passwordConfirmation = passwordState.passwordConfirmation;
+                var passwordErrors = passwordState.rules.filter(function (rule) {
+                    return !rule.valid;
+                }).map(function (rule) {
+                    return rule.message;
+                });
 
-                if (passwordInput) {
-                    passwordInput.value = password;
-                }
-
-                if (confirmInput) {
-                    confirmInput.value = passwordConfirmation;
-                }
-
-                if (password.length < 8) {
-                    showMessage('Password must be at least 8 characters, start with an uppercase letter, and contain at least one number.', 'error');
-                    return;
-                }
-
-                if (!/^[A-Z]/.test(password) || !/\d/.test(password)) {
-                    showMessage('Password must be at least 8 characters, start with an uppercase letter, and contain at least one number.', 'error');
-                    return;
-                }
-
-                if (password !== passwordConfirmation) {
-                    showMessage('New Password and Confirm New Password values did not match.', 'error');
+                if (passwordErrors.length) {
+                    showMessage(passwordErrors.join(' '), 'error');
                     return;
                 }
 
@@ -1234,6 +1380,8 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             });
         }
+
+        bindPasswordAssist();
 
         if (initialStep === 'verify') {
             setEmailValue(hiddenEmail ? hiddenEmail.value : '');

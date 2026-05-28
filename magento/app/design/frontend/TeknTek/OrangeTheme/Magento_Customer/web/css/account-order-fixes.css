@@ -992,3 +992,66 @@ body.sales-order-view .actions-toolbar .secondary {
         z-index: auto !important;
     }
 }
+
+/* TTK final my-orders limiter sizing override */
+body.sales-order-history .order-products-toolbar.toolbar.bottom .pager {
+    justify-content: space-between !important;
+    gap: 12px !important;
+}
+
+body.sales-order-history .order-products-toolbar .toolbar-amount {
+    min-width: 0 !important;
+    flex: 0 0 auto !important;
+}
+
+body.sales-order-history .order-products-toolbar .toolbar-limiter,
+body.sales-order-history .order-products-toolbar .limiter,
+body.sales-order-history .order-products-toolbar .pager > .limiter,
+body.sales-order-history .order-products-toolbar .toolbar-limiter .limiter {
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: flex-end !important;
+    grid-template-columns: none !important;
+    gap: 8px !important;
+    width: auto !important;
+    min-width: 0 !important;
+    margin-left: auto !important;
+}
+
+body.sales-order-history .order-products-toolbar .pager > .limiter > .limiter-label,
+body.sales-order-history .order-products-toolbar .pager > .limiter .limiter-options,
+body.sales-order-history .order-products-toolbar .pager > .limiter .limiter-text,
+body.sales-order-history .order-products-toolbar .toolbar-limiter .limiter > label,
+body.sales-order-history .order-products-toolbar .toolbar-limiter .limiter .field-limiter,
+body.sales-order-history .order-products-toolbar .toolbar-limiter .limiter .limiter-text {
+    justify-self: auto !important;
+}
+
+body.sales-order-history .order-products-toolbar .limiter select,
+body.sales-order-history .order-products-toolbar .limiter .limiter-options {
+    width: 48px !important;
+    min-width: 48px !important;
+    max-width: 48px !important;
+    flex: 0 0 48px !important;
+    height: 38px !important;
+    padding: 0 8px !important;
+    border-radius: 10px !important;
+    line-height: 38px !important;
+    text-align: center !important;
+    appearance: auto !important;
+}
+
+@media (max-width: 767px) {
+    body.sales-order-history .order-products-toolbar.toolbar.bottom .pager {
+        align-items: stretch !important;
+    }
+
+    body.sales-order-history .order-products-toolbar .toolbar-limiter,
+    body.sales-order-history .order-products-toolbar .limiter,
+    body.sales-order-history .order-products-toolbar .pager > .limiter,
+    body.sales-order-history .order-products-toolbar .toolbar-limiter .limiter {
+        justify-content: space-between !important;
+        width: 100% !important;
+        margin-left: 0 !important;
+    }
+}

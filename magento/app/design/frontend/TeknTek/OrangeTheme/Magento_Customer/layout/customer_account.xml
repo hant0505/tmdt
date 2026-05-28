@@ -8,5 +8,6 @@
     <body>
         <referenceBlock name="sale.reorder.sidebar" remove="true"/>
         <referenceBlock name="customer-account-navigation-downloadable-products-link" remove="true"/>
+        <referenceBlock name="customer-account-navigation-my-credit-cards-link" remove="true"/>
     </body>
 </page>
