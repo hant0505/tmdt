@@ -1673,7 +1673,7 @@ $homepageData = [
         var uenc = cartConfig.uenc || '';
         var cartBar = productId > 0
             ? '<div class="ttk-card-actions">' +
-                '<form class="ttk-card-cart-form" action="' + escapeHtml(cartAction) + '" method="post">' +
+                '<form class="ttk-card-cart-form" action="' + escapeHtml(cartAction) + '" method="post" data-role="tocart-form" data-mage-init=\'{"catalogAddToCart":{}}\'>' +
                     '<input type="hidden" name="product" value="' + productId + '">' +
                     '<input type="hidden" name="qty" value="1">' +
                     '<input type="hidden" name="form_key" value="' + escapeHtml(formKey) + '">' +

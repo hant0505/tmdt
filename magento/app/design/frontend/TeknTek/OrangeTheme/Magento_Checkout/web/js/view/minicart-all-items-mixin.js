@@ -1,11 +1,11 @@
 define([
     'jquery',
-    'Magento_Customer/js/customer-data',
-    'Magento_Checkout/js/action/get-totals'
-], function ($, customerData, getTotalsAction) {
+    'Magento_Customer/js/customer-data'
+], function ($, customerData) {
     'use strict';
 
     var controlsBound = false;
+    var missingItemsRefresh = false;
 
     function getFormKey() {
         var cookieMatch;
@@ -20,8 +20,20 @@ define([
 
     function refreshCartTotals() {
         var deferred = $.Deferred();
-        getTotalsAction([], deferred);
-        customerData.reload(['cart'], true);
+        if (window.checkoutConfig && window.checkoutConfig.totalsData) {
+            require([
+                'Magento_Checkout/js/action/get-totals'
+            ], function (getTotalsAction) {
+                getTotalsAction([], deferred);
+                customerData.reload(['cart'], true);
+            }, function () {
+                customerData.reload(['cart'], true);
+                deferred.resolve();
+            });
+        } else {
+            customerData.reload(['cart'], true);
+            deferred.resolve();
+        }
         return deferred.promise();
     }
 
@@ -91,8 +103,22 @@ define([
             checkoutUrl: window.checkout && window.checkout.checkoutUrl ? window.checkout.checkoutUrl : '/checkout',
 
             initialize: function () {
+                var cartSection;
+
                 this._super();
                 bindControls();
+
+                cartSection = customerData.get('cart');
+                cartSection.subscribe(function (data) {
+                    if (!data || missingItemsRefresh) {
+                        return;
+                    }
+
+                    if (data.summary_count && (!data.items || !data.items.length)) {
+                        missingItemsRefresh = true;
+                        customerData.reload(['cart'], true);
+                    }
+                });
 
                 return this;
             },
@@ -103,7 +129,15 @@ define([
              * @returns {Array}
              */
             getCartItems: function () {
-                return this.getCartParamUnsanitizedHtml('items') || [];
+                var items = this.getCartParamUnsanitizedHtml('items') || [];
+
+                if (!Array.isArray(items)) {
+                    items = Object.keys(items || {}).map(function (key) {
+                        return items[key];
+                    });
+                }
+
+                return items;
             }
         });
     };

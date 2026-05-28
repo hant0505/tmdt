@@ -903,3 +903,39 @@ body.catalog-category-view .tekntek-isolated-header .ttk-icon-nav a:hover .ttk-i
     });
 })();
 </script>
+
+<script>
+(function () {
+    function initCartCounter() {
+        if (!window.require) {
+            window.setTimeout(initCartCounter, 200);
+            return;
+        }
+
+        require(['jquery', 'Magento_Customer/js/customer-data', 'mage/apply/main'], function ($, customerData, mage) {
+            var cartSection = customerData.get('cart');
+
+            function updateCounter() {
+                var data = cartSection();
+                var count = parseInt((data && data.summary_count) || 0, 10) || 0;
+                var display = count ? count.toLocaleString(window.LOCALE || 'en-US') : '';
+                var $wrapper = $('.tekntek-minicart-wrapper');
+                var $counter = $wrapper.find('.counter-number');
+                var $qty = $wrapper.find('.counter.qty');
+                var $emptyNote = $wrapper.find('.tekntek-cart-empty-note');
+
+                $counter.text(display);
+                $qty.toggleClass('empty', count === 0);
+                $emptyNote.toggle(count === 0);
+            }
+
+            updateCounter();
+            cartSection.subscribe(updateCounter);
+            customerData.reload(['cart'], true);
+            mage.apply();
+        });
+    }
+
+    initCartCounter();
+})();
+</script>

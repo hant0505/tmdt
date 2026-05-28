@@ -16,7 +16,7 @@
             <circle cx="17" cy="19" r="1.6"/>
             <path d="M3 4h2l2.2 10.5a2 2 0 0 0 2 1.6h7.6a2 2 0 0 0 1.9-1.4l1.8-6.3H7.2"/>
         </svg>
-        <span class="text"><?= $block->escapeHtml(__('Cart')) ?></span>
+          <span class="text"><?= $block->escapeHtml(__('Cart')) ?></span>
         <span class="counter qty empty"
               data-bind="css: { empty: !!getCartParam('summary_count') == false && !isLoading() },
                blockLoader: isLoading">
@@ -70,5 +70,36 @@ script;
             ) ?>"
         }
     }
+    </script>
+    <script>
+    require([
+        'jquery',
+        'Magento_Customer/js/customer-data',
+        'Magento_Ui/js/core/app',
+        'mage/apply/main',
+        'uiRegistry',
+        'ko'
+    ], function ($, customerData, app, mage, registry, ko) {
+        var $minicart = $('[data-block="minicart"]');
+        var jsLayoutConfig = <?= /* @noEscape */ $block->getJsLayout() ?>;
+
+        $minicart.on('dropdowndialogopen', function () {
+            var wrapper = document.getElementById('minicart-content-wrapper');
+            var $content = $('#minicart-content-wrapper');
+            var hasContent = $content.find('.tekntek-minicart-content').length > 0;
+
+            if (!hasContent) {
+                app(jsLayoutConfig);
+                mage.apply();
+                registry.get('minicart_content', function (component) {
+                    if (wrapper && !ko.contextFor(wrapper)) {
+                        ko.applyBindings(component, wrapper);
+                    }
+                });
+            }
+
+            customerData.reload(['cart'], true);
+        });
+    });
     </script>
 </div>

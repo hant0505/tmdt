@@ -10,7 +10,12 @@
     <div data-action="scroll" class="tekntek-minicart-items-wrapper">
         <ol id="mini-cart" class="tekntek-minicart-items" data-bind="foreach: { data: getCartItems(), as: 'item' }">
             <each args="$parent.getRegion($parent.getItemRenderer(item.product_type))"
-                  render="{name: getTemplate(), data: item, afterRender: function() {$parents[1].initSidebar()}}"></each>
+                  render="{name: getTemplate(), data: item, afterRender: function() {
+                      var parent = $parents[1] || $parents[0];
+                      if (parent && typeof parent.initSidebar === 'function') {
+                          parent.initSidebar();
+                      }
+                  }}"></each>
         </ol>
     </div>
 
@@ -25,7 +30,7 @@
 
     <!-- Empty state message -->
     <!-- ko ifnot: getCartParam('summary_count') -->
-    <strong class="tekntek-minicart-empty">You have no items in your shopping cart.</strong>
+    <strong class="tekntek-minicart-empty">Gio hang trong.</strong>
     <!-- /ko -->
 
     <!-- Buttons - Always visible -->
