@@ -71,11 +71,47 @@ define([
                     return;
                 }
 
-                // Refresh minicart UI
+                // Refresh cart data in-place without navigating away.
                 refreshCartTotals();
             })
             .fail(function() {
                 $input.val(currentQty);
+                alert('Error updating cart. Please try again.');
+            });
+    }
+
+    function commitQty($input) {
+        var itemId = $input.data('cart-item');
+        var currentQty = parseInt($input.val(), 10) || 1;
+        var originalQty = parseInt($input.data('original-qty'), 10) || parseInt($input.data('item-qty'), 10) || 1;
+
+        if (currentQty < 1) {
+            $input.val(originalQty);
+            return;
+        }
+
+        if (currentQty === originalQty) {
+            return;
+        }
+
+        $input.data('original-qty', currentQty);
+        $input.attr('data-item-qty', currentQty);
+
+        updateCartItemQty(itemId, currentQty)
+            .done(function(response) {
+                if (response && response.error_message) {
+                    $input.val(originalQty);
+                    $input.data('original-qty', originalQty);
+                    alert(response.error_message);
+                    return;
+                }
+
+                // Refresh cart data in-place without navigating away.
+                refreshCartTotals();
+            })
+            .fail(function() {
+                $input.val(originalQty);
+                $input.data('original-qty', originalQty);
                 alert('Error updating cart. Please try again.');
             });
     }
@@ -95,6 +131,24 @@ define([
         $(document).on('click', '[data-block="minicart"] [data-action="qty-plus"]', function (event) {
             event.preventDefault();
             updateQty($(event.currentTarget).siblings('.cart-item-qty'), 1);
+        });
+
+        $(document).on('focus', '[data-block="minicart"] .cart-item-qty', function () {
+            var $input = $(this);
+
+            $input.data('original-qty', parseInt($input.val(), 10) || 1);
+        });
+
+        $(document).on('change blur', '[data-block="minicart"] .cart-item-qty', function () {
+            commitQty($(this));
+        });
+
+        $(document).on('keydown', '[data-block="minicart"] .cart-item-qty', function (event) {
+            if (event.key === 'Enter' || event.keyCode === 13) {
+                event.preventDefault();
+                commitQty($(event.currentTarget));
+                event.currentTarget.blur();
+            }
         });
     }
 

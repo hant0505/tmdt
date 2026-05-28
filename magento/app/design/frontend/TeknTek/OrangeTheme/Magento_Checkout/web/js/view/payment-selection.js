@@ -86,6 +86,10 @@ define(
 
                 methodList.subscribe(function () {
                     logDebug('Available methods updated', self.getMethodList());
+                    
+                    // Auto-select preferred payment method when methods load
+                    self.selectInitialPaymentMethod();
+                    
                     self.ensureSelectedMethodAvailable();
                     self.updatePlaceOrderViewModel();
                 });
@@ -113,6 +117,7 @@ define(
 
                 this.moveNativePlaceOrderToolbar();
                 this.updatePlaceOrderViewModel();
+                this.selectInitialPaymentMethod();
                 this.ensureSelectedMethodAvailable();
 
                 logDebug('Initial available methods', this.getMethodList());
@@ -208,7 +213,7 @@ define(
                     return;
                 }
 
-                fallback = methods[0].method;
+                fallback = this.getPreferredInitialMethodCode() || methods[0].method;
                 fallbackCustom = this.mapQuoteMethodToCustomOption(fallback) || fallback;
 
                 if (fallbackCustom && this.selectedMethod() !== fallbackCustom) {
@@ -220,6 +225,42 @@ define(
                         method: fallback
                     });
                     checkoutData.setSelectedPaymentMethod(fallback);
+                }
+            },
+
+            getPreferredInitialMethodCode: function () {
+                if (this.isAvailableMethodCode('vnpay')) {
+                    return this.resolveMagentoMethodCode('vnpay');
+                }
+
+                if (this.isAvailableMethodCode('cashondelivery')) {
+                    return this.resolveMagentoMethodCode('cashondelivery');
+                }
+
+                return (this.getMethodList()[0] && this.getMethodList()[0].method) || null;
+            },
+
+            selectInitialPaymentMethod: function () {
+                var methods = this.getMethodList();
+                var current = quote.paymentMethod() && quote.paymentMethod().method;
+                var preferred = this.getPreferredInitialMethodCode();
+                var customCode;
+
+                if (!methods.length || !preferred || current === preferred) {
+                    return;
+                }
+
+                console.log('[AUTO-SELECT] Selecting preferred method:', preferred, 'Available:', methods.length);
+
+                selectPaymentMethodAction({
+                    method: preferred
+                });
+                checkoutData.setSelectedPaymentMethod(preferred);
+
+                customCode = this.mapQuoteMethodToCustomOption(preferred);
+                if (customCode) {
+                    this.selectedMethod(customCode);
+                    this.showVnpayDetails(customCode === 'vnpay');
                 }
             },
 
@@ -253,33 +294,54 @@ define(
             updatePlaceOrderViewModel: function (attempt) {
                 var desiredCustom = this.selectedMethod && this.selectedMethod();
                 var desiredCode = this.resolveMagentoMethodCode(desiredCustom);
-                var methodCode = (quote.paymentMethod() && quote.paymentMethod().method) || desiredCode;
+                var methodCode = desiredCode || (quote.paymentMethod() && quote.paymentMethod().method);
                 var $methodContainer;
                 var vm;
                 var self = this;
 
                 attempt = attempt || 0;
+                
+                var debugEnabled = !!window.tekntekPaymentDebug;
 
                 if (methodCode) {
                     $methodContainer = $('#payment .payment-method').has(
                         'input[type="radio"][name="payment[method]"][value="' + methodCode + '"]'
                     ).first();
+                    
+                    if (debugEnabled && attempt === 0) {
+                        console.log('[updatePlaceOrderViewModel] Looking for methodCode:', methodCode);
+                        console.log('[updatePlaceOrderViewModel] Found $methodContainer:', $methodContainer.length, 'components');
+                    }
                 }
 
                 if (!$methodContainer || !$methodContainer.length) {
                     $methodContainer = $('#payment .payment-method._active').first();
+                    
+                    if (debugEnabled && attempt === 0) {
+                        console.log('[updatePlaceOrderViewModel] Fallback to _active, found:', $methodContainer.length);
+                    }
                 }
 
                 if ($methodContainer && $methodContainer.length) {
                     vm = ko.dataFor($methodContainer[0]);
+                    if (debugEnabled) {
+                        console.log('[updatePlaceOrderViewModel] Got vm from container:', vm ? vm.getCode ? vm.getCode() : 'no getCode' : 'null');
+                    }
+                    
                     if (vm && typeof vm.placeOrder === 'function') {
                         if (methodCode && typeof vm.getCode === 'function' && vm.getCode() !== methodCode) {
+                            if (debugEnabled) {
+                                console.log('[updatePlaceOrderViewModel] Method code mismatch:', vm.getCode(), 'vs', methodCode);
+                            }
                             vm = null;
                         }
                     }
 
                     if (vm && typeof vm.placeOrder === 'function') {
                         this.placeOrderVm(vm);
+                        if (debugEnabled) {
+                            console.log('[updatePlaceOrderViewModel] ✓ Set placeOrderVm successfully');
+                        }
                         return;
                     }
                 }
@@ -306,6 +368,7 @@ define(
                 }
 
                 if (!this.isAvailableMethodCode(desiredCode)) {
+                    console.log('[TeknTek][Payment] placeOrder - code not available:', desiredCode);
                     return false;
                 }
 
@@ -320,10 +383,14 @@ define(
 
                 var vm = this.placeOrderVm();
 
+                console.log('[TeknTek][Payment] placeOrder - vm found:', !!vm, vm ? vm.getCode ? vm.getCode() : 'no getCode' : '');
+
                 if (vm && typeof vm.placeOrder === 'function') {
+                    console.log('[TeknTek][Payment] placeOrder - calling vm.placeOrder()');
                     return vm.placeOrder();
                 }
 
+                console.log('[TeknTek][Payment] placeOrder - NO vm or no placeOrder function!');
                 return false;
             },
 
