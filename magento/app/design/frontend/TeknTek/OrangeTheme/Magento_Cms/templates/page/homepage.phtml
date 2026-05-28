@@ -1439,6 +1439,8 @@ if (empty($searchSuggestionItems)) {
 
 $formKey = $objectManager->get(\Magento\Framework\Data\Form\FormKey::class)->getFormKey();
 $urlEncoder = $objectManager->get(\Magento\Framework\Url\EncoderInterface::class);
+$httpContext = $objectManager->get(\Magento\Framework\App\Http\Context::class);
+$isLoggedIn = (bool) $httpContext->getValue(\Magento\Customer\Model\Context::CONTEXT_AUTH);
 $currentUrl = $block->getUrl('*/*/*', ['_current' => true, '_use_rewrite' => true]);
 
 $homepageData = [
@@ -1448,7 +1450,9 @@ $homepageData = [
     'cart' => [
         'addUrl' => $block->getUrl('checkout/cart/add'),
         'formKey' => $formKey,
-        'uenc' => $urlEncoder->encode($currentUrl)
+        'uenc' => $urlEncoder->encode($currentUrl),
+        'isLoggedIn' => $isLoggedIn,
+        'loginUrl' => $block->getUrl('customer/account/login')
     ]
 ];
 ?>
@@ -1517,6 +1521,8 @@ $homepageData = [
 
     var data = JSON.parse(dataNode.textContent);
     var cartConfig = data.cart || {};
+    var isLoggedIn = !!cartConfig.isLoggedIn;
+    var loginUrl = cartConfig.loginUrl || '/customer/account/login';
 
     var homeSearchForm = document.getElementById('search_mini_form');
     var homeSearchInput = document.getElementById('search');
@@ -1661,6 +1667,37 @@ $homepageData = [
         return '<span>' + '★'.repeat(filledStars) + '☆'.repeat(emptyStars) + '</span>';
     }
 
+    function bindHomepageCartForms(scopeNode) {
+        var rootNode = scopeNode || document;
+
+        Array.prototype.slice.call(rootNode.querySelectorAll('.ttk-card-cart-form')).forEach(function (formNode) {
+            if (!formNode || formNode.getAttribute('data-cart-bound') === '1') {
+                return;
+            }
+
+            formNode.setAttribute('data-cart-bound', '1');
+            formNode.addEventListener('submit', function (event) {
+                if (isLoggedIn) {
+                    return;
+                }
+
+                event.preventDefault();
+                window.location.href = loginUrl;
+            });
+
+            Array.prototype.slice.call(formNode.querySelectorAll('.ttk-card-cart')).forEach(function (buttonNode) {
+                buttonNode.addEventListener('click', function (event) {
+                    if (isLoggedIn) {
+                        return;
+                    }
+
+                    event.preventDefault();
+                    window.location.href = loginUrl;
+                });
+            });
+        });
+    }
+
     function cardTemplate(item) {
         var badge = item.discount ? '<span class="ttk-badge">SALE ' + item.discount + '</span>' : '';
         var openLink = item.url ? '<a class="ttk-card-link" href="' + item.url + '">' : '';
@@ -1701,6 +1738,7 @@ $homepageData = [
     }
 
     offersNode.innerHTML = data.offers.map(cardTemplate).join('');
+    bindHomepageCartForms(offersNode);
 
     productsNode.innerHTML = data.sections.map(function (section) {
         var name = section && section.name ? section.name : '';
@@ -1725,6 +1763,7 @@ $homepageData = [
             }).join('') + '</div>' +
             '</section>';
     }).join('');
+    bindHomepageCartForms(productsNode);
 
 })();
 </script>
