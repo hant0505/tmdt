@@ -10,23 +10,29 @@
     </div>
 
     <div class="tekntek-payment-options-wrapper">
-        <label class="tekntek-payment-option-card">
-            <input type="radio" name="payment_method_selection" value="vnpay"
-                   class="payment-method-radio" data-bind="checked: selectedMethod, enable: isVnpayEnabled">
-            <div class="payment-option-content">
-                <span class="payment-option-title">VNPay</span>
-                <span class="payment-option-desc">Pay securely via VNPay gateway</span>
-            </div>
-        </label>
+        <!-- VNPAY Container for Magento payment method rendering -->
+        <div class="payment-method vnpay-payment-method" id="payment_method_vnpay">
+            <label class="tekntek-payment-option-card">
+                <input type="radio" name="payment[method]" value="vnpay"
+                       class="payment-method-radio" data-bind="checked: selectedMethod, enable: isVnpayEnabled">
+                <div class="payment-option-content">
+                    <span class="payment-option-title">VNPay</span>
+                    <span class="payment-option-desc">Pay securely via VNPay gateway</span>
+                </div>
+            </label>
+        </div>
 
-        <label class="tekntek-payment-option-card">
-            <input type="radio" name="payment_method_selection" value="cashondelivery"
-                   class="payment-method-radio" data-bind="checked: selectedMethod, enable: isCashOnDeliveryEnabled">
-            <div class="payment-option-content">
-                <span class="payment-option-title">Cash On Delivery (COD)</span>
-                <span class="payment-option-desc">Pay when you receive your order</span>
-            </div>
-        </label>
+        <!-- COD Container for Magento payment method rendering -->
+        <div class="payment-method cod-payment-method" id="payment_method_cashondelivery">
+            <label class="tekntek-payment-option-card">
+                <input type="radio" name="payment[method]" value="cashondelivery"
+                       class="payment-method-radio" data-bind="checked: selectedMethod, enable: isCashOnDeliveryEnabled">
+                <div class="payment-option-content">
+                    <span class="payment-option-title">Cash On Delivery (COD)</span>
+                    <span class="payment-option-desc">Pay when you receive your order</span>
+                </div>
+            </label>
+        </div>
     </div>
 
     <div class="payment-details-section" data-bind="visible: isVnpay()">

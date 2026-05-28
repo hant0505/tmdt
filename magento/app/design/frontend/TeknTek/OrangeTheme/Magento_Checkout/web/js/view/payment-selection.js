@@ -7,9 +7,10 @@ define(
         'Magento_Checkout/js/action/select-payment-method',
         'Magento_Checkout/js/checkout-data',
         'Magento_Checkout/js/model/payment-service',
-        'Magento_Checkout/js/model/payment/method-list'
+        'Magento_Checkout/js/model/payment/method-list',
+        'uiRegistry'
     ],
-    function ($, ko, Component, quote, selectPaymentMethodAction, checkoutData, paymentService, methodList) {
+    function ($, ko, Component, quote, selectPaymentMethodAction, checkoutData, paymentService, methodList, registry) {
         'use strict';
 
         return Component.extend({
@@ -79,6 +80,7 @@ define(
 
                 // Watch for changes in selected payment method
                 this.selectedMethod.subscribe(function(newValue) {
+                    logDebug('selectedMethod changed', newValue);
                     self.showVnpayDetails(newValue === 'vnpay');
                     self.applySelectedMethod(newValue);
                     self.updatePlaceOrderViewModel();
@@ -268,6 +270,10 @@ define(
                 var methodCode = this.resolveMagentoMethodCode(desiredCode);
                 var current = quote.paymentMethod();
 
+                if (!!window.tekntekPaymentDebug) {
+                    console.log('[TeknTek][Payment] applySelectedMethod', { desiredCode: desiredCode, resolved: methodCode, current: current });
+                }
+
                 if (!methodCode) {
                     return;
                 }
@@ -278,9 +284,16 @@ define(
                 }
 
                 if (current && current.method === methodCode) {
+                    if (!!window.tekntekPaymentDebug) {
+                        console.log('[TeknTek][Payment] applySelectedMethod - already selected:', methodCode);
+                    }
                     checkoutData.setSelectedPaymentMethod(methodCode);
                     this.updatePlaceOrderViewModel();
                     return;
+                }
+
+                if (!!window.tekntekPaymentDebug) {
+                    console.log('[TeknTek][Payment] applySelectedMethod - selecting method via action', methodCode);
                 }
 
                 selectPaymentMethodAction({
@@ -288,13 +301,67 @@ define(
                 });
 
                 checkoutData.setSelectedPaymentMethod(methodCode);
-                this.updatePlaceOrderViewModel();
+                // Wait for Magento to update the authoritative quote.paymentMethod, then sync the native radio and VM.
+                var synced = false;
+                var maxWait = 1800; // ms
+                var start = Date.now();
+
+                function syncRadioAndVm() {
+                    try {
+                        var $radio = $('input[type="radio"][name="payment[method]"][value="' + methodCode + '"]');
+                        if ($radio.length) {
+                            $radio.prop('checked', true);
+                            $radio.trigger('click');
+                            $radio.trigger('change');
+                            if (!!window.tekntekPaymentDebug) {
+                                console.log('[TeknTek][Payment] applySelectedMethod - synced radio and triggered events for', methodCode, $radio[0]);
+                            }
+                        } else if (!!window.tekntekPaymentDebug) {
+                            console.log('[TeknTek][Payment] applySelectedMethod - radio not in DOM for', methodCode);
+                        }
+                    } catch (e) {
+                        console.log('[TeknTek][Payment] applySelectedMethod - error syncing radio', e);
+                    }
+
+                    // Ensure VM updated after radio sync
+                    try {
+                        this.updatePlaceOrderViewModel();
+                    } catch (e) {
+                        // ignore
+                    }
+                }
+
+                var self = this;
+                var subscription = quote.paymentMethod.subscribe(function (pm) {
+                    if (pm && pm.method === methodCode) {
+                        if (!synced) {
+                            synced = true;
+                            syncRadioAndVm.call(self);
+                        }
+                        try { subscription.dispose(); } catch (e) {}
+                    } else {
+                        // if timeout exceeded, try to sync anyway once
+                        if (!synced && Date.now() - start > maxWait) {
+                            synced = true;
+                            syncRadioAndVm.call(self);
+                            try { subscription.dispose(); } catch (e) {}
+                        }
+                    }
+                });
+
+                // If payment method was already set in quote, sync immediately
+                var currentPm = quote.paymentMethod();
+                if (currentPm && currentPm.method === methodCode) {
+                    try { subscription.dispose(); } catch (e) {}
+                    syncRadioAndVm.call(self);
+                }
             },
 
             updatePlaceOrderViewModel: function (attempt) {
                 var desiredCustom = this.selectedMethod && this.selectedMethod();
                 var desiredCode = this.resolveMagentoMethodCode(desiredCustom);
                 var methodCode = desiredCode || (quote.paymentMethod() && quote.paymentMethod().method);
+                var registryName = methodCode ? ('checkout.steps.billing-step.payment.payments-list.' + methodCode) : null;
                 var $methodContainer;
                 var vm;
                 var self = this;
@@ -322,16 +389,54 @@ define(
                     }
                 }
 
-                if ($methodContainer && $methodContainer.length) {
+                if (registryName) {
+                    vm = registry.get(registryName);
+
+                    if (debugEnabled && attempt === 0) {
+                        console.log('[updatePlaceOrderViewModel] Registry lookup:', registryName, vm ? vm : 'not found');
+                    }
+
+                    if (vm && typeof vm.placeOrder === 'function') {
+                        if (debugEnabled) {
+                            console.log('[updatePlaceOrderViewModel] Using payment VM from registry:', typeof vm.getCode === 'function' ? vm.getCode() : 'no getCode', vm);
+                        }
+                    } else {
+                        vm = null;
+                    }
+                }
+
+                if (!vm && $methodContainer && $methodContainer.length) {
                     vm = ko.dataFor($methodContainer[0]);
                     if (debugEnabled) {
-                        console.log('[updatePlaceOrderViewModel] Got vm from container:', vm ? vm.getCode ? vm.getCode() : 'no getCode' : 'null');
+                        console.log('[updatePlaceOrderViewModel] Got vm from container (initial):', vm ? (typeof vm.getCode === 'function' ? vm.getCode() : 'no getCode') : 'null', vm);
                     }
-                    
-                    if (vm && typeof vm.placeOrder === 'function') {
-                        if (methodCode && typeof vm.getCode === 'function' && vm.getCode() !== methodCode) {
+
+                    // If the vm we found is not the payment-method vm (some themes wrap elements),
+                    // search descendants for a vm that implements placeOrder/getCode.
+                    if (!(vm && typeof vm.placeOrder === 'function') || (methodCode && typeof vm.getCode === 'function' && vm.getCode() !== methodCode)) {
+                        var found = null;
+                        $methodContainer.find('*').each(function () {
+                            try {
+                                var deepVm = ko.dataFor(this);
+                                if (deepVm && typeof deepVm.placeOrder === 'function') {
+                                    if (!methodCode || (typeof deepVm.getCode === 'function' && deepVm.getCode() === methodCode)) {
+                                        found = deepVm;
+                                        return false; // break
+                                    }
+                                }
+                            } catch (e) {
+                                // ignore
+                            }
+                        });
+
+                        if (found) {
+                            vm = found;
                             if (debugEnabled) {
-                                console.log('[updatePlaceOrderViewModel] Method code mismatch:', vm.getCode(), 'vs', methodCode);
+                                console.log('[updatePlaceOrderViewModel] Found payment VM in descendants:', typeof vm.getCode === 'function' ? vm.getCode() : 'no getCode', vm);
+                            }
+                        } else {
+                            if (debugEnabled) {
+                                console.log('[updatePlaceOrderViewModel] No payment VM found in descendants for methodCode:', methodCode);
                             }
                             vm = null;
                         }
@@ -340,7 +445,13 @@ define(
                     if (vm && typeof vm.placeOrder === 'function') {
                         this.placeOrderVm(vm);
                         if (debugEnabled) {
-                            console.log('[updatePlaceOrderViewModel] ✓ Set placeOrderVm successfully');
+                            try {
+                                var vmCode = typeof vm.getCode === 'function' ? vm.getCode() : '(no getCode)';
+                                var canPlace = typeof vm.isPlaceOrderActionAllowed === 'function' ? !!vm.isPlaceOrderActionAllowed() : (vm.isPlaceOrderActionAllowed !== undefined ? !!vm.isPlaceOrderActionAllowed : '(no flag)');
+                                console.log('[updatePlaceOrderViewModel] ✓ Set placeOrderVm successfully', { vmCode: vmCode, canPlace: canPlace, vm: vm });
+                            } catch (e) {
+                                console.log('[updatePlaceOrderViewModel] ✓ Set placeOrderVm successfully (could not inspect vm)', vm);
+                            }
                         }
                         return;
                     }
@@ -379,19 +490,53 @@ define(
                     checkoutData.setSelectedPaymentMethod(desiredCode);
                 }
 
+                // Ensure we have the correct placeOrder view model before invoking.
+                var self = this;
+                var attempts = 0;
+                var maxAttempts = 15; // ~1.8s max wait
+
                 this.updatePlaceOrderViewModel();
 
-                var vm = this.placeOrderVm();
+                return (function waitForVm() {
+                    var vm = self.placeOrderVm();
+                    if (vm && typeof vm.placeOrder === 'function') {
+                        // If vm exposes getCode, ensure it matches desiredCode when available
+                        if (typeof vm.getCode === 'function') {
+                            try {
+                                var vmCode = vm.getCode();
+                                if (vmCode && desiredCode && vmCode !== desiredCode) {
+                                    // mismatch, keep waiting for correct vm
+                                    if (attempts++ < maxAttempts) {
+                                        return new Promise(function (resolve) {
+                                            setTimeout(function () { resolve(waitForVm()); }, 120);
+                                        });
+                                    }
+                                    console.log('[TeknTek][Payment] placeOrder - VM code mismatch after wait:', vmCode, 'expected:', desiredCode);
+                                    return false;
+                                }
+                            } catch (e) {
+                                // ignore getCode errors
+                            }
+                        }
 
-                console.log('[TeknTek][Payment] placeOrder - vm found:', !!vm, vm ? vm.getCode ? vm.getCode() : 'no getCode' : '');
+                        console.log('[TeknTek][Payment] placeOrder - calling vm.placeOrder()');
+                        try {
+                            return vm.placeOrder();
+                        } catch (e) {
+                            console.log('[TeknTek][Payment] placeOrder - vm.placeOrder threw error', e);
+                            return false;
+                        }
+                    }
 
-                if (vm && typeof vm.placeOrder === 'function') {
-                    console.log('[TeknTek][Payment] placeOrder - calling vm.placeOrder()');
-                    return vm.placeOrder();
-                }
+                    if (attempts++ < maxAttempts) {
+                        return new Promise(function (resolve) {
+                            setTimeout(function () { resolve(waitForVm()); }, 120);
+                        });
+                    }
 
-                console.log('[TeknTek][Payment] placeOrder - NO vm or no placeOrder function!');
-                return false;
+                    console.log('[TeknTek][Payment] placeOrder - NO vm or no placeOrder function after waiting');
+                    return false;
+                }());
             },
 
             moveNativePlaceOrderToolbar: function (attempt) {
