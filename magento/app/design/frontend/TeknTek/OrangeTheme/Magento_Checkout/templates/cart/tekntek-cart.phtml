@@ -196,33 +196,48 @@ require([
             }
         });
         
+        // Store original quantity on focus
+        $(document).on('focus', '.qty-input', function() {
+            $(this).data('original-qty', parseInt($(this).val(), 10));
+        });
+        
         // Handle quantity input change - update via AJAX
-        $(document).on('change', '.qty-input', function() {
+        $(document).on('change blur', '.qty-input', function() {
             var $input = $(this);
             var itemId = $input.data('item-id');
             var newQty = parseInt($input.val(), 10);
-            var oldQty = parseInt($input.attr('data-last-qty'), 10) || parseInt($input.val(), 10) || 1;
+            var oldQty = $input.data('original-qty') || parseInt($input.val(), 10) || 1;
             
-            if (newQty < 1) {
-                $input.val(1);
-                newQty = 1;
+            if (!newQty || newQty < 1) {
+                $input.val(oldQty);
+                return;
             }
+
+            // Only update if quantity actually changed
+            if (newQty === oldQty) {
+                return;
+            }
+
+            console.log('[CART] Updating qty - itemId:', itemId, 'newQty:', newQty, 'oldQty:', oldQty);
 
             updateCartItemQty(itemId, newQty)
                 .done(function(response) {
+                    console.log('[CART] Qty update response:', response);
                     if (response && response.error_message) {
                         $input.val(oldQty);
                         alert(response.error_message);
                         return;
                     }
                     if (hasCouponCode) {
+                        console.log('[CART] Has coupon - reloading page');
                         window.location.reload();
                         return;
                     }
-                    $input.attr('data-last-qty', newQty);
+                    $input.data('original-qty', newQty);
                     refreshCartTotals();
                 })
-                .fail(function() {
+                .fail(function(xhr, status, error) {
+                    console.log('[CART] Qty update failed:', error);
                     $input.val(oldQty);
                     alert('Error updating cart. Please try again.');
                 });
@@ -308,14 +323,56 @@ require(['jquery', 'Magento_Customer/js/customer-data'], function($, customerDat
         }
     });
     
-    // Debug: Monitor cart data updates (after coupon applied)
+    // Monitor cart data updates (e.g., from minicart) and refresh page parts
     var cartData = customerData.get('cart');
     cartData.subscribe(function(updatedCart) {
-        console.log('[COUPON DEBUG] Cart data updated:');
-        console.log('[COUPON DEBUG] coupon_code:', updatedCart.coupon_code);
-        console.log('[COUPON DEBUG] subtotal:', updatedCart.subtotal);
-        console.log('[COUPON DEBUG] discount_amount:', updatedCart.discount_amount);
-        console.log('[COUPON DEBUG] totals:', updatedCart);
+        try {
+            console.log('[CART PAGE] customerData cart updated:', updatedCart);
+
+            // If coupon-related change occurred and server requires full reload, reload.
+            if (updatedCart && updatedCart.coupon_code && <?= $hasCouponCode ? 'true' : 'false' ?>) {
+                console.log('[CART PAGE] coupon present, reloading page');
+                window.location.reload();
+                return;
+            }
+
+            // Update item quantity inputs on cart page to reflect updated cart
+            var items = (updatedCart && (updatedCart.items || updatedCart.items_qty)) ? (updatedCart.items || []) : [];
+            if (Array.isArray(items) && items.length) {
+                items.forEach(function(item) {
+                    var itemId = item.item_id || item.item_id || item.id || item.item_id;
+                    var qty = item.qty || item.qty || item.qty || item['quantity'] || item['qty'];
+
+                    if (!itemId && item['product_sku']) {
+                        // try to find by sku in DOM as fallback
+                        var sku = String(item['product_sku']).trim();
+                        var $match = null;
+                        $('.tekntek-item').each(function() {
+                            var $el = $(this);
+                            if ($el.find('.tekntek-item__desc').text().indexOf(sku) !== -1) {
+                                $match = $el.find('input[data-action="update-qty"]');
+                                return false;
+                            }
+                        });
+                        if ($match && $match.length && qty) {
+                            $match.val(qty);
+                        }
+                    } else if (itemId) {
+                        var $input = $('input[data-item-id="' + itemId + '"]');
+                        if ($input.length && qty) {
+                            $input.val(qty);
+                        }
+                    }
+                });
+            }
+
+            // Refresh totals on page (uses existing function defined earlier)
+            if (typeof refreshCartTotals === 'function') {
+                refreshCartTotals();
+            }
+        } catch (e) {
+            console.log('[CART PAGE] Error handling cart data update', e);
+        }
     }, this);
 });
 </script>
