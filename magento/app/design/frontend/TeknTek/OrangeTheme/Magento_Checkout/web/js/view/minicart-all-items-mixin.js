@@ -71,7 +71,12 @@ define([
                     return;
                 }
 
-                // Refresh minicart UI
+                if (window.location && window.location.pathname.indexOf('/checkout/cart') !== -1) {
+                    window.location.reload();
+                    return;
+                }
+
+                // Refresh minicart UI on non-cart pages.
                 refreshCartTotals();
             })
             .fail(function() {

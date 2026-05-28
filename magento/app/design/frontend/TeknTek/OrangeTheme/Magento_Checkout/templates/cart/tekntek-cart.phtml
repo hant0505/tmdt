@@ -1,6 +1,8 @@
 <?php
 /** @var \Magento\Checkout\Block\Cart\Grid $block */
 $quote = $block->getQuote();
+$couponCode = trim((string) $quote->getCouponCode());
+$hasCouponCode = $couponCode !== '';
 $currencyCode = (string) $quote->getQuoteCurrencyCode();
 $items = $block->getItems();
 $hasItems = !empty($items);
@@ -27,8 +29,12 @@ $formatPrice = static function (float $amount, string $currencyCode): string {
                 $name = (string) $item->getName();
                 $sku = (string) $item->getSku();
                 $qty = (float) $item->getQty();
-                $rowTotal = (float) ($item->getRowTotalInclTax() ?: $item->getRowTotal());
                 $unitPrice = (float) ($item->getCalculationPriceInclTax() ?: $item->getCalculationPrice());
+                $discountAmount = (float) ($item->getDiscountAmount() ?: 0);
+                $hasItemDiscount = $hasCouponCode && $discountAmount > 0;
+                $discountedUnitPrice = $hasItemDiscount && $qty > 0
+                    ? max(0, ($unitPrice * $qty - $discountAmount) / $qty)
+                    : $unitPrice;
                 $productUrl = ($product && $product->isVisibleInSiteVisibility()) ? $product->getProductUrl() : '';
                 ?>
                 <div class="tekntek-item">
@@ -61,9 +67,13 @@ $formatPrice = static function (float $amount, string $currencyCode): string {
                                 </svg>
                             </button>
                         </div>
-                        <div class="tekntek-item__price">
-                            <span class="old"><?= $block->escapeHtml($formatPrice($unitPrice, $currencyCode)) ?></span>
-                            <span class="new"><?= $block->escapeHtml($formatPrice($rowTotal, $currencyCode)) ?></span>
+                        <div class="tekntek-item__price" data-unit-price="<?= $block->escapeHtmlAttr($unitPrice) ?>">
+                            <?php if ($hasItemDiscount): ?>
+                                <span class="old"><?= $block->escapeHtml($formatPrice($unitPrice, $currencyCode)) ?></span>
+                                <span class="new"><?= $block->escapeHtml($formatPrice($discountedUnitPrice, $currencyCode)) ?></span>
+                            <?php else: ?>
+                                <span class="current"><?= $block->escapeHtml($formatPrice($unitPrice, $currencyCode)) ?></span>
+                            <?php endif; ?>
                         </div>
                     </div>
                 </div>
@@ -84,6 +94,8 @@ require([
     'Magento_Checkout/js/action/get-totals'
 ], function($, customerData, getTotalsAction) {
     'use strict';
+
+    var hasCouponCode = <?= $hasCouponCode ? 'true' : 'false' ?>;
 
     function getFormKey() {
         var cookieMatch;
@@ -118,17 +130,6 @@ require([
         var parts = fixed.split('.');
         parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',');
         return currencyCode + ' ' + parts.join('.');
-    }
-
-    function updateRowTotal(itemId, qty) {
-        var $item = $('.tekntek-item').find('[data-item-id="' + itemId + '"]').closest('.tekntek-item');
-        var unitText = $item.find('.tekntek-item__price .old').first().text();
-        var unitPrice = parseMoney(unitText);
-        var newTotal = unitPrice * qty;
-
-        if ($item.length) {
-            $item.find('.tekntek-item__price .new').text(formatMoney(newTotal));
-        }
     }
 
     function updateCartItemQty(itemId, qty) {
@@ -182,7 +183,10 @@ require([
                             alert(response.error_message);
                             return;
                         }
-                        updateRowTotal(itemId, newQty);
+                        if (hasCouponCode) {
+                            window.location.reload();
+                            return;
+                        }
                         refreshCartTotals();
                     })
                     .fail(function() {
@@ -211,8 +215,11 @@ require([
                         alert(response.error_message);
                         return;
                     }
+                    if (hasCouponCode) {
+                        window.location.reload();
+                        return;
+                    }
                     $input.attr('data-last-qty', newQty);
-                    updateRowTotal(itemId, newQty);
                     refreshCartTotals();
                 })
                 .fail(function() {
@@ -253,6 +260,10 @@ require([
                     },
                     showLoader: true,
                     success: function(res) {
+                        if (hasCouponCode) {
+                            window.location.reload();
+                            return;
+                        }
                         removeItemFromDom(itemId);
                         refreshCartTotals();
                     },
@@ -263,5 +274,48 @@ require([
             }
         });
     });
+});
+</script>
+
+<!-- Coupon Debug Logging -->
+<script type="text/javascript">
+require(['jquery', 'Magento_Customer/js/customer-data'], function($, customerData) {
+    // Debug: Log coupon form submissions
+    $(document).on('submit', '#discount-coupon-form', function(e) {
+        var couponCode = $('#coupon_code').val();
+        console.log('[COUPON DEBUG] Form submitted with code:', couponCode);
+    });
+    
+    // Debug: Monitor AJAX requests for coupon post
+    $(document).ajaxSend(function(event, xhr, settings) {
+        if (settings.url && settings.url.indexOf('checkout/cart/couponPost') !== -1) {
+            var formData = settings.data;
+            console.log('[COUPON DEBUG] AJAX sending to couponPost:', formData);
+        }
+    });
+    
+    // Debug: Monitor AJAX responses
+    $(document).ajaxComplete(function(event, xhr, settings) {
+        if (settings.url && settings.url.indexOf('checkout/cart/couponPost') !== -1) {
+            var responseText = xhr.responseText || '';
+            console.log('[COUPON DEBUG] Server response:', responseText);
+            try {
+                var responseJson = JSON.parse(responseText);
+                console.log('[COUPON DEBUG] Parsed response:', responseJson);
+            } catch(e) {
+                console.log('[COUPON DEBUG] Response is not JSON');
+            }
+        }
+    });
+    
+    // Debug: Monitor cart data updates (after coupon applied)
+    var cartData = customerData.get('cart');
+    cartData.subscribe(function(updatedCart) {
+        console.log('[COUPON DEBUG] Cart data updated:');
+        console.log('[COUPON DEBUG] coupon_code:', updatedCart.coupon_code);
+        console.log('[COUPON DEBUG] subtotal:', updatedCart.subtotal);
+        console.log('[COUPON DEBUG] discount_amount:', updatedCart.discount_amount);
+        console.log('[COUPON DEBUG] totals:', updatedCart);
+    }, this);
 });
 </script>
