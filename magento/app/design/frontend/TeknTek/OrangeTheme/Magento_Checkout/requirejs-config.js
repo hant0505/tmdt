@@ -10,6 +10,12 @@ var config = {
             'Magento_Checkout/js/model/new-customer-address': {
                 'Magento_Checkout/js/model/new-customer-address-mixin': true
             },
+            'Magento_Ui/js/form/element/post-code': {
+                'Magento_Checkout/js/form/element/post-code-vn-optional-mixin': true
+            },
+            'Magento_Ui/js/form/element/region': {
+                'Magento_Checkout/js/form/element/region-vn-required-mixin': true
+            },
             'Magento_Checkout/js/view/shipping-address/list': {
                 'Magento_Checkout/js/view/shipping-address/list-visibility-mixin': true
             },
