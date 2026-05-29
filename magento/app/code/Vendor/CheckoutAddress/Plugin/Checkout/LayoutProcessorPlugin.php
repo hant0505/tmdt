@@ -29,12 +29,19 @@ class LayoutProcessorPlugin
         $this->setFieldLabel($fieldset, 'country_id', 'Quốc gia/Khu vực');
         $this->setFieldLabel($fieldset, 'telephone', 'Số điện thoại');
 
-        // Keep Vietnam selected by default but allow country selector to stay visible.
+        // Lock shipping country to Vietnam and hide country selector.
         if (isset($fieldset['country_id']) && is_array($fieldset['country_id'])) {
             $fieldset['country_id']['value'] = 'VN';
-            $fieldset['country_id']['visible'] = true;
+            $fieldset['country_id']['default'] = 'VN';
+            $fieldset['country_id']['visible'] = false;
             $fieldset['country_id']['validation']['required-entry'] = true;
             $fieldset['country_id']['sortOrder'] = 44;
+
+            if (!isset($fieldset['country_id']['config']) || !is_array($fieldset['country_id']['config'])) {
+                $fieldset['country_id']['config'] = [];
+            }
+
+            $fieldset['country_id']['config']['default'] = 'VN';
         }
 
         $this->setFieldVisibility($fieldset, 'company', false);

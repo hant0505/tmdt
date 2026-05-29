@@ -15,12 +15,17 @@ class Pay extends \Magento\Framework\App\Action\Action {
     /** @var  \Magento\Framework\App\Config\ScopeConfigInterface */
     protected $scopeConfig;
 
+    /** @var \Magento\Quote\Model\QuoteFactory */
+    protected $quoteFactory; ##save quote factory to restore cart on failed payment
+
     public function __construct(Context $context, \Magento\Sales\Model\Order $order, \Magento\Checkout\Model\Session $checkoutSession, \Magento\Framework\App\Config\ScopeConfigInterface $scopeConfig
+        , \Magento\Quote\Model\QuoteFactory $quoteFactory
     ) {
         parent::__construct($context);
         $this->order = $order;
         $this->checkoutSession = $checkoutSession;
         $this->scopeConfig = $scopeConfig;
+        $this->quoteFactory = $quoteFactory;
     }
 
     /**
@@ -58,6 +63,38 @@ class Pay extends \Magento\Framework\App\Action\Action {
                 return $this->resultRedirectFactory->create()->setPath('checkout/onepage/success');
             } else {
                 $this->messageManager->addError('Thanh toán qua VNPAY thất bại. ' . $this->getResponseDescription($vnp_ResponseCode));
+                // Try to restore customer's cart from the original quote linked to the order
+                try {
+                    $txnRef = $this->getRequest()->getParam('vnp_TxnRef', '');
+                    if ($txnRef) {
+                        // Orders use increment id as TxnRef
+                        $order = $this->order->loadByIncrementId($txnRef);
+                        if ($order && $order->getId()) {
+                            $quoteId = $order->getQuoteId();
+                            if ($quoteId) {
+                                $quote = $this->quoteFactory->create()->load($quoteId);
+                                if ($quote && $quote->getId()) {
+                                    $quote->setIsActive(1);
+                                    $quote->setReservedOrderId(null);
+                                    $quote->save();
+                                    $this->checkoutSession->replaceQuote($quote);
+                                    $this->checkoutSession->setQuoteId($quote->getId());
+                                }
+                            }
+                            try {
+                                // Optionally cancel the failed order to avoid confusion
+                                $order->setState(\Magento\Sales\Model\Order::STATE_CANCELED);
+                                $order->setStatus(\Magento\Sales\Model\Order::STATE_CANCELED);
+                                $order->save();
+                            } catch (\Exception $e) {
+                                // ignore order cancel errors
+                            }
+                        }
+                    }
+                } catch (\Exception $e) {
+                    // ignore restore errors
+                }
+
                 return $this->resultRedirectFactory->create()->setPath('checkout/onepage/failure');
             }
         } else {

@@ -306,7 +306,7 @@ define(
                         checkoutData.setSelectedPaymentMethod('vnpay');
                     }
 
-                    $.when(placeOrderAction({ method: 'vnpay' }))
+                    $.when(placeOrderAction({ method: 'vnpay', po_number: null, additional_data: null }))
                         .fail(function () {
                             if (!!window.tekntekPaymentDebug) {
                                 console.error('[TeknTek][Payment] placeOrderAction failed');
