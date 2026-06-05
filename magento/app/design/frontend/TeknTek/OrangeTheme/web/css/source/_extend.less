@@ -693,6 +693,535 @@
     }
 }
 
+@media (max-width: 767px) {
+    .tekntek-header {
+        width: calc(100vw - 24px);
+        max-width: 100%;
+        margin-top: 12px;
+    }
+
+    .tekntek-header .tekntek-header__inner {
+        display: grid;
+        grid-template-columns: auto minmax(0, 1fr) auto;
+        grid-template-areas:
+            "menu brand actions"
+            "search search search"
+            "nav nav nav";
+        align-items: center;
+        gap: 10px 12px;
+        min-width: 0;
+    }
+
+    .tekntek-header .nav-toggle {
+        grid-area: menu;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 44px;
+        min-height: 44px;
+    }
+
+    .tekntek-header .tekntek-brand {
+        grid-area: brand;
+        min-width: 0;
+        max-width: 100%;
+    }
+
+    .tekntek-header .tekntek-brand__logo {
+        display: block;
+        width: auto;
+        max-width: 170px;
+        height: auto;
+    }
+
+    .tekntek-header .tekntek-header__actions {
+        grid-area: actions;
+        display: flex;
+        flex-wrap: nowrap;
+        justify-content: flex-end;
+        align-items: center;
+        gap: 8px;
+        min-width: 0;
+        max-width: 100%;
+    }
+
+    .tekntek-header .tekntek-search {
+        grid-area: search;
+        display: grid;
+        grid-template-columns: 112px minmax(0, 1fr);
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+    }
+
+    .tekntek-header .tekntek-search__catalog-dropdown,
+    .tekntek-header .tekntek-search__field {
+        min-width: 0;
+        max-width: 100%;
+    }
+
+    .tekntek-header .tekntek-search__field {
+        height: 44px;
+        padding: 0 12px;
+    }
+
+    .tekntek-header .tekntek-search__placeholder {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .tekntek-header .tekntek-header__actions a,
+    .tekntek-header .tekntek-minicart-wrapper .action.showcart {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 44px;
+        min-height: 44px;
+    }
+
+    .tekntek-header .tekntek-minicart-wrapper {
+        position: relative;
+        flex: 0 0 auto;
+    }
+
+    .tekntek-header .tekntek-minicart-wrapper .action.showcart {
+        padding: 0 8px;
+    }
+
+    .tekntek-header .tekntek-minicart-wrapper .block-minicart {
+        right: 0;
+        left: auto;
+        width: calc(100vw - 24px);
+        max-width: calc(100vw - 24px);
+        padding: 12px;
+        box-sizing: border-box;
+    }
+
+    .tekntek-header .tekntek-minicart-content {
+        max-height: 70vh;
+        padding: 16px;
+        overflow-y: auto;
+    }
+
+    .tekntek-header .tekntek-minicart-item__card {
+        grid-template-columns: 72px minmax(0, 1fr);
+        gap: 10px;
+    }
+
+    .tekntek-header .tekntek-minicart-item__details,
+    .tekntek-header .tekntek-minicart-item__top,
+    .tekntek-header .tekntek-minicart-item__bottom {
+        min-width: 0;
+    }
+
+    .tekntek-header .tekntek-minicart-item__name,
+    .tekntek-header .tekntek-minicart-item__name a,
+    .tekntek-header .tekntek-minicart-item__name span {
+        max-width: 100%;
+    }
+
+    .tekntek-header .tekntek-header__categories {
+        grid-area: nav;
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        margin-top: 0;
+    }
+
+    .tekntek-header .tekntek-header__categories .navigation > ul {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        width: 100%;
+    }
+
+    .tekntek-header .tekntek-header__categories .navigation .level0,
+    .tekntek-header .tekntek-header__categories .navigation .level0 > .level-top,
+    .tekntek-header .tekntek-header__categories a {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .tekntek-header .tekntek-header__categories .navigation .level0 > .level-top,
+    .tekntek-header .tekntek-header__categories a,
+    .tekntek-header .tekntek-search__catalog-dropdown .navigation .level0 > .level-top {
+        display: flex;
+        align-items: center;
+        min-height: 40px;
+    }
+
+    .tekntek-isolated-header {
+        width: 100% !important;
+        max-width: 100% !important;
+        left: auto !important;
+        right: auto !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        box-sizing: border-box !important;
+    }
+
+    .tekntek-isolated-header .ttk-main-header {
+        padding: 8px 10px !important;
+        box-sizing: border-box !important;
+    }
+
+    .tekntek-isolated-header .ttk-main-header-inner {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        align-items: center !important;
+        gap: 8px 10px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+        min-height: 0 !important;
+        padding: 10px !important;
+        box-sizing: border-box !important;
+    }
+
+    .tekntek-isolated-header .ttk-logo-link {
+        order: 1 !important;
+        flex: 1 1 auto !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+        min-height: 44px !important;
+        margin-left: 0 !important;
+    }
+
+    .tekntek-isolated-header .ttk-logo {
+        width: auto !important;
+        max-width: 128px !important;
+        height: auto !important;
+        max-height: 46px !important;
+    }
+
+    .tekntek-isolated-header .ttk-right-links {
+        order: 2 !important;
+        flex: 1 1 100% !important;
+        display: flex !important;
+        flex-wrap: wrap !important;
+        justify-content: center !important;
+        align-items: center !important;
+        gap: 6px 8px !important;
+        min-width: 0 !important;
+        max-width: 100% !important;
+    }
+
+    .tekntek-isolated-header .ttk-right-links a,
+    .tekntek-isolated-header .ttk-right-links .action.showcart {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        min-width: 40px !important;
+        min-height: 40px !important;
+        max-width: 100% !important;
+        font-size: 12px !important;
+        line-height: 1.2 !important;
+        white-space: nowrap !important;
+    }
+
+    .tekntek-isolated-header .ttk-search-form {
+        order: 3 !important;
+        flex: 1 1 100% !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+        height: 44px !important;
+        box-sizing: border-box !important;
+    }
+
+    .tekntek-isolated-header .ttk-all-products-btn {
+        flex: 0 0 116px !important;
+        min-width: 0 !important;
+        max-width: 116px !important;
+        padding: 0 10px !important;
+        font-size: 12px !important;
+        justify-content: center !important;
+        box-sizing: border-box !important;
+    }
+
+    .tekntek-isolated-header .ttk-search-input {
+        flex: 1 1 auto !important;
+        min-width: 0 !important;
+        width: auto !important;
+        max-width: 100% !important;
+        padding: 0 10px !important;
+        font-size: 14px !important;
+        box-sizing: border-box !important;
+    }
+
+    .tekntek-isolated-header .ttk-icon-layer-inner {
+        width: 100% !important;
+        max-width: 100% !important;
+        padding: 0 10px !important;
+        box-sizing: border-box !important;
+    }
+
+    .tekntek-isolated-header .ttk-icon-nav ul,
+    body.catalog-category-view .tekntek-isolated-header .ttk-icon-nav ul {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 8px !important;
+    }
+
+
+    .tekntek-isolated-header .ttk-icon-layer {
+        position: fixed !important;
+        inset: 0 !important;
+        width: 100% !important;
+        height: 100vh !important;
+        z-index: 1200 !important;
+        background: rgba(17, 24, 39, 0) !important;
+        opacity: 1 !important;
+        transform: none !important;
+        transition: background-color 220ms ease, visibility 220ms linear !important;
+    }
+
+    .tekntek-isolated-header .ttk-icon-layer.is-open {
+        background: rgba(17, 24, 39, 0.58) !important;
+        transform: none !important;
+    }
+
+    .tekntek-isolated-header .ttk-icon-layer-inner {
+        width: 86vw !important;
+        max-width: 390px !important;
+        height: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: rgba(255, 255, 255, 0.96) !important;
+        box-shadow: 18px 0 34px rgba(15, 23, 42, 0.28) !important;
+        overflow-y: auto !important;
+        transform: translateX(-100%) !important;
+        transition: transform 240ms cubic-bezier(.22,.61,.36,1) !important;
+    }
+
+    .tekntek-isolated-header .ttk-icon-layer.is-open .ttk-icon-layer-inner {
+        transform: translateX(0) !important;
+    }
+
+    .tekntek-isolated-header .ttk-icon-nav {
+        min-height: 100% !important;
+        padding: 72px 0 18px !important;
+        border: 0 !important;
+        border-radius: 0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+    }
+
+    .tekntek-isolated-header .ttk-icon-nav ul,
+    body.catalog-category-view .tekntek-isolated-header .ttk-icon-nav ul {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 0 !important;
+    }
+
+    .tekntek-isolated-header .ttk-icon-nav li,
+    body.catalog-category-view .tekntek-isolated-header .ttk-icon-nav li {
+        text-align: left !important;
+        transform: none !important;
+    }
+
+    .tekntek-isolated-header .ttk-icon-nav a,
+    body.catalog-category-view .tekntek-isolated-header .ttk-icon-nav a {
+        min-height: 54px !important;
+        flex-direction: row !important;
+        justify-content: flex-start !important;
+        gap: 12px !important;
+        padding: 10px 20px !important;
+        border: 0 !important;
+        border-bottom: 1px solid rgba(226, 232, 240, 0.9) !important;
+        border-radius: 0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+    }
+
+    .tekntek-isolated-header .ttk-icon-badge,
+    body.catalog-category-view .tekntek-isolated-header .ttk-icon-badge {
+        width: 28px !important;
+        height: 28px !important;
+        flex: 0 0 28px !important;
+        border-radius: 0 !important;
+        background: transparent !important;
+        border: 0 !important;
+        box-shadow: none !important;
+        color: #374151 !important;
+    }
+
+    .tekntek-isolated-header .ttk-icon-badge::after,
+    body.catalog-category-view .tekntek-isolated-header .ttk-icon-badge::after {
+        display: none !important;
+    }
+
+    .tekntek-isolated-header .ttk-icon-label,
+    body.catalog-category-view .tekntek-isolated-header .ttk-icon-label {
+        flex: 1 1 auto !important;
+        font-size: 13px !important;
+        font-weight: 700 !important;
+        line-height: 1.25 !important;
+        text-align: left !important;
+        color: #4b5563 !important;
+    }
+
+    .tekntek-isolated-header .minicart-wrapper .block-minicart,
+    .tekntek-isolated-header .tekntek-minicart-wrapper .block-minicart {
+        right: 0 !important;
+        left: auto !important;
+        width: calc(100vw - 24px) !important;
+        max-width: calc(100vw - 24px) !important;
+        box-sizing: border-box !important;
+    }
+}
+
+@media (max-width: 480px) {
+    .tekntek-isolated-header .ttk-main-header {
+        padding: 8px !important;
+    }
+
+    .tekntek-isolated-header .ttk-main-header-inner {
+        position: relative !important;
+        gap: 8px !important;
+        padding: 8px !important;
+        padding-top: 52px !important;
+    }
+
+    .tekntek-isolated-header .ttk-logo-link {
+        order: 1 !important;
+        flex: 1 1 100% !important;
+        justify-content: center !important;
+        min-height: 44px !important;
+    }
+
+    .tekntek-isolated-header .ttk-logo {
+        max-width: 132px !important;
+        max-height: 44px !important;
+    }
+
+    .tekntek-isolated-header .ttk-search-form {
+        position: static !important;
+        order: 3 !important;
+        flex: 1 1 100% !important;
+        flex-wrap: wrap !important;
+        height: 44px !important;
+        border-radius: 8px !important;
+    }
+
+    .tekntek-isolated-header .ttk-all-products-btn {
+        position: absolute !important;
+        top: 8px !important;
+        left: 8px !important;
+        z-index: 2 !important;
+        width: 44px !important;
+        min-width: 44px !important;
+        max-width: 44px !important;
+        height: 44px !important;
+        min-height: 44px !important;
+        padding: 0 !important;
+        border: 0 !important;
+        border-radius: 999px !important;
+        background: #111827 !important;
+        color: #ffffff !important;
+        font-size: 0 !important;
+        line-height: 0 !important;
+    }
+
+    .tekntek-isolated-header .ttk-all-products-btn::before {
+        content: "" !important;
+        width: 18px !important;
+        height: 2px !important;
+        border-radius: 999px !important;
+        background: currentColor !important;
+        box-shadow: 0 -6px 0 currentColor, 0 6px 0 currentColor !important;
+    }
+
+    .tekntek-isolated-header .ttk-all-products-btn::after {
+        display: none !important;
+    }
+
+
+    .tekntek-isolated-header .ttk-all-products-btn[aria-expanded="true"] {
+        position: fixed !important;
+        top: 30px !important;
+        left: 30px !important;
+        z-index: 1301 !important;
+        background: rgba(255, 255, 255, 0.92) !important;
+        color: #374151 !important;
+        box-shadow: 0 10px 22px rgba(15, 23, 42, 0.14) !important;
+    }
+
+    .tekntek-isolated-header .ttk-all-products-btn[aria-expanded="true"]::before {
+        width: 20px !important;
+        transform: rotate(45deg) !important;
+        box-shadow: none !important;
+    }
+
+    .tekntek-isolated-header .ttk-all-products-btn[aria-expanded="true"]::after {
+        content: "" !important;
+        display: block !important;
+        position: absolute !important;
+        width: 20px !important;
+        height: 2px !important;
+        border: 0 !important;
+        border-radius: 999px !important;
+        background: currentColor !important;
+        transform: rotate(-45deg) !important;
+    }
+
+    .tekntek-isolated-header .ttk-search-input {
+        flex: 1 1 100% !important;
+        width: 100% !important;
+        min-width: 0 !important;
+        min-height: 42px !important;
+        padding: 0 12px !important;
+    }
+
+    .tekntek-isolated-header .ttk-right-links {
+        order: 2 !important;
+        flex: 1 1 100% !important;
+        justify-content: center !important;
+        width: 100% !important;
+        padding: 0 48px !important;
+        box-sizing: border-box !important;
+    }
+
+    .tekntek-isolated-header .ttk-right-links > .minicart-wrapper,
+    .tekntek-isolated-header .ttk-right-links > .tekntek-minicart-wrapper {
+        position: absolute !important;
+        top: 8px !important;
+        right: 8px !important;
+        z-index: 2 !important;
+        min-width: 44px !important;
+        min-height: 44px !important;
+    }
+
+    .tekntek-isolated-header .ttk-right-links a,
+    .tekntek-isolated-header .ttk-right-links .action.showcart {
+        flex: 0 1 auto !important;
+        min-width: 40px !important;
+        min-height: 40px !important;
+        padding: 0 4px !important;
+        font-size: 12px !important;
+    }
+
+    .tekntek-isolated-header .ttk-right-links > .minicart-wrapper .action.showcart,
+    .tekntek-isolated-header .ttk-right-links > .tekntek-minicart-wrapper .action.showcart {
+        width: 44px !important;
+        min-width: 44px !important;
+        height: 44px !important;
+        min-height: 44px !important;
+        padding: 0 !important;
+    }
+
+    .tekntek-isolated-header .ttk-search-preview {
+        top: calc(100% + 4px) !important;
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    .tekntek-isolated-header .ttk-icon-nav ul,
+    body.catalog-category-view .tekntek-isolated-header .ttk-icon-nav ul {
+        grid-template-columns: 1fr !important;
+    }
+}
+
 @media (max-width: 640px) {
     .tekntek-search {
         grid-template-columns: 110px 1fr;
