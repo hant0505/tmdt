@@ -362,3 +362,59 @@ body.tekntek-coupon-modal-open {
     transition: all 0.2s ease;
     margin: 0 !important;
 }
+
+@media (max-width: 767px) {
+    .checkout-index-index #payment .payment-option.discount-code,
+    .checkout-index-index #payment .payment-option.discount-code .payment-option-content,
+    .checkout-index-index #payment .payment-option.discount-code .form-discount,
+    .checkout-index-index #payment .payment-option.discount-code .form-discount .fieldset,
+    .checkout-index-index #payment .payment-option.discount-code .form-discount .field,
+    .checkout-index-index #payment .payment-option.discount-code .form-discount .control,
+    .checkout-index-index #payment .payment-option.discount-code .form-discount .actions-toolbar,
+    .checkout-index-index #payment .payment-option.discount-code .form-discount .actions-toolbar .primary {
+        display: block !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+        box-sizing: border-box;
+    }
+
+    .checkout-index-index #payment .payment-option.discount-code .payment-option-content,
+    .checkout-index-index #payment .payment-option.discount-code._active .payment-option-content {
+        padding: 0 !important;
+        margin: 0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+    }
+
+    .checkout-index-index #payment .payment-option.discount-code .form-discount .fieldset {
+        display: grid !important;
+        grid-template-columns: 1fr;
+        gap: 10px;
+        align-items: stretch;
+    }
+
+    .checkout-index-index #payment .payment-option.discount-code .form-discount .control .input-text {
+        width: 100% !important;
+        max-width: 100% !important;
+        height: 44px;
+        line-height: 44px;
+        padding: 0 12px;
+        border: 1px solid #d1d5db;
+        border-radius: 8px;
+        background: #fff;
+        box-sizing: border-box;
+    }
+
+    .checkout-index-index #payment .payment-option.discount-code .form-discount .actions-toolbar .action {
+        width: 100% !important;
+        max-width: 100% !important;
+        min-height: 44px;
+        height: auto;
+        padding: 0 14px;
+        border-radius: 8px;
+        line-height: 44px;
+        box-sizing: border-box;
+        justify-content: center;
+    }
+}

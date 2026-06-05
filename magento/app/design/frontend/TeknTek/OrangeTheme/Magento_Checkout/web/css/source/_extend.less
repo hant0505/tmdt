@@ -23,10 +23,10 @@
 
 .tekntek-cart__title {
     margin: 0 0 18px;
-    font-family: 'DM Serif Display', 'Times New Roman', serif;
-    font-size: clamp(30px, 3.4vw, 42px);
-    font-weight: 400;
-    letter-spacing: 0.4px;
+    font-family: 'Open Sans', 'Roboto', Arial, sans-serif;
+    font-size: clamp(28px, 3vw, 38px);
+    font-weight: 700;
+    letter-spacing: 0;
     color: #1d1d1d;
 }
 
@@ -247,6 +247,7 @@
 }
 
 .checkout-cart-index .cart-summary > .title {
+    display: block;
     margin-bottom: 14px;
     font-family: 'Open Sans', sans-serif;
     font-size: 16px;
@@ -342,6 +343,168 @@
 @media (max-width: 640px) {
     .tekntek-item {
         grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 767px) {
+    .checkout-cart-index .column.main,
+    .checkout-cart-index .cart-container {
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
+    }
+
+    .checkout-cart-index .form-cart,
+    .checkout-cart-index .tekntek-cart.container,
+    .checkout-cart-index .tekntek-cart__layout,
+    .checkout-cart-index .tekntek-cart__items,
+    .checkout-cart-index .cart-summary,
+    .checkout-cart-index #block-discount {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
+    }
+
+    .checkout-cart-index .form-cart {
+        order: 1;
+        float: none;
+        padding: 0;
+    }
+
+    .checkout-cart-index .tekntek-cart.container {
+        margin: 8px 0 20px;
+    }
+
+    .checkout-cart-index .cart-summary {
+        order: 2;
+        float: none;
+        position: static;
+        clear: both;
+        margin: 0 0 24px;
+        transform: none;
+    }
+
+    .checkout-cart-index .cart-summary .block,
+    .checkout-cart-index .cart-summary .fieldset,
+    .checkout-cart-index .cart-summary .field,
+    .checkout-cart-index .cart-summary .control,
+    .checkout-cart-index .cart-summary select,
+    .checkout-cart-index .cart-summary input {
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+
+    .checkout-cart-index .cart-summary .checkout-methods-items,
+    .checkout-cart-index .cart-summary .checkout-methods-items .item,
+    .checkout-cart-index .cart-summary .checkout-methods-items .action.primary.checkout {
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+
+    .checkout-cart-index #block-discount .content,
+    .checkout-cart-index #discount-coupon-form,
+    .checkout-cart-index #discount-coupon-form .fieldset,
+    .checkout-cart-index #discount-coupon-form .field,
+    .checkout-cart-index #discount-coupon-form .control,
+    .checkout-cart-index #discount-coupon-form input {
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+
+    .checkout-cart-index .cart.main.actions {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+
+    .checkout-cart-index .cart.main.actions .action,
+    .checkout-cart-index .action.continue {
+        width: 100%;
+        max-width: 100%;
+        min-height: 44px;
+        margin: 0;
+        box-sizing: border-box;
+    }
+
+    .checkout-cart-index .cart.table-wrapper,
+    .checkout-cart-index .cart.table-wrapper table,
+    .checkout-cart-index .cart.table-wrapper tbody,
+    .checkout-cart-index .cart.table-wrapper tr,
+    .checkout-cart-index .cart.table-wrapper td {
+        display: block;
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
+    }
+
+    .checkout-cart-index .cart.table-wrapper {
+        overflow: visible;
+    }
+
+    .checkout-cart-index .tekntek-cart__items {
+        padding: 16px;
+    }
+
+    .checkout-cart-index .tekntek-item__qty-row {
+        flex-wrap: wrap;
+        align-items: center;
+    }
+
+    .checkout-cart-index .qty-input-group {
+        max-width: 100%;
+    }
+
+    .checkout-cart-index .cart-summary::before {
+        content: 'Summary';
+        display: block;
+        font-size: 18px;
+        font-weight: 700;
+        color: #1d1d1d;
+    }
+
+    .checkout-cart-index .cart-summary > .title {
+        display: none;
+    }
+
+    .checkout-cart-index .btn-delete-item {
+        min-width: 44px;
+        min-height: 44px;
+        margin-left: 0;
+    }
+
+    .checkout-cart-index .btn-delete-item svg {
+        width: 24px;
+        height: 24px;
+    }
+}
+
+@media (max-width: 480px) {
+    .checkout-cart-index .cart-container {
+        padding-left: 0;
+        padding-right: 0;
+    }
+
+    .checkout-cart-index .cart-summary {
+        padding: 16px;
+    }
+
+    .checkout-cart-index .tekntek-cart__breadcrumbs {
+        flex-wrap: wrap;
+        row-gap: 4px;
+    }
+
+    .checkout-cart-index .tekntek-cart__title {
+        font-size: 30px;
     }
 }
 
@@ -2038,4 +2201,319 @@ body {
     }
 }
 
+@media (max-width: 767px) {
+    .checkout-index-index .page-main {
+        display: block;
+        padding: 0 12px;
+    }
 
+    .checkout-index-index .column.main,
+    .checkout-index-index .checkout-container,
+    .checkout-index-index .opc-wrapper,
+    .checkout-index-index .opc-sidebar,
+    .checkout-index-index .opc-summary-wrapper,
+    .checkout-index-index .opc-block-summary {
+        float: none;
+        position: static;
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        margin-left: 0;
+        margin-right: 0;
+        box-sizing: border-box;
+        transform: none;
+    }
+
+    .checkout-index-index .checkout-container {
+        display: grid;
+        grid-template-columns: 1fr;
+        row-gap: 16px;
+        margin: 12px auto 36px;
+    }
+
+    .checkout-index-index .opc-progress-bar {
+        grid-column: 1;
+        grid-row: 1;
+        display: flex;
+        width: 100%;
+        max-width: 100%;
+        margin: 0 0 16px;
+        padding: 0;
+        overflow: visible;
+        box-sizing: border-box;
+    }
+
+    .checkout-index-index .opc-progress-bar-item {
+        flex: 1 1 0;
+        min-width: 0;
+        margin: 0;
+        text-align: center;
+    }
+
+    .checkout-index-index .opc-progress-bar-item > span {
+        white-space: normal;
+        word-break: normal;
+        font-size: 13px;
+        line-height: 1.25;
+    }
+
+    .checkout-index-index .opc-wrapper {
+        grid-column: 1;
+        grid-row: 2;
+        padding: 0;
+    }
+
+    .checkout-index-index .opc-sidebar {
+        grid-column: 1;
+        grid-row: 3;
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+        padding: 0;
+    }
+
+    .checkout-index-index .opc-sidebar .modal-inner-wrap {
+        position: static !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+        margin: 0 !important;
+        transform: none !important;
+        box-shadow: none !important;
+        box-sizing: border-box;
+    }
+
+    .checkout-index-index .opc-sidebar .modal-header {
+        display: none;
+    }
+
+    .checkout-index-index .opc-sidebar .modal-content {
+        display: block !important;
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    .checkout-index-index .opc-sidebar .opc-block-summary {
+        display: flex !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+
+    .checkout-index-index .opc-estimated-wrapper {
+        display: none !important;
+    }
+
+    .checkout-index-index .opc-wrapper .step-content,
+    .checkout-index-index .opc-block-summary,
+    .checkout-index-index .tekntek-payment-selection-wrapper {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        padding: 16px;
+        margin: 0 0 16px;
+        border-radius: 10px;
+        box-sizing: border-box;
+    }
+
+    .checkout-index-index .checkout-shipping-address,
+    .checkout-index-index .checkout-shipping-method,
+    .checkout-index-index .checkout-payment-method,
+    .checkout-index-index .payment-method,
+    .checkout-index-index .payment-method-content,
+    .checkout-index-index .payment-option,
+    .checkout-index-index .payment-option-content,
+    .checkout-index-index .fieldset,
+    .checkout-index-index .field,
+    .checkout-index-index .control {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
+    }
+
+    .checkout-index-index input,
+    .checkout-index-index select,
+    .checkout-index-index textarea {
+        max-width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
+    }
+
+    .checkout-index-index .field input.input-text,
+    .checkout-index-index .field select,
+    .checkout-index-index .field textarea,
+    .checkout-index-index .modal-popup input,
+    .checkout-index-index .modal-popup select,
+    .checkout-index-index .modal-popup textarea {
+        width: 100%;
+        min-height: 44px;
+    }
+
+    .checkout-index-index .opc .checkout-shipping-address .step-title,
+    .checkout-index-index .opc .checkout-shipping-method .step-title,
+    .checkout-index-index .checkout-step .step-title h2 {
+        margin: 0 0 14px;
+        font-size: 22px;
+        line-height: 1.25;
+    }
+
+    .checkout-index-index #checkout-shipping-method-load,
+    .checkout-index-index .table-checkout-shipping-method,
+    .checkout-index-index .table-checkout-shipping-method tbody,
+    .checkout-index-index .table-checkout-shipping-method tr {
+        display: block;
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        box-sizing: border-box;
+    }
+
+    .checkout-index-index .table-checkout-shipping-method tr {
+        padding: 0;
+    }
+
+    .checkout-index-index .table-checkout-shipping-method td {
+        display: inline-block;
+        max-width: 100%;
+        padding: 8px 10px;
+        box-sizing: border-box;
+        white-space: normal;
+        vertical-align: middle;
+    }
+
+    .checkout-index-index #shipping-method-buttons-container,
+    .checkout-index-index #shipping-method-buttons-container .primary,
+    .checkout-index-index .actions-toolbar,
+    .checkout-index-index .actions-toolbar .primary,
+    .checkout-index-index .tekntek-payment-actions {
+        width: 100%;
+        max-width: 100%;
+        margin-left: 0;
+        margin-right: 0;
+        box-sizing: border-box;
+    }
+
+    .checkout-index-index #shipping-method-buttons-container .action.continue.primary,
+    .checkout-index-index .payment-method-content .actions-toolbar .primary .action.primary.checkout,
+    .checkout-index-index .tekntek-place-order-button {
+        width: 100%;
+        max-width: 100%;
+        min-height: 48px;
+        margin: 0;
+        box-sizing: border-box;
+        text-align: center;
+    }
+
+    .checkout-index-index .tekntek-payment-options-wrapper {
+        width: 100%;
+        max-width: 100%;
+    }
+
+    .checkout-index-index .tekntek-payment-option-card {
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+
+    .checkout-index-index .opc-block-summary .table-totals,
+    .checkout-index-index .opc-block-summary .table-totals tbody,
+    .checkout-index-index .opc-block-summary .table-totals tr {
+        width: 100%;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+
+    .checkout-index-index .opc-block-summary .table-totals .mark,
+    .checkout-index-index .opc-block-summary .table-totals .amount {
+        font-size: 15px;
+        word-break: break-word;
+    }
+
+    .checkout-index-index .opc-block-summary .totals.shipping .value {
+        white-space: normal;
+    }
+
+    .checkout-index-index .modal-popup .modal-inner-wrap {
+        display: flex;
+        flex-direction: column;
+        width: calc(100vw - 24px);
+        max-width: calc(100vw - 24px);
+        min-width: 0;
+        max-height: calc(100vh - 24px);
+        margin: 12px auto;
+        box-sizing: border-box;
+        overflow: hidden;
+    }
+
+    .checkout-index-index .modal-popup .modal-header,
+    .checkout-index-index .modal-popup .modal-content,
+    .checkout-index-index .modal-popup .modal-footer {
+        width: 100%;
+        max-width: 100%;
+        padding-left: 16px;
+        padding-right: 16px;
+        box-sizing: border-box;
+    }
+
+    .checkout-index-index .modal-popup .modal-content {
+        flex: 1 1 auto;
+        min-height: 0;
+        max-height: calc(100vh - 170px);
+        overflow-y: auto;
+    }
+
+    .checkout-index-index .modal-popup .modal-footer {
+        flex: 0 0 auto;
+        position: sticky;
+        bottom: 0;
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        padding-top: 12px;
+        padding-bottom: 12px;
+        border-top: 1px solid #e5e7eb;
+        background: #fff;
+    }
+
+    .checkout-index-index .modal-popup .modal-footer .action {
+        width: 100%;
+        min-height: 44px;
+        margin: 0;
+        box-sizing: border-box;
+    }
+}
+
+@media (max-width: 480px) {
+    .checkout-index-index .page-main {
+        padding-left: 8px;
+        padding-right: 8px;
+    }
+
+    .checkout-index-index .checkout-container {
+        margin-top: 8px;
+        row-gap: 12px;
+    }
+
+    .checkout-index-index .opc-wrapper .step-content,
+    .checkout-index-index .opc-block-summary,
+    .checkout-index-index .tekntek-payment-selection-wrapper {
+        padding: 14px;
+    }
+
+    .checkout-index-index .modal-popup .modal-inner-wrap {
+        width: calc(100vw - 16px);
+        max-width: calc(100vw - 16px);
+        margin: 8px auto;
+    }
+
+    .checkout-index-index .modal-popup .modal-header,
+    .checkout-index-index .modal-popup .modal-content,
+    .checkout-index-index .modal-popup .modal-footer {
+        padding-left: 14px;
+        padding-right: 14px;
+    }
+}

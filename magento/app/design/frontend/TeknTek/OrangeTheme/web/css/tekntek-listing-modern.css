@@ -444,3 +444,203 @@
     color: #9ca3af !important;
     text-decoration: line-through;
 }
+
+@media (max-width: 767px) {
+    .catalog-category-view .products.wrapper,
+    .catalogsearch-result-index .products.wrapper,
+    .catalog-category-view .products-grid,
+    .catalogsearch-result-index .products-grid {
+        max-width: 100%;
+        overflow-x: hidden;
+    }
+
+    .catalog-category-view .products-grid .product-items,
+    .catalogsearch-result-index .products-grid .product-items {
+        display: grid !important;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 12px;
+        width: 100%;
+        margin: 0 !important;
+        padding: 0;
+        overflow: visible;
+    }
+
+    .catalog-category-view .products-grid .product-item,
+    .catalogsearch-result-index .products-grid .product-item {
+        width: auto !important;
+        max-width: 100%;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    .catalog-category-view .products-grid .product-item-info,
+    .catalogsearch-result-index .products-grid .product-item-info {
+        display: flex !important;
+        flex-direction: column;
+        width: 100% !important;
+        max-width: 100%;
+        min-height: 100%;
+        margin: 0 !important;
+        transform: none !important;
+    }
+
+    .catalog-category-view .products-grid .product-item-photo,
+    .catalogsearch-result-index .products-grid .product-item-photo {
+        height: 148px;
+        min-height: 148px;
+        padding: 12px 10px 8px;
+    }
+
+    .catalog-category-view .products-grid .product-image-container,
+    .catalogsearch-result-index .products-grid .product-image-container,
+    .catalog-category-view .products-grid .product-image-wrapper,
+    .catalogsearch-result-index .products-grid .product-image-wrapper {
+        width: 100% !important;
+        max-width: 100% !important;
+    }
+
+    .catalog-category-view .products-grid .product-image-photo,
+    .catalogsearch-result-index .products-grid .product-image-photo {
+        width: auto !important;
+        height: auto !important;
+        max-width: 100% !important;
+        max-height: 124px !important;
+        object-fit: contain;
+    }
+
+    .catalog-category-view .products-grid .product-item-details,
+    .catalogsearch-result-index .products-grid .product-item-details {
+        display: flex;
+        flex: 1;
+        flex-direction: column;
+        min-width: 0;
+        padding: 10px;
+    }
+
+    .catalog-category-view .products-grid .product-item-name,
+    .catalogsearch-result-index .products-grid .product-item-name {
+        min-height: 38px;
+        margin: 0 0 8px;
+    }
+
+    .catalog-category-view .products-grid .product-item-link,
+    .catalogsearch-result-index .products-grid .product-item-link {
+        min-height: 0;
+        font-size: 13px;
+        line-height: 19px;
+        word-break: break-word;
+        -webkit-line-clamp: 2;
+    }
+
+    .catalog-category-view .products-grid .price-box,
+    .catalogsearch-result-index .products-grid .price-box {
+        gap: 4px 6px;
+        min-height: 0;
+        margin: auto 0 10px;
+    }
+
+    .catalog-category-view .products-grid .price-box .price,
+    .catalogsearch-result-index .products-grid .price-box .price {
+        font-size: 14px;
+        line-height: 18px;
+    }
+
+    .catalog-category-view .products-grid .product-item-inner,
+    .catalogsearch-result-index .products-grid .product-item-inner {
+        position: static !important;
+        display: block !important;
+        width: 100% !important;
+        margin-top: auto !important;
+        padding: 0 !important;
+        border: 0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        opacity: 1 !important;
+        visibility: visible !important;
+        transform: none !important;
+    }
+
+    .catalog-category-view .products-grid .product-item-actions,
+    .catalogsearch-result-index .products-grid .product-item-actions,
+    .catalog-category-view .products-grid .actions-primary,
+    .catalogsearch-result-index .products-grid .actions-primary,
+    .catalog-category-view .products-grid .actions-primary form,
+    .catalogsearch-result-index .products-grid .actions-primary form {
+        width: 100%;
+        margin: 0 !important;
+    }
+
+    .catalog-category-view .products-grid .action.tocart,
+    .catalogsearch-result-index .products-grid .action.tocart {
+        width: 100%;
+        min-height: 40px;
+        padding: 8px 10px;
+        white-space: normal;
+    }
+
+    .catalog-category-view .products-list .product-item-info,
+    .catalogsearch-result-index .products-list .product-item-info {
+        width: 100% !important;
+        max-width: 100%;
+        margin: 0 !important;
+    }
+
+    .catalog-category-view .toolbar-products,
+    .catalogsearch-result-index .toolbar-products {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+        margin: 0 0 16px;
+    }
+
+    .catalog-category-view .toolbar-products .toolbar-amount,
+    .catalogsearch-result-index .toolbar-products .toolbar-amount,
+    .catalog-category-view .toolbar-products .modes,
+    .catalogsearch-result-index .toolbar-products .modes,
+    .catalog-category-view .toolbar-products .sorter,
+    .catalogsearch-result-index .toolbar-products .sorter,
+    .catalog-category-view .toolbar-products .limiter,
+    .catalogsearch-result-index .toolbar-products .limiter {
+        float: none;
+        margin: 0;
+    }
+
+    .catalog-category-view .toolbar-products .sorter,
+    .catalogsearch-result-index .toolbar-products .sorter {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-left: auto;
+    }
+
+    .catalog-category-view .toolbar-products select,
+    .catalogsearch-result-index .toolbar-products select {
+        max-width: 150px;
+        min-height: 36px;
+    }
+
+    .catalog-category-view .filter-title strong,
+    .catalogsearch-result-index .filter-title strong {
+        width: 100%;
+        min-height: 40px;
+        text-align: center;
+    }
+
+    .catalog-category-view .pages,
+    .catalogsearch-result-index .pages {
+        width: 100%;
+        margin: 18px 0 0;
+        text-align: center;
+    }
+
+    .catalog-category-view .pages .items,
+    .catalogsearch-result-index .pages .items {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 6px;
+        padding: 0;
+    }
+}
