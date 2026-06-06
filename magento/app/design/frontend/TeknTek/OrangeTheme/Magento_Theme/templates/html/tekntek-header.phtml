@@ -397,10 +397,13 @@ nav.navigation,
     padding: 0;
     display: grid;
     grid-template-columns: repeat(12, minmax(0, 1fr));
+    align-items: stretch;
     gap: 10px;
 }
 
 .tekntek-isolated-header .ttk-icon-nav li {
+    display: flex;
+    min-width: 0;
     text-align: center;
     opacity: 0;
     transform: translateY(-6px);
@@ -420,9 +423,11 @@ nav.navigation,
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: center;
     gap: 6px;
-    min-height: 62px;
+    width: 100%;
+    min-height: 74px;
+    height: 100%;
     padding: 8px 7px 7px;
     border-radius: 8px;
     border: 1px solid rgba(191, 219, 254, 0.92);
@@ -478,11 +483,16 @@ nav.navigation,
 }
 
 .tekntek-isolated-header .ttk-icon-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 24px;
     font-size: 10px;
     line-height: 1.12;
     font-weight: 600;
     letter-spacing: -0.1px;
     text-align: center;
+    overflow-wrap: anywhere;
     color: #334155;
     position: relative;
     z-index: 1;
@@ -512,11 +522,12 @@ body.catalog-category-view .tekntek-isolated-header .ttk-icon-nav ul {
 
 body.catalog-category-view .tekntek-isolated-header .ttk-icon-nav a {
     color: #334155 !important;
-    min-height: 62px;
+    min-height: 74px;
+    height: 100%;
     padding: 8px 7px 7px;
     border-radius: 8px;
     gap: 6px;
-    justify-content: flex-start;
+    justify-content: center;
     box-shadow: 0 8px 16px rgba(37, 99, 235, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.92);
 }
 
@@ -550,6 +561,10 @@ body.catalog-category-view .tekntek-isolated-header .ttk-icon-nav svg * {
 }
 
 body.catalog-category-view .tekntek-isolated-header .ttk-icon-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 24px;
     font-size: 10px;
     line-height: 1.12;
     font-weight: 600;
