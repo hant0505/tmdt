@@ -1459,54 +1459,6 @@ $homepageData = [
 
 <script>
 (function () {
-    var allProductsToggle = document.getElementById('ttk-all-products-toggle');
-    var categoryLayer = document.getElementById('ttk-icon-layer');
-    var closeLayerTimer = null;
-
-    if (allProductsToggle && categoryLayer) {
-        function openLayer() {
-            if (closeLayerTimer) {
-                window.clearTimeout(closeLayerTimer);
-                closeLayerTimer = null;
-            }
-            categoryLayer.hidden = false;
-            window.requestAnimationFrame(function () {
-                categoryLayer.classList.add('is-open');
-                allProductsToggle.setAttribute('aria-expanded', 'true');
-            });
-        }
-
-        function closeLayer() {
-            categoryLayer.classList.remove('is-open');
-            allProductsToggle.setAttribute('aria-expanded', 'false');
-            if (closeLayerTimer) {
-                window.clearTimeout(closeLayerTimer);
-            }
-            closeLayerTimer = window.setTimeout(function () {
-                if (!categoryLayer.classList.contains('is-open')) {
-                    categoryLayer.hidden = true;
-                }
-            }, 240);
-        }
-
-        allProductsToggle.addEventListener('click', function (event) {
-            event.preventDefault();
-            if (categoryLayer.classList.contains('is-open')) {
-                closeLayer();
-            } else {
-                openLayer();
-            }
-        });
-
-        document.addEventListener('click', function (event) {
-            var clickInsideLayer = categoryLayer.contains(event.target);
-            var clickOnToggle = allProductsToggle.contains(event.target);
-            if (!clickInsideLayer && !clickOnToggle && categoryLayer.classList.contains('is-open')) {
-                closeLayer();
-            }
-        });
-    }
-
     var dataNode = document.getElementById('ttk-data-json');
     var offersNode = document.getElementById('ttk-offers');
     var productsNode = document.getElementById('ttk-products');
