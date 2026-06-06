@@ -2280,6 +2280,7 @@ body {
         margin: 0 !important;
         transform: none !important;
         box-shadow: none !important;
+        background: transparent !important;
         box-sizing: border-box;
     }
 
@@ -2293,6 +2294,8 @@ body {
         max-width: 100%;
         min-width: 0;
         padding: 0;
+        background: transparent !important;
+        box-shadow: none !important;
         box-sizing: border-box;
     }
 
@@ -2316,6 +2319,11 @@ body {
         margin: 0 0 16px;
         border-radius: 10px;
         box-sizing: border-box;
+    }
+
+    .checkout-index-index .opc-block-summary {
+        background: #fff !important;
+        box-shadow: none !important;
     }
 
     .checkout-index-index .checkout-shipping-address,
@@ -2436,43 +2444,65 @@ body {
         white-space: normal;
     }
 
+    .checkout-index-index .modal-popup,
+    .checkout-index-index .modal-popup._show,
+    .checkout-index-index .modal-popup.modal-slide {
+        left: 0 !important;
+        right: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        transform: none !important;
+        box-sizing: border-box;
+    }
+
     .checkout-index-index .modal-popup .modal-inner-wrap {
-        display: flex;
-        flex-direction: column;
+        display: block;
         width: calc(100vw - 24px);
         max-width: calc(100vw - 24px);
         min-width: 0;
+        height: auto !important;
+        min-height: 0 !important;
         max-height: calc(100vh - 24px);
         margin: 12px auto;
         box-sizing: border-box;
-        overflow: hidden;
+        overflow-x: hidden;
+        overflow-y: auto;
+        transform: none !important;
     }
 
     .checkout-index-index .modal-popup .modal-header,
     .checkout-index-index .modal-popup .modal-content,
-    .checkout-index-index .modal-popup .modal-footer {
+    .checkout-index-index .modal-popup .modal-footer,
+    .checkout-index-index .modal-popup .form-shipping-address {
         width: 100%;
         max-width: 100%;
+        min-width: 0;
         padding-left: 16px;
         padding-right: 16px;
         box-sizing: border-box;
     }
 
     .checkout-index-index .modal-popup .modal-content {
-        flex: 1 1 auto;
+        height: auto !important;
         min-height: 0;
-        max-height: calc(100vh - 170px);
-        overflow-y: auto;
+        max-height: none;
+        padding-bottom: 0;
+        overflow: visible;
+    }
+
+    .checkout-index-index .modal-popup .form-shipping-address {
+        height: auto !important;
+        margin-bottom: 0;
+        padding-bottom: 0;
     }
 
     .checkout-index-index .modal-popup .modal-footer {
-        flex: 0 0 auto;
-        position: sticky;
-        bottom: 0;
+        position: static;
         z-index: 2;
         display: flex;
         flex-direction: column;
         gap: 10px;
+        margin-top: 12px;
         padding-top: 12px;
         padding-bottom: 12px;
         border-top: 1px solid #e5e7eb;

@@ -36,8 +36,8 @@ $ttkCategoryUrls = [
     'smartwatches' => $block->getUrl($ttkUrlKeyMap['smartwatches']),
     'headphones' => $block->getUrl($ttkUrlKeyMap['headphones']),
     'tablets' => $block->getUrl($ttkUrlKeyMap['tablets']),
-    'exchange_rates' => 'http://localhost/currency',
-    'news' => 'http://localhost/businessnews'
+    'exchange_rates' => $block->getUrl('currency'),
+    'news' => $block->getUrl('businessnews')
 ];
 
 try {
@@ -363,6 +363,7 @@ nav.navigation,
 }
 
 .tekntek-isolated-header .ttk-icon-layer.is-open {
+    display: block !important;
     opacity: 1;
     transform: translateY(0);
     visibility: visible;
@@ -720,54 +721,61 @@ body.catalog-category-view .tekntek-isolated-header .ttk-icon-nav a:hover .ttk-i
 
 <script>
 (function () {
-    var allProductsToggle = document.getElementById('ttk-all-products-toggle');
-    var categoryLayer = document.getElementById('ttk-icon-layer');
-    var closeLayerTimer = null;
+    var headers = document.querySelectorAll('.tekntek-isolated-header');
 
-    if (!allProductsToggle || !categoryLayer) {
+    if (!headers.length) {
         return;
     }
 
-    function openLayer() {
-        if (closeLayerTimer) {
-            window.clearTimeout(closeLayerTimer);
-            closeLayerTimer = null;
-        }
-        categoryLayer.hidden = false;
-        window.requestAnimationFrame(function () {
-            categoryLayer.classList.add('is-open');
-            allProductsToggle.setAttribute('aria-expanded', 'true');
-        });
-    }
+    Array.prototype.forEach.call(headers, function (header) {
+        var allProductsToggle = header.querySelector('#ttk-all-products-toggle');
+        var categoryLayer = header.querySelector('#ttk-icon-layer');
+        var closeLayerTimer = null;
 
-    function closeLayer() {
-        categoryLayer.classList.remove('is-open');
-        allProductsToggle.setAttribute('aria-expanded', 'false');
-        if (closeLayerTimer) {
-            window.clearTimeout(closeLayerTimer);
+        if (!allProductsToggle || !categoryLayer) {
+            return;
         }
-        closeLayerTimer = window.setTimeout(function () {
-            if (!categoryLayer.classList.contains('is-open')) {
-                categoryLayer.hidden = true;
+
+        function openLayer() {
+            if (closeLayerTimer) {
+                window.clearTimeout(closeLayerTimer);
+                closeLayerTimer = null;
             }
-        }, 240);
-    }
-
-    allProductsToggle.addEventListener('click', function (event) {
-        event.preventDefault();
-        if (categoryLayer.classList.contains('is-open')) {
-            closeLayer();
-        } else {
-            openLayer();
+            categoryLayer.hidden = false;
+            window.requestAnimationFrame(function () {
+                categoryLayer.classList.add('is-open');
+                allProductsToggle.setAttribute('aria-expanded', 'true');
+            });
         }
-    });
 
-    document.addEventListener('click', function (event) {
-        var clickInsideLayer = categoryLayer.contains(event.target);
-        var clickOnToggle = allProductsToggle.contains(event.target);
-        if (!clickInsideLayer && !clickOnToggle && categoryLayer.classList.contains('is-open')) {
-            closeLayer();
+        function closeLayer() {
+            categoryLayer.classList.remove('is-open');
+            allProductsToggle.setAttribute('aria-expanded', 'false');
+            if (closeLayerTimer) {
+                window.clearTimeout(closeLayerTimer);
+            }
+            closeLayerTimer = window.setTimeout(function () {
+                if (!categoryLayer.classList.contains('is-open')) {
+                    categoryLayer.hidden = true;
+                }
+            }, 240);
         }
+
+        allProductsToggle.addEventListener('click', function (event) {
+            event.preventDefault();
+            if (categoryLayer.classList.contains('is-open')) {
+                closeLayer();
+            } else {
+                openLayer();
+            }
+        });
+
+        document.addEventListener('click', function (event) {
+            var clickInsideHeader = header.contains(event.target);
+            if (!clickInsideHeader && categoryLayer.classList.contains('is-open')) {
+                closeLayer();
+            }
+        });
     });
 })();
 
