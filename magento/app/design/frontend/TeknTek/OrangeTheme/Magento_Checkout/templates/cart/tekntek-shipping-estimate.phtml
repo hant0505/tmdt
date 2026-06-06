@@ -1,0 +1,24 @@
+<?php
+/**
+ * Cart shipping estimate with tax wording removed.
+ *
+ * @var \Magento\Checkout\Block\Cart\Shipping $block
+ */
+?>
+<div id="block-shipping" class="block shipping" data-mage-init='{"collapsible":{"openedState":"active", "active": true, "saveState": true}}'>
+    <div class="title" data-role="title">
+        <strong id="block-shipping-heading" role="heading" aria-level="2">
+            <?= $block->escapeHtml(__('Estimate Shipping')) ?>
+        </strong>
+    </div>
+    <div id="block-summary" class="content" data-role="content" aria-labelledby="block-shipping-heading" data-bind="scope:'block-summary'">
+        <!-- ko template: getTemplate() --><!-- /ko -->
+        <script type="text/x-magento-init">
+            {
+                "#block-summary": {
+                    "Magento_Ui/js/core/app": <?= /* @noEscape */ $block->getJsLayout() ?>
+                }
+            }
+        </script>
+    </div>
+</div>
