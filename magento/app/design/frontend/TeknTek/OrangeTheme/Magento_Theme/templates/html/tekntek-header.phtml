@@ -657,7 +657,7 @@ body.catalog-category-view .tekntek-isolated-header .ttk-icon-nav a:hover .ttk-i
 }
 </style>
 
-<div class="tekntek-isolated-header">
+<div class="tekntek-isolated-header" data-mage-init='{"Magento_Theme/js/tekntek-header-menu":{}}'>
     <header class="ttk-main-header">
         <div class="ttk-main-header-inner">
             <a class="ttk-logo-link" href="<?= $block->escapeUrl($block->getUrl('')) ?>" aria-label="TeknTek">
@@ -720,65 +720,6 @@ body.catalog-category-view .tekntek-isolated-header .ttk-icon-nav a:hover .ttk-i
 </div>
 
 <script>
-(function () {
-    var headers = document.querySelectorAll('.tekntek-isolated-header');
-
-    if (!headers.length) {
-        return;
-    }
-
-    Array.prototype.forEach.call(headers, function (header) {
-        var allProductsToggle = header.querySelector('#ttk-all-products-toggle');
-        var categoryLayer = header.querySelector('#ttk-icon-layer');
-        var closeLayerTimer = null;
-
-        if (!allProductsToggle || !categoryLayer) {
-            return;
-        }
-
-        function openLayer() {
-            if (closeLayerTimer) {
-                window.clearTimeout(closeLayerTimer);
-                closeLayerTimer = null;
-            }
-            categoryLayer.hidden = false;
-            window.requestAnimationFrame(function () {
-                categoryLayer.classList.add('is-open');
-                allProductsToggle.setAttribute('aria-expanded', 'true');
-            });
-        }
-
-        function closeLayer() {
-            categoryLayer.classList.remove('is-open');
-            allProductsToggle.setAttribute('aria-expanded', 'false');
-            if (closeLayerTimer) {
-                window.clearTimeout(closeLayerTimer);
-            }
-            closeLayerTimer = window.setTimeout(function () {
-                if (!categoryLayer.classList.contains('is-open')) {
-                    categoryLayer.hidden = true;
-                }
-            }, 240);
-        }
-
-        allProductsToggle.addEventListener('click', function (event) {
-            event.preventDefault();
-            if (categoryLayer.classList.contains('is-open')) {
-                closeLayer();
-            } else {
-                openLayer();
-            }
-        });
-
-        document.addEventListener('click', function (event) {
-            var clickInsideHeader = header.contains(event.target);
-            if (!clickInsideHeader && categoryLayer.classList.contains('is-open')) {
-                closeLayer();
-            }
-        });
-    });
-})();
-
 (function () {
     var searchForm = document.getElementById('search_mini_form');
     var searchInput = document.getElementById('search');
