@@ -517,7 +517,7 @@
 /* Checkout uses its own header wrapper; remove Luma/global spacing around the custom header. */
 .checkout-index-index .page-header {
     position: relative;
-    z-index: 80;
+    z-index: 5000;
     margin: 0;
     padding: 0;
     overflow: visible;
@@ -543,6 +543,8 @@
 }
 
 .checkout-index-index .page-header .tekntek-isolated-header {
+    position: relative;
+    z-index: 5001;
     width: 100%;
     max-width: 100%;
     left: auto;
@@ -551,15 +553,51 @@
     margin-left: 0;
     margin-right: 0;
     overflow: visible;
+    pointer-events: auto;
     box-sizing: border-box;
 }
 
-.checkout-index-index .page-header .ttk-icon-layer {
-    z-index: 3000 !important;
+.checkout-index-index .page-header .ttk-main-header,
+.checkout-index-index .page-header .ttk-main-header-inner,
+.checkout-index-index .page-header .ttk-logo-link,
+.checkout-index-index .page-header .ttk-search-form,
+.checkout-index-index .page-header .ttk-all-products-btn,
+.checkout-index-index .page-header .ttk-search-input,
+.checkout-index-index .page-header .ttk-search-submit,
+.checkout-index-index .page-header .ttk-right-links,
+.checkout-index-index .page-header .ttk-right-links a,
+.checkout-index-index .page-header .minicart-wrapper,
+.checkout-index-index .page-header .action.showcart {
+    pointer-events: auto;
 }
 
-.checkout-index-index .page-header .ttk-icon-layer.is-open {
+.checkout-index-index .page-header .ttk-icon-layer {
+    z-index: 6000 !important;
+}
+
+.checkout-index-index .page-header .ttk-icon-layer.is-open,
+.checkout-index-index .page-header .ttk-search-form:has(.ttk-all-products-btn:focus) + .ttk-right-links + .ttk-icon-layer,
+.checkout-index-index .page-header .tekntek-isolated-header:has(.ttk-all-products-btn:focus) .ttk-icon-layer,
+.checkout-index-index .page-header .tekntek-isolated-header:has(.ttk-icon-layer:focus-within) .ttk-icon-layer {
     display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    transform: translateY(0) !important;
+}
+
+.checkout-index-index .page-header .ttk-icon-layer.is-open .ttk-icon-nav li,
+.checkout-index-index .page-header .tekntek-isolated-header:has(.ttk-all-products-btn:focus) .ttk-icon-nav li,
+.checkout-index-index .page-header .tekntek-isolated-header:has(.ttk-icon-layer:focus-within) .ttk-icon-nav li {
+    opacity: 1 !important;
+    transform: translateY(0) !important;
+}
+
+.checkout-index-index .page-main,
+.checkout-index-index .columns,
+.checkout-index-index .column.main {
+    position: relative;
+    z-index: 1;
 }
 
 .checkout-index-index .page-main {
@@ -589,6 +627,8 @@ body {
 }
 
 .checkout-index-index .checkout-container {
+    position: relative;
+    z-index: 1;
     width: min(1100px, calc(100vw - 32px));
     margin: 20px auto 56px;
     display: grid;
