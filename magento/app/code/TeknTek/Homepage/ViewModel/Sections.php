@@ -228,7 +228,7 @@ class Sections implements ArgumentInterface
     private function buildFallbackOfferCards(int $storeId, int $perCategory): array
     {
         // Known storefront categories currently used in homepage icon navigation.
-        $categoryIds = [20, 4, 18, 21, 13, 14, 22, 15, 19, 16];
+        $categoryIds = [10, 7, 8, 11, 3, 4, 12, 5, 9, 6];
 
         $cards = [];
         foreach ($categoryIds as $categoryId) {
