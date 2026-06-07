@@ -6,6 +6,7 @@ $hasCouponCode = $couponCode !== '';
 $currencyCode = (string) $quote->getQuoteCurrencyCode();
 $items = $block->getItems();
 $hasItems = !empty($items);
+$imageHelper = $this->helper(\Magento\Catalog\Helper\Image::class);
 
 $formatPrice = static function (float $amount, string $currencyCode): string {
     return $currencyCode . ' ' . number_format($amount, 2, '.', ',');
@@ -36,9 +37,18 @@ $formatPrice = static function (float $amount, string $currencyCode): string {
                     ? max(0, ($unitPrice * $qty - $discountAmount) / $qty)
                     : $unitPrice;
                 $productUrl = ($product && $product->isVisibleInSiteVisibility()) ? $product->getProductUrl() : '';
+                $imageUrl = $product ? (string) $imageHelper->init($product, 'cart_page_product_thumbnail')->getUrl() : '';
                 ?>
                 <div class="tekntek-item">
-                    <div class="tekntek-item__image" aria-hidden="true"></div>
+                    <div class="tekntek-item__image">
+                        <?php if ($productUrl): ?>
+                            <a href="<?= $block->escapeUrl($productUrl) ?>" tabindex="-1" aria-hidden="true">
+                                <img src="<?= $block->escapeUrl($imageUrl) ?>" alt="<?= $block->escapeHtmlAttr($name) ?>" loading="lazy">
+                            </a>
+                        <?php else: ?>
+                            <img src="<?= $block->escapeUrl($imageUrl) ?>" alt="<?= $block->escapeHtmlAttr($name) ?>" loading="lazy">
+                        <?php endif; ?>
+                    </div>
                     <div class="tekntek-item__meta">
                         <p class="tekntek-item__name">
                             <?php if ($productUrl): ?>

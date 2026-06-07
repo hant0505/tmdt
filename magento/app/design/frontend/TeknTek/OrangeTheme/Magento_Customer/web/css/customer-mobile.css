@@ -938,6 +938,15 @@
         box-sizing: border-box !important;
     }
 
+    body.sales-order-history .ttk-order-card__actions,
+    body.sales-order-history .ttk-order-card__actions .action,
+    body.sales-order-history .ttk-order-card__actions a,
+    body.sales-order-history .ttk-reorder-form,
+    body.sales-order-history .ttk-reorder-form button {
+        position: static !important;
+        z-index: auto !important;
+    }
+
     body.sales-order-history .order-products-toolbar.toolbar.bottom {
         width: 100% !important;
         max-width: 100% !important;
