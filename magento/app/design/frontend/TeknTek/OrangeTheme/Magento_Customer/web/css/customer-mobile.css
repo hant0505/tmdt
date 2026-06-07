@@ -631,3 +631,319 @@
         color: #2455d6 !important;
     }
 }
+
+/* My Orders mobile: keep account nav compact and order cards in main flow. */
+@media (max-width: 767px) {
+    body.account .page-main .columns,
+    body.customer-account .page-main .columns,
+    body.sales-order-history .page-main .columns,
+    body.sales-order-view .page-main .columns,
+    body.wishlist-index-index .page-main .columns {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 12px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        position: static !important;
+        overflow: visible !important;
+        box-sizing: border-box !important;
+    }
+
+    body.account .sidebar-main,
+    body.customer-account .sidebar-main,
+    body.sales-order-history .sidebar-main,
+    body.sales-order-view .sidebar-main,
+    body.wishlist-index-index .sidebar-main {
+        order: 0 !important;
+        display: block !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+        height: auto !important;
+        min-height: 0 !important;
+        margin: 0 0 10px !important;
+        padding: 0 !important;
+        float: none !important;
+        clear: both !important;
+        position: static !important;
+        transform: none !important;
+        z-index: auto !important;
+        box-sizing: border-box !important;
+    }
+
+    body.account .sidebar-main .block,
+    body.customer-account .sidebar-main .block,
+    body.sales-order-history .sidebar-main .block,
+    body.sales-order-view .sidebar-main .block,
+    body.wishlist-index-index .sidebar-main .block {
+        width: 100% !important;
+        max-width: 100% !important;
+        height: auto !important;
+        min-height: 0 !important;
+        margin: 0 !important;
+        box-sizing: border-box !important;
+    }
+
+    body.account .column.main,
+    body.customer-account .column.main,
+    body.sales-order-history .column.main,
+    body.sales-order-view .column.main,
+    body.wishlist-index-index .column.main {
+        order: 1 !important;
+        display: block !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        float: none !important;
+        clear: both !important;
+        position: static !important;
+        transform: none !important;
+        z-index: auto !important;
+        overflow: visible !important;
+        box-sizing: border-box !important;
+    }
+
+    body.account .sidebar .block.account-nav,
+    body.account .sidebar .block-collapsible-nav,
+    body.customer-account .sidebar .block.account-nav,
+    body.customer-account .sidebar .block-collapsible-nav,
+    body.sales-order-history .sidebar .block.account-nav,
+    body.sales-order-history .sidebar .block-collapsible-nav,
+    body.sales-order-view .sidebar .block.account-nav,
+    body.sales-order-view .sidebar .block-collapsible-nav,
+    body.wishlist-index-index .sidebar .block.account-nav,
+    body.wishlist-index-index .sidebar .block-collapsible-nav {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: 1px solid #e2e8f0 !important;
+        border-radius: 12px !important;
+        background: #ffffff !important;
+        box-shadow: none !important;
+        overflow: hidden !important;
+    }
+
+    body.account .sidebar .block.account-nav > .title,
+    body.account .sidebar .block-collapsible-nav > .title,
+    body.customer-account .sidebar .block.account-nav > .title,
+    body.customer-account .sidebar .block-collapsible-nav > .title,
+    body.sales-order-history .sidebar .block.account-nav > .title,
+    body.sales-order-history .sidebar .block-collapsible-nav > .title,
+    body.sales-order-view .sidebar .block.account-nav > .title,
+    body.sales-order-view .sidebar .block-collapsible-nav > .title,
+    body.wishlist-index-index .sidebar .block.account-nav > .title,
+    body.wishlist-index-index .sidebar .block-collapsible-nav > .title {
+        display: flex !important;
+        align-items: center !important;
+        justify-content: space-between !important;
+        min-height: 42px !important;
+        margin: 0 !important;
+        padding: 0 14px !important;
+        border-bottom: 1px solid #edf2f7 !important;
+        box-sizing: border-box !important;
+    }
+
+    body.account .sidebar .block.account-nav > .content,
+    body.account .sidebar .block-collapsible-nav > .content,
+    body.customer-account .sidebar .block.account-nav > .content,
+    body.customer-account .sidebar .block-collapsible-nav > .content,
+    body.sales-order-history .sidebar .block.account-nav > .content,
+    body.sales-order-history .sidebar .block-collapsible-nav > .content,
+    body.sales-order-view .sidebar .block.account-nav > .content,
+    body.sales-order-view .sidebar .block-collapsible-nav > .content,
+    body.wishlist-index-index .sidebar .block.account-nav > .content,
+    body.wishlist-index-index .sidebar .block-collapsible-nav > .content,
+    body.account .account-nav-content,
+    body.customer-account .account-nav-content,
+    body.sales-order-history .account-nav-content,
+    body.sales-order-view .account-nav-content,
+    body.wishlist-index-index .account-nav-content {
+        display: none !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        height: auto !important;
+        max-height: none !important;
+        margin: 0 !important;
+        padding: 8px 10px 10px !important;
+        overflow: visible !important;
+        box-sizing: border-box !important;
+    }
+
+    body.account .sidebar .block.account-nav.active > .content,
+    body.account .sidebar .block.account-nav > .title.active + .content,
+    body.account .sidebar .block.account-nav > .content.active,
+    body.account .sidebar .block.account-nav > .content[aria-hidden="false"],
+    body.account .account-nav-content.active,
+    body.account .account-nav-content[aria-hidden="false"],
+    body.account .sidebar .block-collapsible-nav.active > .content,
+    body.account .sidebar .block-collapsible-nav > .title.active + .content,
+    body.account .sidebar .block-collapsible-nav > .content.active,
+    body.account .sidebar .block-collapsible-nav > .content[aria-hidden="false"],
+    body.customer-account .sidebar .block.account-nav.active > .content,
+    body.customer-account .sidebar .block.account-nav > .title.active + .content,
+    body.customer-account .sidebar .block.account-nav > .content.active,
+    body.customer-account .sidebar .block.account-nav > .content[aria-hidden="false"],
+    body.customer-account .account-nav-content.active,
+    body.customer-account .account-nav-content[aria-hidden="false"],
+    body.customer-account .sidebar .block-collapsible-nav.active > .content,
+    body.customer-account .sidebar .block-collapsible-nav > .title.active + .content,
+    body.customer-account .sidebar .block-collapsible-nav > .content.active,
+    body.customer-account .sidebar .block-collapsible-nav > .content[aria-hidden="false"],
+    body.sales-order-history .sidebar .block.account-nav.active > .content,
+    body.sales-order-history .sidebar .block.account-nav > .title.active + .content,
+    body.sales-order-history .sidebar .block.account-nav > .content.active,
+    body.sales-order-history .sidebar .block.account-nav > .content[aria-hidden="false"],
+    body.sales-order-history .account-nav-content.active,
+    body.sales-order-history .account-nav-content[aria-hidden="false"],
+    body.sales-order-history .sidebar .block-collapsible-nav.active > .content,
+    body.sales-order-history .sidebar .block-collapsible-nav > .title.active + .content,
+    body.sales-order-history .sidebar .block-collapsible-nav > .content.active,
+    body.sales-order-history .sidebar .block-collapsible-nav > .content[aria-hidden="false"],
+    body.sales-order-view .sidebar .block.account-nav.active > .content,
+    body.sales-order-view .sidebar .block.account-nav > .title.active + .content,
+    body.sales-order-view .sidebar .block.account-nav > .content.active,
+    body.sales-order-view .sidebar .block.account-nav > .content[aria-hidden="false"],
+    body.sales-order-view .account-nav-content.active,
+    body.sales-order-view .account-nav-content[aria-hidden="false"],
+    body.sales-order-view .sidebar .block-collapsible-nav.active > .content,
+    body.sales-order-view .sidebar .block-collapsible-nav > .title.active + .content,
+    body.sales-order-view .sidebar .block-collapsible-nav > .content.active,
+    body.sales-order-view .sidebar .block-collapsible-nav > .content[aria-hidden="false"],
+    body.wishlist-index-index .sidebar .block.account-nav.active > .content,
+    body.wishlist-index-index .sidebar .block.account-nav > .title.active + .content,
+    body.wishlist-index-index .sidebar .block.account-nav > .content.active,
+    body.wishlist-index-index .sidebar .block.account-nav > .content[aria-hidden="false"],
+    body.wishlist-index-index .account-nav-content.active,
+    body.wishlist-index-index .account-nav-content[aria-hidden="false"],
+    body.wishlist-index-index .sidebar .block-collapsible-nav.active > .content,
+    body.wishlist-index-index .sidebar .block-collapsible-nav > .title.active + .content,
+    body.wishlist-index-index .sidebar .block-collapsible-nav > .content.active,
+    body.wishlist-index-index .sidebar .block-collapsible-nav > .content[aria-hidden="false"] {
+        display: block !important;
+    }
+
+    body.account .sidebar .nav.items,
+    body.customer-account .sidebar .nav.items,
+    body.sales-order-history .sidebar .nav.items,
+    body.sales-order-view .sidebar .nav.items,
+    body.wishlist-index-index .sidebar .nav.items {
+        display: grid !important;
+        gap: 4px !important;
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+
+    body.account .sidebar .nav.item,
+    body.customer-account .sidebar .nav.item,
+    body.sales-order-history .sidebar .nav.item,
+    body.sales-order-view .sidebar .nav.item,
+    body.wishlist-index-index .sidebar .nav.item {
+        margin: 0 !important;
+        padding: 0 !important;
+        border: 0 !important;
+    }
+
+    body.account .sidebar .nav.item a,
+    body.account .sidebar .nav.item > strong,
+    body.customer-account .sidebar .nav.item a,
+    body.customer-account .sidebar .nav.item > strong,
+    body.sales-order-history .sidebar .nav.item a,
+    body.sales-order-history .sidebar .nav.item > strong,
+    body.sales-order-view .sidebar .nav.item a,
+    body.sales-order-view .sidebar .nav.item > strong,
+    body.wishlist-index-index .sidebar .nav.item a,
+    body.wishlist-index-index .sidebar .nav.item > strong {
+        display: flex !important;
+        align-items: center !important;
+        min-height: 46px !important;
+        margin: 0 !important;
+        padding: 0 14px !important;
+        border: 0 !important;
+        border-radius: 10px !important;
+        box-shadow: none !important;
+        font-size: 14px !important;
+        font-weight: 700 !important;
+        line-height: 1.25 !important;
+        transform: none !important;
+    }
+
+    body.sales-order-history .page-title-wrapper {
+        display: block !important;
+        margin: 2px 0 14px !important;
+        padding: 0 !important;
+    }
+
+    body.sales-order-history .page-title-wrapper .page-title {
+        display: block !important;
+        margin: 0 !important;
+        font-size: 28px !important;
+        line-height: 1.15 !important;
+    }
+
+    body.sales-order-history .ttk-orders-list,
+    body.sales-order-history .ttk-account-list {
+        display: grid !important;
+        gap: 12px !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+    }
+
+    body.sales-order-history .ttk-order-card,
+    body.sales-order-history .ttk-account-row-card {
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+        margin: 0 !important;
+        padding: 16px !important;
+        border-radius: 14px !important;
+        overflow: visible !important;
+        box-sizing: border-box !important;
+    }
+
+    body.sales-order-history .ttk-account-row-card__main,
+    body.sales-order-history .ttk-account-row-card__meta,
+    body.sales-order-history .ttk-account-row-card__actions {
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+        box-sizing: border-box !important;
+    }
+
+    body.sales-order-history .ttk-account-row-card__meta {
+        grid-template-columns: 1fr !important;
+        gap: 12px !important;
+        padding: 14px 0 !important;
+    }
+
+    body.sales-order-history .ttk-account-row-card__actions {
+        display: grid !important;
+        grid-template-columns: 1fr !important;
+        gap: 10px !important;
+        padding-top: 0 !important;
+    }
+
+    body.sales-order-history .ttk-account-row-card__actions .ttk-reorder-form,
+    body.sales-order-history .ttk-account-row-card__actions .action,
+    body.sales-order-history .ttk-account-row-card__actions .ttk-action-chip {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin: 0 !important;
+        box-sizing: border-box !important;
+    }
+
+    body.sales-order-history .order-products-toolbar.toolbar.bottom {
+        width: 100% !important;
+        max-width: 100% !important;
+        margin-top: 12px !important;
+        padding: 14px !important;
+        border-radius: 14px !important;
+        box-sizing: border-box !important;
+    }
+}
