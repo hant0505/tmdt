@@ -1224,13 +1224,39 @@
     }
 
     .tekntek-minicart-item__card {
-        grid-template-columns: 80px 1fr;
+        grid-template-columns: 80px minmax(0, 1fr);
+    }
+
+    .tekntek-minicart-item__details,
+    .tekntek-minicart-item__top {
+        min-width: 0;
+        width: 100%;
+    }
+
+    .tekntek-minicart-item__top {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 6px;
     }
 
     .tekntek-minicart-item__name,
     .tekntek-minicart-item__name a,
     .tekntek-minicart-item__name span {
-        max-width: 160px;
+        display: -webkit-box;
+        max-width: 100%;
+        min-width: 0;
+        overflow: hidden;
+        text-align: left;
+        text-overflow: clip;
+        white-space: normal;
+        overflow-wrap: anywhere;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 2;
+    }
+
+    .tekntek-minicart-item__price {
+        min-width: 0;
+        text-align: left;
     }
 
     .tekntek-minicart-totals {
