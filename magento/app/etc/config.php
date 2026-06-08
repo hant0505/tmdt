@@ -366,6 +366,7 @@ return [
         'PayPal_BraintreeGiftWrapping' => 1,
         'PayPal_BraintreeGraphQl' => 1,
         'PayPal_BraintreeReward' => 1,
+        'Payment_ZaloPay' => 1,
         'Recommendation_SimilarPic' => 1,
         'Shipping_GHN' => 1,
         'Shipping_GHTK' => 1,

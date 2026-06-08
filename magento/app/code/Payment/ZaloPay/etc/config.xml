@@ -4,13 +4,10 @@
     <default>
         <payment>
             <zalopay>
-                <active>1</active>
+                <active>0</active>
                 <model>Payment\ZaloPay\Model\Payment</model>
                 <order_status>pending_payment</order_status>
                 <title>ZaloPay Sandbox</title>
-                <app_id>2554</app_id>
-                <key1>sdngKKJmqEMzvh5QQcdD2A9XBSKUNaYn</key1>
-                <key2>trMrHtvjo6myautxDUiAcYsVtaeQ8nhf</key2>
                 <create_order_endpoint>https://sb-openapi.zalopay.vn/v2/create</create_order_endpoint>
                 <debug>0</debug>
                 <allowspecific>0</allowspecific>

@@ -27,6 +27,15 @@
         </label>
 
         <label class="tekntek-payment-option-card">
+            <input type="radio" name="payment_method_selection" value="zalopay"
+                   class="payment-method-radio" data-bind="checked: selectedMethod, enable: isZaloPayAvailable">
+            <div class="payment-option-content">
+                <span class="payment-option-title">ZaloPay</span>
+                <span class="payment-option-desc">Thanh toán qua ZaloPay</span>
+            </div>
+        </label>
+
+        <label class="tekntek-payment-option-card">
             <input type="radio" name="payment_method_selection" value="cashondelivery"
                    class="payment-method-radio" data-bind="checked: selectedMethod, enable: isCashOnDeliveryAvailable">
             <div class="payment-option-content">
@@ -42,6 +51,15 @@
                 <p class="info-label">VNPay Checkout</p>
                 <!-- <p class="info-amount">Amount: <strong>--</strong></p> -->
                 <p class="info-text">You will be redirected to VNPay after placing the order.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="payment-details-section" data-bind="visible: isZaloPay()">
+        <div class="details-content">
+            <div class="transfer-info-box">
+                <p class="info-label">ZaloPay Sandbox</p>
+                <p class="info-text">You will be redirected to ZaloPay after placing the order.</p>
             </div>
         </div>
     </div>
