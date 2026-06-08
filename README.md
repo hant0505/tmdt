@@ -13,7 +13,7 @@ Hệ thống được xây dựng nhằm mang đến trải nghiệm mua sắm t
 | STT | Họ và tên | Mã sinh viên |
 |---|---|---|
 | 1 | Trần Phương Phương | 23020562 |
-| 2 | Nguyễn Hoàng Hà Anh | 23020532  |
+| 2 | Nguyễn Thu Hà | 23020532  |
 | 3 | Nguyễn Tự Anh Tuấn | 23020570 |
 
 ---
