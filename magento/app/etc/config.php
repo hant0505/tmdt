@@ -371,6 +371,7 @@ return [
         'Shipping_GHTK' => 1,
         'TeknTek_AccountDashboard' => 1,
         'TeknTek_CatalogTweaks' => 1,
+        'TeknTek_FooterDocs' => 1,
         'TeknTek_Homepage' => 1,
         'TeknTek_SearchSuggestion' => 1,
         'TeknTek_SignupFlow' => 1,

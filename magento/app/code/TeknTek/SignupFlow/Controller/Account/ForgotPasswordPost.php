@@ -51,6 +51,8 @@ class ForgotPasswordPost extends CoreForgotPasswordPost
                 AccountManagement::EMAIL_RESET
             );
         } catch (NoSuchEntityException $exception) {
+            // Don't reveal if email exists (security best practice)
+            // But show success message anyway
         } catch (SecurityViolationException $exception) {
             $this->messageManager->addErrorMessage($exception->getMessage());
             return $resultRedirect->setPath('*/*/forgotpassword');

@@ -37,22 +37,26 @@ class ResetPassword extends Action implements HttpPostActionInterface
         $password = (string)$this->getRequest()->getParam('password');
         $passwordConfirmation = (string)$this->getRequest()->getParam('password_confirmation');
         $email = null;
+        $createPasswordParams = [
+            'id' => $customerId,
+            'token' => $resetPasswordToken,
+        ];
 
         if ($password !== $passwordConfirmation) {
             $this->messageManager->addErrorMessage(__("New Password and Confirm New Password values didn't match."));
-            $resultRedirect->setPath('customer/account/createPassword', ['token' => $resetPasswordToken]);
+            $resultRedirect->setPath('customer/account/createPassword', $createPasswordParams);
             return $resultRedirect;
         }
 
         if ($password === '') {
             $this->messageManager->addErrorMessage(__('Please enter a new password.'));
-            $resultRedirect->setPath('customer/account/createPassword', ['token' => $resetPasswordToken]);
+            $resultRedirect->setPath('customer/account/createPassword', $createPasswordParams);
             return $resultRedirect;
         }
 
         if (!$this->isPasswordStrongEnough($password)) {
             $this->messageManager->addErrorMessage(__('Password must be at least 8 characters, start with an uppercase letter, and contain at least one number.'));
-            $resultRedirect->setPath('customer/account/createPassword', ['token' => $resetPasswordToken]);
+            $resultRedirect->setPath('customer/account/createPassword', $createPasswordParams);
             return $resultRedirect;
         }
 
@@ -89,7 +93,7 @@ class ResetPassword extends Action implements HttpPostActionInterface
             $this->messageManager->addErrorMessage(__('Something went wrong while saving the new password.'));
         }
 
-        $resultRedirect->setPath('customer/account/createPassword', ['token' => $resetPasswordToken]);
+        $resultRedirect->setPath('customer/account/createPassword', $createPasswordParams);
         return $resultRedirect;
     }
 

@@ -1,5 +1,8 @@
 <?php
 /** @var \Magento\Framework\View\Element\Template $block */
+$docUrl = static function (string $topic) use ($block): string {
+    return $block->getUrl('docs/page/index', ['topic' => $topic]);
+};
 ?>
 <footer class="tekntek-footer" role="contentinfo">
     <div class="tekntek-footer__top">
@@ -21,18 +24,18 @@
 
             <section class="tekntek-footer__section">
                 <h3 class="tekntek-footer__title">About us</h3>
-                <p><a href="#">Stores</a></p>
-                <p><a href="#">Corporate website</a></p>
-                <p><a href="#">Exclusive Offers</a></p>
-                <p><a href="#">Career</a></p>
+                <p><a href="<?= $block->escapeUrl($docUrl('stores')) ?>">Stores</a></p>
+                <p><a href="<?= $block->escapeUrl($docUrl('corporate')) ?>">Corporate website</a></p>
+                <p><a href="<?= $block->escapeUrl($docUrl('offers')) ?>">Exclusive Offers</a></p>
+                <p><a href="<?= $block->escapeUrl($docUrl('career')) ?>">Career</a></p>
             </section>
 
             <section class="tekntek-footer__section">
                 <h3 class="tekntek-footer__title">Help &amp; Support</h3>
-                <p><a href="#">Help center</a></p>
-                <p><a href="#">Payments</a></p>
-                <p><a href="#">Product returns</a></p>
-                <p><a href="#">FAQ</a></p>
+                <p><a href="<?= $block->escapeUrl($docUrl('help-center')) ?>">Help center</a></p>
+                <p><a href="<?= $block->escapeUrl($docUrl('payments')) ?>">Payments</a></p>
+                <p><a href="<?= $block->escapeUrl($docUrl('returns')) ?>">Product returns</a></p>
+                <p><a href="<?= $block->escapeUrl($docUrl('faq')) ?>">FAQ</a></p>
             </section>
 
         </div>

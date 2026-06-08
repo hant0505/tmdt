@@ -12,18 +12,24 @@ $displayName = $customerName !== '' ? $customerName : (string) __('there');
     border-radius: 18px;
     background: linear-gradient(135deg, #f8fafc 0%, #eef6ff 52%, #f9fafb 100%);
     box-shadow: 0 12px 30px rgba(15, 23, 42, 0.06);
+    font-family: "Segoe UI", Arial, "Helvetica Neue", sans-serif;
 }
 .ttk-account-greeting__title {
     margin: 0;
     color: #111827;
+    font-family: "Segoe UI", Arial, "Helvetica Neue", sans-serif;
     font-size: 28px;
     font-weight: 800;
     line-height: 1.2;
+}
+.ttk-account-greeting__emoji {
+    font-family: "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif;
 }
 .ttk-account-greeting__subtitle {
     margin: 8px 0 0;
     max-width: 680px;
     color: #4b5563;
+    font-family: "Segoe UI", Arial, "Helvetica Neue", sans-serif;
     font-size: 15px;
     line-height: 1.6;
 }
@@ -40,7 +46,7 @@ $displayName = $customerName !== '' ? $customerName : (string) __('there');
 
 <div class="ttk-account-greeting bg-gray-50 rounded-2xl border border-gray-100 shadow-sm">
     <h2 class="ttk-account-greeting__title text-2xl md:text-3xl font-bold text-gray-800">
-        <?= $block->escapeHtml(__('Hello, %1 👋', $displayName)) ?>
+        <?= $block->escapeHtml(__('Hello, %1', $displayName)) ?> <span class="ttk-account-greeting__emoji" aria-hidden="true">👋</span>
     </h2>
     <p class="ttk-account-greeting__subtitle text-gray-500">
         <?= $block->escapeHtml(__('Welcome back! Manage your account information and orders here.')) ?>

@@ -1673,6 +1673,7 @@ $homepageData = [
         'cameras': '<?= $block->escapeUrl($block->getViewFileUrl('images/categories/camera.png')) ?>',
         'monitors': '<?= $block->escapeUrl($block->getViewFileUrl('images/categories/monitor.png')) ?>',
         'keyboards': '<?= $block->escapeUrl($block->getViewFileUrl('images/categories/keyboard-cropped.png')) ?>',
+        'mice': '<?= $block->escapeUrl($block->getViewFileUrl('images/categories/mouse.png')) ?>',
         'computer-mice': '<?= $block->escapeUrl($block->getViewFileUrl('images/categories/mouse.png')) ?>',
         'hard-drives': '<?= $block->escapeUrl($block->getViewFileUrl('images/categories/hard-drive.png')) ?>',
         'exchange-rates': 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI4IiBmaWxsPSIjRUNGMEYxIi8+PHBhdGggZD0iTTEwIDEySDIyTTEwIDIwSDIyTTEwIDE2SDE2IiBzdHJva2U9IiMwODc4RjQiIHN0cm9rZS13aWR0aD0iMSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PC9zdmc+',
@@ -1769,6 +1770,7 @@ $homepageData = [
         var iconName = section && section.icon_key ? section.icon_key : normalizeName(name);
         var sectionIconUrl = sectionIconMap[iconName] || ('icon-' + iconName + '.svg');
         var sectionIconModifierMap = {
+            'mice': 'ttk-section-icon--mice',
             'computer-mice': 'ttk-section-icon--mice',
             'keyboards': 'ttk-section-icon--keyboard',
             'hard-drives': 'ttk-section-icon--hard-drive'

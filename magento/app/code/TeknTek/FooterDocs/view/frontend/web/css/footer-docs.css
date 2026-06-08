@@ -1,0 +1,113 @@
+
+.tekntek_docs-page-index .page-title-wrapper {
+    display: none;
+}
+
+.tekntek-doc {
+    background: #f6f7fb;
+    color: #182033;
+    padding: 56px 16px 72px;
+}
+
+.tekntek-doc__inner {
+    margin: 0 auto;
+    max-width: 920px;
+}
+
+.tekntek-doc__back {
+    color: #e56a1f;
+    display: inline-flex;
+    font-weight: 700;
+    margin-bottom: 24px;
+    text-decoration: none;
+}
+
+.tekntek-doc__header {
+    max-width: 760px;
+}
+
+.tekntek-doc__eyebrow {
+    color: #596273;
+    display: block;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    margin-bottom: 10px;
+    text-transform: uppercase;
+}
+
+.tekntek-doc h1 {
+    font-size: 40px;
+    line-height: 1.12;
+    margin: 0 0 14px;
+}
+
+.tekntek-doc__header p {
+    color: #4a5568;
+    font-size: 17px;
+    line-height: 1.7;
+    margin: 0;
+}
+
+.tekntek-doc__panel {
+    display: grid;
+    gap: 14px;
+    margin-top: 32px;
+}
+
+.tekntek-doc__item {
+    align-items: flex-start;
+    background: #ffffff;
+    border: 1px solid #e4e8ef;
+    border-radius: 8px;
+    display: flex;
+    gap: 14px;
+    padding: 18px 20px;
+}
+
+.tekntek-doc__item p {
+    color: #2c3445;
+    line-height: 1.65;
+    margin: 0;
+}
+
+.tekntek-doc__mark {
+    background: #e56a1f;
+    border-radius: 50%;
+    flex: 0 0 9px;
+    height: 9px;
+    margin-top: 9px;
+    width: 9px;
+}
+
+.tekntek-doc__cta {
+    background: #e56a1f;
+    border-radius: 6px;
+    color: #ffffff;
+    display: inline-flex;
+    font-weight: 700;
+    margin-top: 28px;
+    padding: 12px 18px;
+    text-decoration: none;
+}
+
+.tekntek-doc__cta:hover,
+.tekntek-doc__cta:focus {
+    background: #c95312;
+    color: #ffffff;
+    text-decoration: none;
+}
+
+@media (max-width: 640px) {
+    .tekntek-doc {
+        padding: 36px 14px 52px;
+    }
+
+    .tekntek-doc h1 {
+        font-size: 30px;
+    }
+
+    .tekntek-doc__item {
+        padding: 16px;
+    }
+}

@@ -16,6 +16,8 @@ services:
       SMTP_AUTH: ${SMTP_AUTH:-off}
       SMTP_TLS: ${SMTP_TLS:-off}
       SMTP_STARTTLS: ${SMTP_STARTTLS:-off}
+      RESEND_API_KEY: ${RESEND_API_KEY:-}
+      RESEND_FROM_EMAIL: ${RESEND_FROM_EMAIL:-}
     depends_on:
       - mailpit
 

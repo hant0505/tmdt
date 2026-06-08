@@ -14,7 +14,6 @@ if ($signupSession->hasVerifiedEmail()) {
 
 $prefilledEmail = $signupSession->getEmail();
 $expiresAt = $signupSession->getExpiresAt();
-        background: #ececec !important;
 $signupInit = [
     'TeknTek_SignupFlow/js/signup-flow' => [
         'sendUrl' => $block->getUrl('tekntek_signup/code/send'),

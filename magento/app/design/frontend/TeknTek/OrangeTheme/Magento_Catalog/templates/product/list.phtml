@@ -12,6 +12,7 @@ use Magento\Framework\App\Action\Action;
 <?php
 $_productCollection = $block->getLoadedProductCollection();
 $_helper = $block->getData('outputHelper');
+$priceHelper = $this->helper(\Magento\Framework\Pricing\Helper\Data::class);
 $now = time();
 ?>
 <?php if (!$_productCollection->count()): ?>
@@ -93,7 +94,14 @@ $now = time();
                                     </div>
                                 </div>
                             <?php endif; ?>
-                            <?= /* @noEscape */ $block->getProductPrice($_product) ?>
+                            <?php if ($isSale): ?>
+                                <div class="tekntek-sale-price-inline" aria-label="<?= $escaper->escapeHtmlAttr(__('Sale price')) ?>">
+                                    <span class="old-price"><?= $escaper->escapeHtml($priceHelper->currency($regularPrice, true, false)) ?></span>
+                                    <span class="final-price"><?= $escaper->escapeHtml($priceHelper->currency($finalPrice, true, false)) ?></span>
+                                </div>
+                            <?php else: ?>
+                                <?= /* @noEscape */ $block->getProductPrice($_product) ?>
+                            <?php endif; ?>
                             <?= $block->getProductDetailsHtml($_product) ?>
 
                             <div class="product-item-inner">

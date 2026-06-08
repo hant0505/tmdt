@@ -55,7 +55,9 @@ class Ghtk extends AbstractCarrier implements CarrierInterface
         /** @var \Magento\Shipping\Model\Rate\Result $result */
         $result = $this->_rateResultFactory->create();
 
-        $weightInKg = $request->getPackageWeight() ?: 1;
+        // Convert weight to KG based on store configuration
+        $weight = $request->getPackageWeight() ?: 1;
+        $weightInKg = $this->_convertWeightToKg($weight);
 
         // Mặc định khách ở Cầu Giấy, Hà Nội nếu chưa nhập
         $destProvince = $request->getDestCity() ?: 'Hà Nội';
@@ -101,7 +103,12 @@ class Ghtk extends AbstractCarrier implements CarrierInterface
             if ($baseCurrencyCode === 'USD') {
                 $currency = $this->currencyFactory->create()->load('VND');
                 $rate = $currency->getAnyRate('USD'); 
-                return round($amountVND * $rate, 4);
+                
+                // Check if rate is valid, otherwise use fallback
+                if ($rate && $rate > 0) {
+                    return round($amountVND * $rate, 4);
+                }
+                $this->_logger->warning('GHTK: Exchange rate VND/USD not found, using fallback 26310');
             }
 
             return round($amountVND / 26310, 4); 
@@ -171,5 +178,33 @@ class Ghtk extends AbstractCarrier implements CarrierInterface
             'standard' => 'GHTK Tiết kiệm',
             'express' => 'GHTK Hỏa tốc'
         ];
+    }
+
+    /**
+     * Convert weight to KG based on store weight unit configuration
+     * Magento supports both KG and LBS as weight units
+     */
+    private function _convertWeightToKg(float $weight): float
+    {
+        try {
+            // Try to get weight unit from system configuration
+            $weightUnit = $this->_scopeConfig->getValue(
+                'general/locale/weight_unit',
+                \Magento\Store\Model\ScopeInterface::SCOPE_STORE
+            );
+            
+            // If weight unit is LBS, convert to KG
+            if ($weightUnit === 'lbs') {
+                // 1 LB = 0.453592 KG
+                $convertedWeight = round($weight * 0.453592, 4);
+                $this->_logger->info('GHTK Weight conversion: ' . $weight . ' lbs → ' . $convertedWeight . ' kg');
+                return $convertedWeight;
+            }
+        } catch (\Exception $e) {
+            $this->_logger->warning('GHTK: Could not determine weight unit, assuming KG');
+        }
+        
+        // Default: assume already in KG
+        return $weight;
     }
 }

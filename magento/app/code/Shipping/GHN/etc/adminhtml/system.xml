@@ -18,6 +18,14 @@
                 <field id="shop_id" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="0">
                     <label>Shop ID</label>
                 </field>
+                <field id="from_district_id" translate="label" type="text" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>From District ID (Quận/Huyện gửi hàng)</label>
+                    <comment>Lấy từ GHN để xác định khu vực gửi hàng. Mặc định: 3440 (Cầu Giấy, Hà Nội)</comment>
+                </field>
+                <field id="to_district_id" translate="label" type="text" sortOrder="51" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>To District ID (Quận/Huyện nhận hàng - mặc định)</label>
+                    <comment>Mặc định cho khách: 3440 (Cầu Giấy, Hà Nội)</comment>
+                </field>
             </group>
         </section>
     </system>

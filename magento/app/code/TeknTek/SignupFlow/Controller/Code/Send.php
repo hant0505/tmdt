@@ -63,25 +63,11 @@ class Send extends Action implements HttpPostActionInterface
         $this->inlineTranslation->suspend();
 
         try {
-            $store = $this->storeManager->getStore();
-
-            $transport = $this->transportBuilder
-                ->setTemplateIdentifier('tekntek_signup_code')
-                ->setTemplateOptions([
-                    'area' => 'frontend',
-                    'store' => (int)$store->getId(),
-                ])
-                ->setTemplateVars([
-                    'code' => $code,
-                    'expires_minutes' => (int)(self::EXPIRES_SECONDS / 60),
-                    'email' => $email,
-                    'store' => $store,
-                ])
-                ->setFromByScope('general')
-                ->addTo($email)
-                ->getTransport();
-
-            $transport->sendMessage();
+            if ($this->getEnvValue('RESEND_API_KEY') !== '') {
+                $this->sendViaResend($email, $code);
+            } else {
+                $this->sendViaMagentoTransport($email, $code);
+            }
         } catch (\Throwable $throwable) {
             $this->signupSession->clear();
             ObjectManager::getInstance()->get(LoggerInterface::class)->error(
@@ -107,5 +93,85 @@ class Send extends Action implements HttpPostActionInterface
             'email' => $email,
             'expires_at' => $expiresAt,
         ]);
+    }
+
+    private function sendViaMagentoTransport(string $email, string $code): void
+    {
+        $store = $this->storeManager->getStore();
+
+        $transport = $this->transportBuilder
+            ->setTemplateIdentifier('tekntek_signup_code')
+            ->setTemplateOptions([
+                'area' => 'frontend',
+                'store' => (int)$store->getId(),
+            ])
+            ->setTemplateVars([
+                'code' => $code,
+                'expires_minutes' => (int)(self::EXPIRES_SECONDS / 60),
+                'email' => $email,
+                'store' => $store,
+            ])
+            ->setFromByScope('general')
+            ->addTo($email)
+            ->getTransport();
+
+        $transport->sendMessage();
+    }
+
+    private function sendViaResend(string $email, string $code): void
+    {
+        $apiKey = $this->getEnvValue('RESEND_API_KEY');
+        $fromEmail = $this->getEnvValue('RESEND_FROM_EMAIL') ?: 'onboarding@resend.dev';
+        $expiresMinutes = (int)(self::EXPIRES_SECONDS / 60);
+
+        $payload = [
+            'from' => $fromEmail,
+            'to' => [$email],
+            'subject' => 'Your verification code',
+            'html' => sprintf(
+                '<p>Hello,</p><p>Your verification code is <strong>%s</strong>.</p><p>This code expires in %d minutes.</p><p>If you did not request this code, you can ignore this email.</p>',
+                htmlspecialchars($code, ENT_QUOTES, 'UTF-8'),
+                $expiresMinutes
+            ),
+        ];
+
+        $handle = curl_init('https://api.resend.com/emails');
+        if ($handle === false) {
+            throw new \RuntimeException('Unable to initialize Resend request.');
+        }
+
+        curl_setopt_array($handle, [
+            CURLOPT_POST => true,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_TIMEOUT => 15,
+            CURLOPT_HTTPHEADER => [
+                'Authorization: Bearer ' . $apiKey,
+                'Content-Type: application/json',
+            ],
+            CURLOPT_POSTFIELDS => json_encode($payload, JSON_THROW_ON_ERROR),
+        ]);
+
+        $responseBody = curl_exec($handle);
+        $statusCode = (int)curl_getinfo($handle, CURLINFO_HTTP_CODE);
+        $error = curl_error($handle);
+        curl_close($handle);
+
+        if ($responseBody === false || $statusCode < 200 || $statusCode >= 300) {
+            $message = $error !== '' ? $error : (string)$responseBody;
+            throw new \RuntimeException('Resend API failed with HTTP ' . $statusCode . ': ' . $message);
+        }
+    }
+
+    private function getEnvValue(string $key): string
+    {
+        $value = getenv($key);
+        if ($value === false && isset($_ENV[$key])) {
+            $value = $_ENV[$key];
+        }
+        if ($value === false && isset($_SERVER[$key])) {
+            $value = $_SERVER[$key];
+        }
+
+        return trim((string)$value);
     }
 }
