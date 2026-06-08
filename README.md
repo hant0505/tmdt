@@ -23,7 +23,6 @@ Hệ thống được xây dựng nhằm mang đến trải nghiệm mua sắm t
 - Hỗ trợ khách hàng xem, tìm kiếm và so sánh sản phẩm.
 - Cho phép người dùng đăng ký, đăng nhập và quản lý tài khoản cá nhân.
 - Hỗ trợ giỏ hàng, đặt hàng và thanh toán trực tuyến.
-- Tích hợp cổng thanh toán **VNPay**.
 - Cung cấp chức năng đánh giá sản phẩm, đổi trả hàng và chăm sóc khách hàng.
 - Hiển thị tin tức công nghệ và thông tin giới thiệu doanh nghiệp.
 
