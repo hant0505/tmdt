@@ -13,6 +13,7 @@ use Magento\Framework\HTTP\Client\Curl;
 use Magento\Framework\Serialize\Serializer\Json;
 use Magento\Framework\Stdlib\DateTime\TimezoneInterface;
 use Magento\Framework\UrlInterface;
+use Magento\Directory\Model\CurrencyFactory;
 use Magento\Sales\Api\OrderRepositoryInterface;
 use Magento\Sales\Model\Order;
 use Magento\Sales\Model\ResourceModel\Order\CollectionFactory as OrderCollectionFactory;
@@ -23,6 +24,7 @@ class Data extends AbstractHelper
 {
     private const CONFIG_PATH = 'payment/zalopay/';
     private const DEFAULT_SANDBOX_ENDPOINT = 'https://sb-openapi.zalopay.vn/v2/create';
+    private const FALLBACK_USD_TO_VND_RATE = 25000;
 
     private EncryptorInterface $encryptor;
 
@@ -38,6 +40,8 @@ class Data extends AbstractHelper
 
     private OrderCollectionFactory $orderCollectionFactory;
 
+    private CurrencyFactory $currencyFactory;
+
     private LoggerInterface $logger;
 
     public function __construct(
@@ -49,6 +53,7 @@ class Data extends AbstractHelper
         UrlInterface $urlBuilder,
         OrderRepositoryInterface $orderRepository,
         OrderCollectionFactory $orderCollectionFactory,
+        CurrencyFactory $currencyFactory,
         LoggerInterface $logger
     ) {
         parent::__construct($context);
@@ -59,6 +64,7 @@ class Data extends AbstractHelper
         $this->urlBuilder = $urlBuilder;
         $this->orderRepository = $orderRepository;
         $this->orderCollectionFactory = $orderCollectionFactory;
+        $this->currencyFactory = $currencyFactory;
         $this->logger = $logger;
     }
 
@@ -108,7 +114,11 @@ class Data extends AbstractHelper
         }
 
         $appTransId = $this->buildAppTransId((string)$order->getIncrementId());
-        $amount = (int)round((float)$order->getGrandTotal());
+        $amount = $this->convertOrderAmountToVnd(
+            (float)$order->getGrandTotal(),
+            $order,
+            (float)$order->getBaseGrandTotal()
+        );
         if ($amount <= 0) {
             throw new LocalizedException(__('ZaloPay amount is invalid.'));
         }
@@ -255,7 +265,16 @@ class Data extends AbstractHelper
         }
 
         if (isset($callbackData['amount'])) {
-            $expectedAmount = (int)round((float)$order->getGrandTotal());
+            $payment = $order->getPayment();
+            $expectedAmount = (int)$payment->getAdditionalInformation('zalopay_amount');
+            if ($expectedAmount <= 0) {
+                $expectedAmount = $this->convertOrderAmountToVnd(
+                    (float)$order->getGrandTotal(),
+                    $order,
+                    (float)$order->getBaseGrandTotal()
+                );
+            }
+
             if ((int)$callbackData['amount'] !== $expectedAmount) {
                 throw new LocalizedException(__('ZaloPay callback amount does not match.'));
             }
@@ -285,10 +304,13 @@ class Data extends AbstractHelper
     {
         $items = [];
         foreach ($order->getAllVisibleItems() as $item) {
+            $priceInclTax = (float)($item->getPriceInclTax() ?: $item->getPrice());
+            $basePriceInclTax = (float)($item->getBasePriceInclTax() ?: $item->getBasePrice());
+
             $items[] = [
                 'itemid' => (string)$item->getSku(),
                 'itemname' => (string)$item->getName(),
-                'itemprice' => (int)round((float)$item->getPriceInclTax()),
+                'itemprice' => $this->convertOrderAmountToVnd($priceInclTax, $order, $basePriceInclTax),
                 'itemquantity' => (int)$item->getQtyOrdered()
             ];
         }
@@ -308,5 +330,42 @@ class Data extends AbstractHelper
         }
 
         return 'guest';
+    }
+
+    private function convertOrderAmountToVnd(float $amount, Order $order, ?float $baseAmount = null): int
+    {
+        $currencyCode = strtoupper((string)($order->getOrderCurrencyCode() ?: $order->getBaseCurrencyCode()));
+        if ($currencyCode === '' || $currencyCode === 'VND') {
+            return (int)round($amount);
+        }
+
+        $rate = $this->getCurrencyRateToVnd($currencyCode);
+        if ($rate > 0) {
+            return (int)round($amount * $rate);
+        }
+
+        if ($baseAmount !== null && strtoupper((string)$order->getBaseCurrencyCode()) === 'VND') {
+            return (int)round($baseAmount);
+        }
+
+        if ($currencyCode === 'USD') {
+            return (int)round($amount * self::FALLBACK_USD_TO_VND_RATE);
+        }
+
+        throw new LocalizedException(__('Cannot convert order amount from %1 to VND for ZaloPay.', $currencyCode));
+    }
+
+    private function getCurrencyRateToVnd(string $currencyCode): float
+    {
+        try {
+            $currency = $this->currencyFactory->create()->load($currencyCode);
+            $rate = (float)$currency->getAnyRate('VND');
+
+            return $rate > 0 ? $rate : 0.0;
+        } catch (\Throwable $exception) {
+            $this->debug('Currency conversion failed', ['currency' => $currencyCode]);
+
+            return 0.0;
+        }
     }
 }
