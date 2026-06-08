@@ -31,7 +31,7 @@ Hệ thống được xây dựng nhằm mang đến trải nghiệm mua sắm t
 
 ## 👤 Đối tượng sử dụng
 
-### Khách hàng chưa đăng nhập
+### Khách hàng chưa đăngký
 
 - Xem trang chủ.
 - Xem danh mục sản phẩm.
