@@ -36,8 +36,8 @@ $ttkCategoryUrls = [
     'smartwatches' => $block->getUrl($ttkUrlKeyMap['smartwatches']),
     'headphones' => $block->getUrl($ttkUrlKeyMap['headphones']),
     'tablets' => $block->getUrl($ttkUrlKeyMap['tablets']),
-    'exchange_rates' => 'http://localhost/currency',
-    'news' => 'http://localhost/businessnews'
+    'exchange_rates' => $block->getUrl('currency'),
+    'news' => $block->getUrl('businessnews')
 ];
 
 try {

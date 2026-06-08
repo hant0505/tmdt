@@ -37,8 +37,8 @@ $ttkCategoryUrls = [
     'smartwatches' => $block->getUrl($ttkUrlKeyMap['smartwatches']),
     'headphones' => $block->getUrl($ttkUrlKeyMap['headphones']),
     'tablets' => $block->getUrl($ttkUrlKeyMap['tablets']),
-    'exchange_rates' => '#',
-    'news' => '#'
+    'exchange_rates' => $block->getUrl('currency'),
+    'news' => $block->getUrl('businessnews'),
 ];
 
 try {
@@ -1376,6 +1376,23 @@ if ($homepageSectionsViewModel instanceof \TeknTek\Homepage\ViewModel\Sections) 
     );
 }
 
+// Add exchange rates and business news sections with dynamic URLs
+$homepageSections[] = [
+    'id' => 'exchange_rates',
+    'name' => 'Exchange Rates',
+    'url' => $block->getUrl('currency'),
+    'icon_key' => 'exchange_rates',
+    'cards' => []
+];
+
+$homepageSections[] = [
+    'id' => 'business_news',
+    'name' => 'Business News',
+    'url' => $block->getUrl('businessnews'),
+    'icon_key' => 'business_news',
+    'cards' => []
+];
+
 $fallbackCards = [[
     'id' => 0,
     'name' => 'View Products',
@@ -1448,6 +1465,8 @@ if (empty($searchSuggestionItems)) {
 
 $formKey = $objectManager->get(\Magento\Framework\Data\Form\FormKey::class)->getFormKey();
 $urlEncoder = $objectManager->get(\Magento\Framework\Url\EncoderInterface::class);
+$httpContext = $objectManager->get(\Magento\Framework\App\Http\Context::class);
+$isLoggedIn = (bool) $httpContext->getValue(\Magento\Customer\Model\Context::CONTEXT_AUTH);
 $currentUrl = $block->getUrl('*/*/*', ['_current' => true, '_use_rewrite' => true]);
 
 $homepageData = [
@@ -1457,7 +1476,9 @@ $homepageData = [
     'cart' => [
         'addUrl' => $block->getUrl('checkout/cart/add'),
         'formKey' => $formKey,
-        'uenc' => $urlEncoder->encode($currentUrl)
+        'uenc' => $urlEncoder->encode($currentUrl),
+        'isLoggedIn' => $isLoggedIn,
+        'loginUrl' => $block->getUrl('customer/account/login')
     ]
 ];
 ?>
@@ -1478,6 +1499,8 @@ $homepageData = [
 
     var data = JSON.parse(dataNode.textContent);
     var cartConfig = data.cart || {};
+    var isLoggedIn = !!cartConfig.isLoggedIn;
+    var loginUrl = cartConfig.loginUrl || '/customer/account/login';
 
     var homeSearchForm = document.getElementById('search_mini_form');
     var homeSearchInput = document.getElementById('search');
@@ -1612,7 +1635,9 @@ $homepageData = [
         'monitors': '<?= $block->escapeUrl($block->getViewFileUrl('images/categories/monitor.png')) ?>',
         'keyboards': '<?= $block->escapeUrl($block->getViewFileUrl('images/categories/keyboard-cropped.png')) ?>',
         'computer-mice': '<?= $block->escapeUrl($block->getViewFileUrl('images/categories/mouse.png')) ?>',
-        'hard-drives': '<?= $block->escapeUrl($block->getViewFileUrl('images/categories/hard-drive.png')) ?>'
+        'hard-drives': '<?= $block->escapeUrl($block->getViewFileUrl('images/categories/hard-drive.png')) ?>',
+        'exchange-rates': 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI4IiBmaWxsPSIjRUNGMEYxIi8+PHBhdGggZD0iTTEwIDEySDIyTTEwIDIwSDIyTTEwIDE2SDE2IiBzdHJva2U9IiMwODc4RjQiIHN0cm9rZS13aWR0aD0iMSIgc3Ryb2tlLWxpbmVjYXA9InJvdW5kIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PC9zdmc+',
+        'business-news': 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHJ4PSI4IiBmaWxsPSIjRkVGM0MzIi8+PHBhdGggZD0iTTExIDEwSDIxQzIxLjU1MjMgMTAgMjIgMTAuNDQ3NyAyMiAxMVYyMUMyMiAyMS41NTIzIDIxLjU1MjMgMjIgMjEgMjJIMTFDMTAuNDQ3NyAyMiAxMCAyMS41NTIzIDEwIDIxVjExQzEwIDEwLjQ0NzcgMTAuNDQ3NyAxMCAxMSAxMFoiIHN0cm9rZT0iI0RBNjIwMCIgc3Ryb2tlLXdpZHRoPSIxIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIGZpbGw9Im5vbmUiLz48cGF0aCBkPSJNMTMgMTJIMTlNMTMgMTVIMTkTMTMgMThIMTYiIHN0cm9rZT0iI0RBNjIwMCIgc3Ryb2tlLXdpZHRoPSIxIiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz48L3N2Zz4='
     };
 
     function stars(item) {
@@ -1620,6 +1645,37 @@ $homepageData = [
         var filledStars = Math.max(0, Math.min(5, Math.round(ratingSummary / 20)));
         var emptyStars = Math.max(0, 5 - filledStars);
         return '<span>' + '★'.repeat(filledStars) + '☆'.repeat(emptyStars) + '</span>';
+    }
+
+    function bindHomepageCartForms(scopeNode) {
+        var rootNode = scopeNode || document;
+
+        Array.prototype.slice.call(rootNode.querySelectorAll('.ttk-card-cart-form')).forEach(function (formNode) {
+            if (!formNode || formNode.getAttribute('data-cart-bound') === '1') {
+                return;
+            }
+
+            formNode.setAttribute('data-cart-bound', '1');
+            formNode.addEventListener('submit', function (event) {
+                if (isLoggedIn) {
+                    return;
+                }
+
+                event.preventDefault();
+                window.location.href = loginUrl;
+            });
+
+            Array.prototype.slice.call(formNode.querySelectorAll('.ttk-card-cart')).forEach(function (buttonNode) {
+                buttonNode.addEventListener('click', function (event) {
+                    if (isLoggedIn) {
+                        return;
+                    }
+
+                    event.preventDefault();
+                    window.location.href = loginUrl;
+                });
+            });
+        });
     }
 
     function cardTemplate(item) {
@@ -1662,6 +1718,7 @@ $homepageData = [
     }
 
     offersNode.innerHTML = data.offers.map(cardTemplate).join('');
+    bindHomepageCartForms(offersNode);
 
     productsNode.innerHTML = data.sections.map(function (section) {
         var name = section && section.name ? section.name : '';
@@ -1686,6 +1743,7 @@ $homepageData = [
             }).join('') + '</div>' +
             '</section>';
     }).join('');
+    bindHomepageCartForms(productsNode);
 
 })();
 </script>

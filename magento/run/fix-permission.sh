@@ -28,7 +28,7 @@ docker exec -it magento_php bash -c '
 echo "Fixing permissions on Host..."
 
 
-sudo chown -R punpun:www-data .
+sudo chown -R tmdt:www-data .
 sudo find var generated pub/static pub/media app/etc -type d -exec chmod 775 {} + 2>/dev/null || true
 sudo find var generated pub/static pub/media app/etc -type f -exec chmod 664 {} + 2>/dev/null || true
 

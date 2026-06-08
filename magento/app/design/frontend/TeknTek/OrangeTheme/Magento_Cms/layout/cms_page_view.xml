@@ -22,16 +22,16 @@
                 <arguments>
                     <argument name="view_model" xsi:type="object">TeknTek\Homepage\ViewModel\Sections</argument>
                     <argument name="homepage_category_ids" xsi:type="array">
-                        <item name="laptops" xsi:type="number">13</item>
-                        <item name="smartphones" xsi:type="number">14</item>
-                        <item name="tablets" xsi:type="number">16</item>
-                        <item name="headphones" xsi:type="number">19</item>
-                        <item name="smartwatches" xsi:type="number">15</item>
-                        <item name="cameras" xsi:type="number">22</item>
-                        <item name="monitors" xsi:type="number">21</item>
-                        <item name="keyboards" xsi:type="number">18</item>
-                        <item name="computer_mice" xsi:type="number">4</item>
-                        <item name="hard_drives" xsi:type="number">20</item>
+                        <item name="laptops" xsi:type="number">3</item>
+                        <item name="smartphones" xsi:type="number">4</item>
+                        <item name="tablets" xsi:type="number">6</item>
+                        <item name="headphones" xsi:type="number">9</item>
+                        <item name="smartwatches" xsi:type="number">5</item>
+                        <item name="cameras" xsi:type="number">12</item>
+                        <item name="monitors" xsi:type="number">11</item>
+                        <item name="keyboards" xsi:type="number">8</item>
+                        <item name="computer_mice" xsi:type="number">7</item>
+                        <item name="hard_drives" xsi:type="number">10</item>
                     </argument>
                     <argument name="homepage_category_product_limit" xsi:type="number">4</argument>
                 </arguments>

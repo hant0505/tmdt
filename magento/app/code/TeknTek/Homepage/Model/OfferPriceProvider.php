@@ -15,7 +15,7 @@ class OfferPriceProvider
 {
     private const CACHE_KEY = 'tekntek_offer_product_map_v2_%d';
     private const CACHE_TAG = 'TEKNTEK_OFFER_PRODUCTS';
-    private const OFFER_CATEGORY_IDS = [20, 4, 18, 21, 13, 14, 22, 15, 19, 16];
+    private const OFFER_CATEGORY_IDS = [10, 7, 8, 11, 3, 4, 12, 5, 9, 6];
 
     /** @var array<int,array<int,int>> */
     private array $runtimeMapByStore = [];
