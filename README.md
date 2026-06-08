@@ -1,4 +1,4 @@
-# 🛒 TeknTek - Website Thương Mại Điện Tử Thiết Bị Công Nghệ
+# 🛒 TeknTek - Hệ thống thương mại điện tử bán đồ công nghệ
 
 ## 📌 Giới thiệu
 
