@@ -2,8 +2,11 @@ define([
     'jquery',
     'ko',
     'Magento_Customer/js/model/address-list',
-    'Magento_Checkout/js/model/quote'
-], function ($, ko, addressList, quote) {
+    'Magento_Checkout/js/model/quote',
+    'mage/url',
+    'Magento_Customer/js/model/customer',
+    'Magento_Customer/js/customer-data'
+], function ($, ko, addressList, quote, urlBuilder, customer, customerData) {
     'use strict';
 
     var debugPrefix = '[TeknTek Checkout Debug]';
@@ -267,6 +270,64 @@ define([
         return resolveStreetFromSource(addressData, source);
     }
 
+
+    function getCustomerAddressId(address) {
+        var key, match;
+
+        if (!address) {
+            return null;
+        }
+
+        if (address.customerAddressId) {
+            return address.customerAddressId;
+        }
+
+        if (address.customer_address_id) {
+            return address.customer_address_id;
+        }
+
+        if (typeof address.getKey === 'function') {
+            key = address.getKey();
+            match = key && key.toString().match(/^customer-address(\d+)$/);
+
+            if (match) {
+                return match[1];
+            }
+        }
+
+        return null;
+    }
+
+    function persistCustomerAddress(addressData, addressId) {
+        if (!customer || !customer.isLoggedIn || !customer.isLoggedIn()) {
+            return;
+        }
+
+        addressData = $.extend(true, {}, addressData || {});
+        addressData.save_in_address_book = 1;
+
+        $.ajax({
+            url: urlBuilder.build('checkoutaddress/address/save'),
+            type: 'POST',
+            dataType: 'json',
+            data: {
+                form_key: window.FORM_KEY || '',
+                address_id: addressId || '',
+                address: addressData
+            }
+        }).done(function (response) {
+            debugLog('addressBook.persist.done', response);
+            if (customerData && typeof customerData.reload === 'function') {
+                customerData.reload(['customer'], true);
+            }
+        }).fail(function (xhr) {
+            debugLog('addressBook.persist.fail', {
+                status: xhr && xhr.status,
+                response: xhr && xhr.responseJSON
+            });
+        });
+    }
+
     return function (Target) {
         return Target.extend({
             _isPruningNewCustomerAddresses: false,
@@ -386,11 +447,24 @@ define([
              * @return {Boolean|undefined}
              */
             saveNewAddress: function () {
+                var addressData = this.source && this.source.get ?
+                        $.extend(true, {}, this.source.get('shippingAddress') || {}) : {},
+                    selectedAddress = quote && typeof quote.shippingAddress === 'function' ? quote.shippingAddress() : null,
+                    addressId = getCustomerAddressId(selectedAddress),
+                    result;
+
+                addressData.save_in_address_book = 1;
+
                 debugLog('saveNewAddress.start', {
-                    sourceShippingAddress: this.source && this.source.get ? this.source.get('shippingAddress') : null
+                    sourceShippingAddress: addressData,
+                    customerAddressId: addressId
                 });
 
-                var result = this._super();
+                result = this._super();
+
+                if (!this.source || !this.source.get || !this.source.get('params.invalid')) {
+                    persistCustomerAddress(addressData, addressId);
+                }
 
                 debugLog('saveNewAddress.end', {
                     result: result,
