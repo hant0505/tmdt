@@ -8,48 +8,7 @@
 $defaultBillingAddress = $block->getDefaultBilling();
 $defaultShippingAddress = $block->getDefaultShipping();
 ?>
-<style>
-body.account .ttk-address-default-block > .ttk-address-default-grid,
-body.customer-address-index .ttk-address-default-block > .ttk-address-default-grid {
-    display: flex !important;
-    flex-direction: row !important;
-    align-items: stretch !important;
-    justify-content: flex-start !important;
-    gap: 24px !important;
-    width: 100% !important;
-    max-width: none !important;
-}
 
-body.account .ttk-address-default-block > .ttk-address-default-grid > .ttk-address-card,
-body.customer-address-index .ttk-address-default-block > .ttk-address-default-grid > .ttk-address-card {
-    flex: 1 1 0 !important;
-    width: auto !important;
-    max-width: none !important;
-    min-width: 0 !important;
-    margin: 0 !important;
-    float: none !important;
-    clear: none !important;
-    align-self: stretch !important;
-    transform: none !important;
-}
-
-body.account .ttk-address-default-block > .ttk-address-default-grid > .ttk-address-card:first-child,
-body.customer-address-index .ttk-address-default-block > .ttk-address-default-grid > .ttk-address-card:first-child {
-    order: 1 !important;
-}
-
-body.account .ttk-address-default-block > .ttk-address-default-grid > .ttk-address-card:nth-child(2),
-body.customer-address-index .ttk-address-default-block > .ttk-address-default-grid > .ttk-address-card:nth-child(2) {
-    order: 2 !important;
-}
-
-@media (max-width: 900px) {
-    body.account .ttk-address-default-block > .ttk-address-default-grid,
-    body.customer-address-index .ttk-address-default-block > .ttk-address-default-grid {
-        flex-direction: column !important;
-    }
-}
-</style>
 <div class="block block-addresses-default ttk-address-default-block">
     <div class="block-title">
         <strong><?= $escaper->escapeHtml(__('Default Addresses')) ?></strong>
