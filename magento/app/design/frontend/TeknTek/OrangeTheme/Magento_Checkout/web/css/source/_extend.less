@@ -997,6 +997,42 @@ body {
     order: 0;
 }
 
+.checkout-index-index .opc-block-summary .table-totals,
+.checkout-index-index .opc-block-summary .table-totals tbody {
+    width: 100%;
+    max-width: 100%;
+    table-layout: fixed;
+}
+
+.checkout-index-index .opc-block-summary .table-totals tr {
+    display: table-row;
+    width: 100%;
+}
+
+.checkout-index-index .opc-block-summary .table-totals .mark {
+    width: 68%;
+    max-width: 68%;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: normal;
+}
+
+.checkout-index-index .opc-block-summary .table-totals .amount {
+    width: 32%;
+    max-width: 32%;
+    white-space: nowrap;
+    text-align: right;
+}
+
+.checkout-index-index .opc-block-summary .totals.shipping .mark .label,
+.checkout-index-index .opc-block-summary .totals.shipping .mark .value {
+    display: block;
+    max-width: 100%;
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+
+
 .checkout-index-index .opc-block-summary .table-totals .mark,
 .checkout-index-index .opc-block-summary .table-totals .amount {
     border: 0;
@@ -2544,6 +2580,17 @@ body {
         font-size: 15px;
         word-break: break-word;
     }
+
+    .checkout-index-index .opc-block-summary .table-totals .mark {
+        width: 64%;
+        max-width: 64%;
+    }
+
+    .checkout-index-index .opc-block-summary .table-totals .amount {
+        width: 36%;
+        max-width: 36%;
+    }
+
 
     .checkout-index-index .opc-block-summary .totals.shipping .value {
         white-space: normal;
