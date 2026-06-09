@@ -1,0 +1,111 @@
+<?php
+/** @var \Magento\Framework\View\Element\Template $block */
+
+$topic = (string) $block->getRequest()->getParam('topic', 'help-center');
+$docs = [
+    'stores' => [
+        'title' => 'Stores',
+        'intro' => 'Find TeknTek store information and the services available when you visit us.',
+        'items' => [
+            'Main address: 36 Xuan Thuy, VietNam.',
+            'Store teams can help with product pickup, basic setup guidance, order questions, and warranty handoff.',
+            'Bring your order number or invoice when visiting for after-sales support.',
+        ],
+    ],
+    'corporate' => [
+        'title' => 'Corporate Website',
+        'intro' => 'Company information for customers, partners, and business enquiries.',
+        'items' => [
+            'TeknTek supplies laptops, components, accessories, and consumer technology products.',
+            'For partnership enquiries, email tekntek01@gmail.com with your company name and proposal summary.',
+            'For customer service, use the help center or contact details in the footer for faster routing.',
+        ],
+    ],
+    'offers' => [
+        'title' => 'Exclusive Offers',
+        'intro' => 'Details about TeknTek deals, bundles, and promotional pricing.',
+        'items' => [
+            'Offer prices apply while stock lasts and may vary by product, category, or campaign period.',
+            'Some offers cannot be combined with coupon codes or other discounts.',
+            'Visit the special offers page regularly for the newest promoted products.',
+        ],
+        'cta' => ['label' => 'View special offers', 'url' => $block->getUrl('special-offers')],
+    ],
+    'career' => [
+        'title' => 'Career',
+        'intro' => 'Information for people interested in joining TeknTek.',
+        'items' => [
+            'We look for people who enjoy practical customer support, product knowledge, and careful operations.',
+            'Send your CV and preferred role to tekntek01@gmail.com.',
+            'Include links to your portfolio or relevant experience if you are applying for a technical or content role.',
+        ],
+    ],
+    'help-center' => [
+        'title' => 'Help Center',
+        'intro' => 'Quick support information for orders, products, setup, and account questions.',
+        'items' => [
+            'For order support, prepare your order number and the email or phone number used at checkout.',
+            'For technical support, include product model, serial number if available, and a clear description of the issue.',
+            'Email tekntek01@gmail.com or call +31 20 123 4567 during working hours.',
+        ],
+        'cta' => ['label' => 'Contact support', 'url' => $block->getUrl('contact')],
+    ],
+    'payments' => [
+        'title' => 'Payments',
+        'intro' => 'Payment options and payment troubleshooting guidance.',
+        'items' => [
+            'TeknTek supports checkout payment methods available on the payment step, including cash on delivery where eligible.',
+            'Online payment orders should be completed only after the checkout confirmation page appears.',
+            'If a payment fails but money is deducted, contact support with the transaction time and order email.',
+        ],
+    ],
+    'returns' => [
+        'title' => 'Product Returns',
+        'intro' => 'Return and exchange guidance for eligible TeknTek orders.',
+        'items' => [
+            'Please contact support within 48 hours if an item arrives damaged or incorrect.',
+            'Return eligibility depends on product condition, warranty status, accessories, packaging, and purchase date.',
+            'Customers with an account can request a return from their order area when the order is eligible.',
+        ],
+        'cta' => ['label' => 'My returns', 'url' => $block->getUrl('rma')],
+    ],
+    'faq' => [
+        'title' => 'FAQ',
+        'intro' => 'Common answers about shopping, delivery, warranty, and after-sales support.',
+        'items' => [
+            'Delivery time normally depends on stock location, shipping method, and destination.',
+            'Eligible products include manufacturer warranty or TeknTek store warranty depending on the brand.',
+            'For setup help after purchase, contact support with your order number and product model.',
+        ],
+    ],
+];
+
+$doc = $docs[$topic] ?? $docs['help-center'];
+?>
+<main class="tekntek-doc" aria-labelledby="tekntek-doc-title">
+    <div class="tekntek-doc__inner">
+        <a class="tekntek-doc__back" href="<?= $block->escapeUrl($block->getUrl('')) ?>">
+            <?= $block->escapeHtml(__('Back to store')) ?>
+        </a>
+        <header class="tekntek-doc__header">
+            <span class="tekntek-doc__eyebrow"><?= $block->escapeHtml(__('TeknTek Support')) ?></span>
+            <h1 id="tekntek-doc-title"><?= $block->escapeHtml(__($doc['title'])) ?></h1>
+            <p><?= $block->escapeHtml(__($doc['intro'])) ?></p>
+        </header>
+
+        <section class="tekntek-doc__panel" aria-label="<?= $block->escapeHtmlAttr(__($doc['title'])) ?>">
+            <?php foreach ($doc['items'] as $item): ?>
+                <article class="tekntek-doc__item">
+                    <span class="tekntek-doc__mark" aria-hidden="true"></span>
+                    <p><?= $block->escapeHtml(__($item)) ?></p>
+                </article>
+            <?php endforeach; ?>
+        </section>
+
+        <?php if (!empty($doc['cta'])): ?>
+            <a class="tekntek-doc__cta" href="<?= $block->escapeUrl($doc['cta']['url']) ?>">
+                <?= $block->escapeHtml(__($doc['cta']['label'])) ?>
+            </a>
+        <?php endif; ?>
+    </div>
+</main>
