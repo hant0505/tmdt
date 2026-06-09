@@ -1,8 +1,9 @@
 <?xml version="1.0"?>
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="checkout" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <body>
-        <!-- Render custom header inside checkout header wrapper -->
+        <!-- Render the theme header inside checkout; checkout layout does not include the standard header container. -->
         <referenceBlock name="logo" remove="true"/>
+        <referenceBlock name="tekntek.header" remove="true"/>
         <referenceContainer name="checkout.header.wrapper">
             <block class="Magento\Framework\View\Element\Template"
                    name="tekntek.checkout.header"

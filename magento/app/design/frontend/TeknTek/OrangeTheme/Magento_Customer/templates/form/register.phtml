@@ -523,66 +523,149 @@ $signupInit = [
         color: #374151;
     }
 }
-    .customer-account-create .tekntek-register__password-wrap {
-        position: relative;
-        display: block;
+
+@media (max-width: 1024px) {
+    body.customer-account-create,
+    body.customer-account-create .page-wrapper {
+        background: #11035d !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
     }
 
-    .customer-account-create .tekntek-register__password-wrap input {
-        padding-right: 76px;
+    body.customer-account-create .page-title-wrapper,
+    body.customer-account-create .page-main > .page-title-wrapper,
+    body.customer-account-create h1.page-title,
+    body.customer-account-create .page-title {
+        display: none !important;
     }
 
-    .customer-account-create .tekntek-register__password-toggle {
-        position: absolute;
-        top: 50%;
-        right: 10px;
-        transform: translateY(-50%);
-        border: 0;
-        background: transparent;
-        color: #365fd6;
-        font-size: 12px;
-        font-weight: 700;
-        line-height: 1;
-        padding: 4px 6px;
-        cursor: pointer;
+    body.customer-account-create .page-main {
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+        padding: 12px !important;
+        box-sizing: border-box !important;
     }
 
-    .customer-account-create .tekntek-register__password-rules {
-        display: grid;
-        gap: 6px;
-        margin-top: -4px;
+    body.customer-account-create .page-main .columns,
+    body.customer-account-create .column.main {
+        display: block !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: transparent !important;
+        box-sizing: border-box !important;
     }
 
-    .customer-account-create .tekntek-register__password-rule-list {
-        list-style: none;
-        margin: 0;
-        padding: 0;
-        display: grid;
-        gap: 5px;
+    body.customer-account-create .tekntek-auth {
+        width: 100% !important;
+        max-width: 560px !important;
+        min-width: 0 !important;
+        margin: 0 auto !important;
+        box-sizing: border-box !important;
     }
 
-    .customer-account-create .tekntek-register__password-rule {
-        color: #9d2d2d;
-        font-size: 12px;
-        line-height: 1.35;
+    body.customer-account-create .tekntek-auth__shell,
+    body.customer-account-create .tekntek-auth__stage {
+        display: block !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+        min-height: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        background: transparent !important;
+        border: 0 !important;
+        box-shadow: none !important;
+        overflow: visible !important;
+        box-sizing: border-box !important;
     }
 
-    .customer-account-create .tekntek-register__password-rule::before {
-        content: 'x';
-        display: inline-block;
-        width: 14px;
-        margin-right: 6px;
-        font-weight: 700;
-        text-transform: uppercase;
+    body.customer-account-create .tekntek-auth__stage::before,
+    body.customer-account-create .tekntek-auth__stage::after,
+    body.customer-account-create .tekntek-auth__visual {
+        content: none !important;
+        display: none !important;
     }
 
-    .customer-account-create .tekntek-register__password-rule.is-valid {
-        color: #1f7a38;
+    body.customer-account-create .tekntek-auth__panel--register {
+        position: relative !important;
+        inset: auto !important;
+        left: auto !important;
+        top: auto !important;
+        transform: none !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        min-width: 0 !important;
+        max-height: none !important;
+        margin: 0 !important;
+        padding: 22px 18px !important;
+        border-radius: 18px !important;
+        background: #ffffff !important;
+        box-shadow: 0 12px 28px rgba(15, 23, 42, 0.08) !important;
+        overflow: visible !important;
+        box-sizing: border-box !important;
     }
 
-    .customer-account-create .tekntek-register__password-rule.is-valid::before {
-        content: '✓';
+    body.customer-account-create .tekntek-register__progress {
+        display: flex !important;
+        align-items: center !important;
+        gap: 6px !important;
     }
+
+    body.customer-account-create .tekntek-register__progress-line {
+        display: block !important;
+        flex: 1 1 14px !important;
+        min-width: 12px !important;
+        max-width: 48px !important;
+    }
+
+
+
+    body.customer-account-create .tekntek-register__progress {
+        display: grid !important;
+        grid-template-columns: 28px minmax(24px, 1fr) 28px minmax(24px, 1fr) 28px !important;
+        align-items: center !important;
+        gap: 8px !important;
+        width: 100% !important;
+        margin: 8px 0 18px !important;
+    }
+
+    body.customer-account-create .tekntek-register__step-indicator {
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        width: 28px !important;
+        min-width: 28px !important;
+        max-width: 28px !important;
+        gap: 0 !important;
+    }
+
+    body.customer-account-create .tekntek-register__step-indicator span {
+        width: 28px !important;
+        height: 28px !important;
+        flex: 0 0 28px !important;
+        margin: 0 !important;
+    }
+
+    body.customer-account-create .tekntek-register__progress-line {
+        display: block !important;
+        width: 100% !important;
+        min-width: 0 !important;
+        max-width: none !important;
+        height: 2px !important;
+        border-radius: 999px !important;
+        background: #c7d2fe !important;
+    }
+
+    body.customer-account-create .tekntek-register__step-indicator strong {
+        display: none !important;
+    }
+}
+
 </style>
 <div class="tekntek-auth tekntek-auth--register"
      data-role="tekntek-signup-root"

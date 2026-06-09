@@ -20,10 +20,12 @@ class RequireLoginForCustomerActions implements ObserverInterface
      * @var string[]
      */
     private array $protectedActions = [
-        'checkout_cart_add',
-        'review_product_post',
-        'tekntek_suggest_review_submit',
+        // 'checkout_cart_add',
+        // 'review_product_post',
+        // 'tekntek_suggest_review_submit',
+        // 'wishlist_index_add',
         'wishlist_index_add',
+        'catalog_product_compare_add',
     ];
 
     public function __construct(

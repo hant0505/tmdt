@@ -10,9 +10,10 @@ define(
         'Magento_Checkout/js/model/payment/method-list',
         'Magento_Checkout/js/action/place-order',
         'Magento_Checkout/js/model/payment/additional-validators',
-        'uiRegistry'
+        'uiRegistry',
+        'mage/url'
     ],
-    function ($, ko, Component, quote, selectPaymentMethodAction, checkoutData, paymentService, methodList, placeOrderAction, additionalValidators, registry) {
+    function ($, ko, Component, quote, selectPaymentMethodAction, checkoutData, paymentService, methodList, placeOrderAction, additionalValidators, registry, urlBuilder) {
         'use strict';
 
         return Component.extend({
@@ -51,6 +52,11 @@ define(
 
                 this.isVnpayAvailable = ko.pureComputed(function () {
                     var code = self.resolveMagentoMethodCode('vnpay');
+                    return self.isAvailableMethodCode(code);
+                });
+
+                this.isZaloPayAvailable = ko.pureComputed(function () {
+                    var code = self.resolveMagentoMethodCode('zalopay');
                     return self.isAvailableMethodCode(code);
                 });
 
@@ -111,6 +117,10 @@ define(
                     return 'vnpay';
                 }
 
+                if (normalized.indexOf('zalopay') !== -1 || normalized.indexOf('zalo_pay') !== -1) {
+                    return 'zalopay';
+                }
+
                 if (normalized === 'cashondelivery' || normalized === 'cash_on_delivery' || normalized === 'cod') {
                     return 'cashondelivery';
                 }
@@ -135,6 +145,15 @@ define(
                     for (i = 0; i < methods.length; i++) {
                         method = (methods[i] && methods[i].method ? methods[i].method : '').toLowerCase();
                         if (method.indexOf('vnpay') !== -1 || method.indexOf('vnpayment') !== -1) {
+                            return methods[i].method;
+                        }
+                    }
+                }
+
+                if (desired === 'zalopay') {
+                    for (i = 0; i < methods.length; i++) {
+                        method = (methods[i] && methods[i].method ? methods[i].method : '').toLowerCase();
+                        if (method.indexOf('zalopay') !== -1 || method.indexOf('zalo_pay') !== -1) {
                             return methods[i].method;
                         }
                     }
@@ -327,6 +346,36 @@ define(
                     return true;
                 }
 
+                if (methodToPlace === 'zalopay') {
+                    if (!!window.tekntekPaymentDebug) {
+                        console.log('[TeknTek][Payment] using direct placeOrderAction for zalopay');
+                    }
+
+                    if (!additionalValidators.validate()) {
+                        if (!!window.tekntekPaymentDebug) {
+                            console.error('[TeknTek][Payment] additionalValidators failed');
+                        }
+                        return false;
+                    }
+
+                    if (current !== 'zalopay') {
+                        selectPaymentMethodAction({ method: 'zalopay' });
+                        checkoutData.setSelectedPaymentMethod('zalopay');
+                    }
+
+                    $.when(placeOrderAction({ method: 'zalopay', po_number: null, additional_data: null }))
+                        .fail(function () {
+                            if (!!window.tekntekPaymentDebug) {
+                                console.error('[TeknTek][Payment] ZaloPay placeOrderAction failed');
+                            }
+                        })
+                        .done(function () {
+                            window.location.replace(urlBuilder.build('zalopay/payment/redirect'));
+                        });
+
+                    return true;
+                }
+
                 // Use async registry to wait for renderer to be fully initialized
                 var rendererKey = 'checkout.steps.billing-step.payment.payments-list.' + methodToPlace;
                 var rendererFound = false;
@@ -367,6 +416,10 @@ define(
 
             isVnpay: function() {
                 return this.selectedMethod() === 'vnpay';
+            },
+
+            isZaloPay: function() {
+                return this.selectedMethod() === 'zalopay';
             },
 
             isCashOnDelivery: function() {

@@ -4,6 +4,7 @@
     <head>
         <css src="Magento_Customer::css/account-dashboard-modern.css"/>
         <css src="Magento_Customer::css/account-order-fixes.css"/>
+        <css src="Magento_Customer::css/customer-mobile.css"/>
     </head>
     <body>
         <referenceBlock name="sale.reorder.sidebar" remove="true"/>

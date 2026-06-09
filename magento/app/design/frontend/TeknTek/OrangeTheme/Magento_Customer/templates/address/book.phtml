@@ -54,8 +54,8 @@ body.customer-address-index .ttk-address-default-block > .ttk-address-default-gr
     <div class="block-title">
         <strong><?= $escaper->escapeHtml(__('Default Addresses')) ?></strong>
     </div>
-    <div class="block-content ttk-address-default-grid" style="display:flex!important;flex-direction:row!important;align-items:stretch!important;gap:24px!important;width:100%!important;max-width:none!important;">
-        <article class="ttk-address-card ttk-address-card--default" style="flex:1 1 0!important;width:auto!important;max-width:none!important;min-width:0!important;margin:0!important;float:none!important;clear:none!important;order:1!important;">
+    <div class="block-content ttk-address-default-grid">
+        <article class="ttk-address-card ttk-address-card--default">
             <div class="ttk-address-card__head">
                 <strong><?= $escaper->escapeHtml(__('Default Billing Address')) ?></strong>
                 <span><?= $escaper->escapeHtml(__('Billing')) ?></span>
@@ -82,7 +82,7 @@ body.customer-address-index .ttk-address-default-block > .ttk-address-default-gr
             </div>
         </article>
 
-        <article class="ttk-address-card ttk-address-card--default" style="flex:1 1 0!important;width:auto!important;max-width:none!important;min-width:0!important;margin:0!important;float:none!important;clear:none!important;order:2!important;">
+        <article class="ttk-address-card ttk-address-card--default">
             <div class="ttk-address-card__head">
                 <strong><?= $escaper->escapeHtml(__('Default Shipping Address')) ?></strong>
                 <span><?= $escaper->escapeHtml(__('Shipping')) ?></span>
