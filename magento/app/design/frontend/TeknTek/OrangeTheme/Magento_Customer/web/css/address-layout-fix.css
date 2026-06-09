@@ -354,6 +354,7 @@ body.customer-address-index .customer-addresses-toolbar.toolbar.bottom {
 
     body.customer-address-index .column.main .page-title {
         font-size: 30px !important;
+        text-align: center !important;
     }
 
     body.customer-address-index .block-addresses-default,
@@ -370,9 +371,20 @@ body.customer-address-index .customer-addresses-toolbar.toolbar.bottom {
 
     body.customer-address-index .ttk-address-default-grid,
     body.customer-address-index .ttk-address-default-block > .ttk-address-default-grid,
-    body.customer-address-index .ttk-address-grid {
+    body.customer-address-index .ttk-address-grid,
+    body.account.customer-address-index .ttk-address-default-grid,
+    body.account.customer-address-index .ttk-address-default-block > .ttk-address-default-grid,
+    body.account.customer-address-index .ttk-address-grid {
+        display: grid !important;
         grid-template-columns: minmax(0, 1fr) !important;
+        grid-auto-flow: row !important;
         gap: 14px !important;
+    }
+
+    body.account.customer-address-index .ttk-address-default-grid > .ttk-address-card:first-child,
+    body.account.customer-address-index .ttk-address-default-grid > .ttk-address-card:nth-child(2) {
+        grid-column: auto !important;
+        grid-row: auto !important;
     }
 
     body.customer-address-index .ttk-address-card,
