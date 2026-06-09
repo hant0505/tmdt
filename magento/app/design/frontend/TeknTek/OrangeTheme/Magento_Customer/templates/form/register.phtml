@@ -14,15 +14,6 @@ if ($signupSession->hasVerifiedEmail()) {
 
 $prefilledEmail = $signupSession->getEmail();
 $expiresAt = $signupSession->getExpiresAt();
-$signupInit = [
-    'TeknTek_SignupFlow/js/signup-flow' => [
-        'sendUrl' => $block->getUrl('tekntek_signup/code/send'),
-        'verifyUrl' => $block->getUrl('tekntek_signup/code/verify'),
-        'createUrl' => $block->getUrl('tekntek_signup/account/create'),
-        'successUrl' => $block->getUrl(''),
-        'expiresSeconds' => 300,
-    ],
-];
 ?>
 <style>
 @media (min-width: 1024px) {
@@ -240,6 +231,102 @@ $signupInit = [
     .customer-account-create .tekntek-register__field input::placeholder {
         color: #9ca3af;
         opacity: 1;
+    }
+
+
+    .customer-account-create .tekntek-register__password-wrap {
+        position: relative;
+        display: block;
+        width: 100%;
+    }
+
+    .customer-account-create .tekntek-register__password-wrap input {
+        padding-right: 76px !important;
+    }
+
+    .customer-account-create .tekntek-register__password-toggle {
+        position: absolute;
+        top: 50%;
+        right: 8px;
+        transform: translateY(-50%);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 56px;
+        height: 28px;
+        padding: 0 10px;
+        border: 1px solid #cbd5e1;
+        border-radius: 999px;
+        background: #f8fafc;
+        color: #355fbe;
+        font-size: 12px;
+        font-weight: 700;
+        line-height: 1;
+        box-shadow: none;
+        text-transform: none;
+        cursor: pointer;
+    }
+
+    .customer-account-create .tekntek-register__password-toggle:hover,
+    .customer-account-create .tekntek-register__password-toggle:focus {
+        border-color: #3d6fcb;
+        background: #eef4ff;
+        color: #284f9d;
+        outline: none;
+    }
+
+    .customer-account-create .tekntek-register__password-rules {
+        display: grid;
+        gap: 6px;
+        margin: -2px 0 0;
+    }
+
+    .customer-account-create .tekntek-register__password-rule-list {
+        display: grid;
+        gap: 6px;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+    }
+
+    .customer-account-create .tekntek-register__password-rule {
+        position: relative;
+        min-height: 20px;
+        padding-left: 26px;
+        color: #6b7280;
+        font-size: 12px;
+        line-height: 1.35;
+    }
+
+    .customer-account-create .tekntek-register__password-rule::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: -1px;
+        width: 18px;
+        height: 18px;
+        border: 1px solid #cbd5e1;
+        border-radius: 50%;
+        background: #ffffff;
+        box-sizing: border-box;
+    }
+
+    .customer-account-create .tekntek-register__password-rule.is-valid {
+        color: #166534;
+        font-weight: 600;
+    }
+
+    .customer-account-create .tekntek-register__password-rule.is-valid::before {
+        content: "\2713";
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-color: #22c55e;
+        background: #22c55e;
+        color: #ffffff;
+        font-size: 12px;
+        font-weight: 800;
+        line-height: 1;
     }
 
     .customer-account-create .tekntek-register__button {
@@ -463,6 +550,22 @@ $signupInit = [
         background: #ffffff;
     }
 
+
+    .customer-account-create .tekntek-register__password-wrap input {
+        padding-right: 82px !important;
+    }
+
+    .customer-account-create .tekntek-register__password-toggle {
+        height: 30px;
+        min-width: 60px;
+        right: 9px;
+        font-size: 12px;
+    }
+
+    .customer-account-create .tekntek-register__password-rule {
+        font-size: 13px;
+    }
+
     .customer-account-create .tekntek-register__button {
         width: 100%;
         min-height: 46px;
@@ -671,8 +774,7 @@ $signupInit = [
      data-role="tekntek-signup-root"
      data-initial-step="<?= $escaper->escapeHtmlAttr($initialStep) ?>"
     data-initial-email="<?= $escaper->escapeHtmlAttr($prefilledEmail) ?>"
-    data-initial-expires-at="<?= $escaper->escapeHtmlAttr((string)$expiresAt) ?>"
-    data-mage-init='<?= $escaper->escapeHtmlAttr((string)json_encode($signupInit, JSON_UNESCAPED_SLASHES)) ?>'>
+    data-initial-expires-at="<?= $escaper->escapeHtmlAttr((string)$expiresAt) ?>">
     <div class="tekntek-auth__shell">
         <div class="tekntek-auth__stage tekntek-auth__stage--register">
             <section class="tekntek-auth__panel tekntek-auth__panel--form tekntek-auth__panel--register" aria-labelledby="tekntek-register-heading">
@@ -821,10 +923,10 @@ $signupInit = [
                         <div class="tekntek-register__password-rules" data-role="password-rules" aria-live="polite">
                             <p class="tekntek-register__hint"><?= $escaper->escapeHtml(__('Password requirements:')) ?></p>
                             <ul class="tekntek-register__password-rule-list">
-                                <li class="tekntek-register__password-rule" data-rule="length"><?= $escaper->escapeHtml(__('At least 8 characters')) ?></li>
-                                <li class="tekntek-register__password-rule" data-rule="uppercase"><?= $escaper->escapeHtml(__('Starts with an uppercase letter')) ?></li>
-                                <li class="tekntek-register__password-rule" data-rule="number"><?= $escaper->escapeHtml(__('Contains at least 1 number')) ?></li>
-                                <li class="tekntek-register__password-rule" data-rule="match"><?= $escaper->escapeHtml(__('Repeated password matches')) ?></li>
+                                <li class="tekntek-register__password-rule" data-rule="length" role="checkbox" aria-checked="false"><?= $escaper->escapeHtml(__('At least 8 characters')) ?></li>
+                                <li class="tekntek-register__password-rule" data-rule="uppercase" role="checkbox" aria-checked="false"><?= $escaper->escapeHtml(__('Starts with an uppercase letter')) ?></li>
+                                <li class="tekntek-register__password-rule" data-rule="number" role="checkbox" aria-checked="false"><?= $escaper->escapeHtml(__('Contains at least 1 number')) ?></li>
+                                <li class="tekntek-register__password-rule" data-rule="match" role="checkbox" aria-checked="false"><?= $escaper->escapeHtml(__('Repeated password matches')) ?></li>
                             </ul>
                         </div>
 
@@ -932,6 +1034,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
 
                 node.classList.toggle('is-valid', !!matchedRule.valid);
+                node.setAttribute('aria-checked', matchedRule.valid ? 'true' : 'false');
             });
 
             return state;
@@ -986,6 +1089,19 @@ document.addEventListener('DOMContentLoaded', function () {
             messageBox.classList.remove('is-success');
             messageBox.classList.add(type === 'error' ? 'is-error' : 'is-success');
             messageBox.textContent = text;
+        }
+
+        function getFormKey(form) {
+            var input = form ? form.querySelector('input[name="form_key"]') : null;
+            return input ? input.value : '';
+        }
+
+        function parseJson(text) {
+            try {
+                return text ? JSON.parse(text) : {};
+            } catch (e) {
+                return {};
+            }
         }
 
         function setStep(step) {
@@ -1163,7 +1279,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     return;
                 }
 
-                var formKey = (root.querySelector('input[name="form_key"]') || {}).value || '';
+                var formKey = getFormKey(verifyForm);
                 var body = new URLSearchParams();
                 body.append('form_key', formKey);
                 body.append('code', hiddenCode.value || '');
@@ -1178,12 +1294,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 }).then(function (resp) {
                     return resp.text();
                 }).then(function (text) {
-                    var data = {};
-                    try {
-                        data = text ? JSON.parse(text) : {};
-                    } catch (e) {
-                        data = {};
-                    }
+                    var data = parseJson(text);
 
                     if (!data.success) {
                         showMessage((data && data.message) || 'The code is invalid or has expired.', 'error');
@@ -1239,7 +1350,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     submitLabelNode.textContent = 'Sending code...';
                 }
 
-                var formKey = (root.querySelector('input[name="form_key"]') || {}).value || '';
+                var formKey = getFormKey(emailForm);
                 var body = new URLSearchParams();
                 body.append('form_key', formKey);
                 body.append('email', email);
@@ -1256,12 +1367,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     return resp.text();
                 }).then(function (text) {
                     window.clearTimeout(timeoutId);
-                    var data = {};
-                    try {
-                        data = text ? JSON.parse(text) : {};
-                    } catch (e) {
-                        data = {};
-                    }
+                    var data = parseJson(text);
 
                     if (!data.success) {
                         showMessage((data && data.message) || 'Unable to send verification code.', 'error');
@@ -1348,16 +1454,11 @@ document.addEventListener('DOMContentLoaded', function () {
                     headers: {
                         'X-Requested-With': 'XMLHttpRequest'
                     },
-                        body: formData
+                    body: formData
                 }).then(function (resp) {
                     return resp.text();
                 }).then(function (text) {
-                    var data = {};
-                    try {
-                        data = text ? JSON.parse(text) : {};
-                    } catch (e) {
-                        data = {};
-                    }
+                    var data = parseJson(text);
 
                     if (!data.success) {
                         if (data.redirect_to_login && data.redirect_url) {
@@ -1397,7 +1498,7 @@ document.addEventListener('DOMContentLoaded', function () {
                     return;
                 }
 
-                var formKey = (root.querySelector('input[name="form_key"]') || {}).value || '';
+                var formKey = getFormKey(verifyForm);
                 var email = hiddenEmail ? hiddenEmail.value : '';
 
                 if (!formKey || !email) {
@@ -1419,8 +1520,9 @@ document.addEventListener('DOMContentLoaded', function () {
                     },
                     body: body.toString()
                 }).then(function (resp) {
-                    return resp.json();
+                    return resp.text();
                 }).then(function (data) {
+                    data = parseJson(data);
                     if (data && data.success && data.expires_at) {
                         expiresAt = parseInt(data.expires_at, 10) || 0;
                         renderTimer();
