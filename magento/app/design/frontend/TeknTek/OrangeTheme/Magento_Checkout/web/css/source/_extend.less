@@ -997,6 +997,42 @@ body {
     order: 0;
 }
 
+.checkout-index-index .opc-block-summary .table-totals,
+.checkout-index-index .opc-block-summary .table-totals tbody {
+    width: 100%;
+    max-width: 100%;
+    table-layout: fixed;
+}
+
+.checkout-index-index .opc-block-summary .table-totals tr {
+    display: table-row;
+    width: 100%;
+}
+
+.checkout-index-index .opc-block-summary .table-totals .mark {
+    width: 68%;
+    max-width: 68%;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    word-break: normal;
+}
+
+.checkout-index-index .opc-block-summary .table-totals .amount {
+    width: 32%;
+    max-width: 32%;
+    white-space: nowrap;
+    text-align: right;
+}
+
+.checkout-index-index .opc-block-summary .totals.shipping .mark .label,
+.checkout-index-index .opc-block-summary .totals.shipping .mark .value {
+    display: block;
+    max-width: 100%;
+    white-space: normal;
+    overflow-wrap: anywhere;
+}
+
+
 .checkout-index-index .opc-block-summary .table-totals .mark,
 .checkout-index-index .opc-block-summary .table-totals .amount {
     border: 0;
@@ -2545,6 +2581,17 @@ body {
         word-break: break-word;
     }
 
+    .checkout-index-index .opc-block-summary .table-totals .mark {
+        width: 64%;
+        max-width: 64%;
+    }
+
+    .checkout-index-index .opc-block-summary .table-totals .amount {
+        width: 36%;
+        max-width: 36%;
+    }
+
+
     .checkout-index-index .opc-block-summary .totals.shipping .value {
         white-space: normal;
     }
@@ -2599,6 +2646,38 @@ body {
         height: auto !important;
         margin-bottom: 0;
         padding-bottom: 0;
+    }
+
+    .checkout-index-index .modal-popup .form-shipping-address [name$="save_in_address_book"],
+    .checkout-index-index .modal-popup .form-shipping-address .field[name$="save_in_address_book"] {
+        display: none !important;
+    }
+
+    .checkout-index-index .modal-popup .form-shipping-address .field.choice {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        width: 100%;
+        margin: 14px 0 0;
+        padding: 0;
+    }
+
+    .checkout-index-index .modal-popup .form-shipping-address .field.choice input[type="checkbox"] {
+        flex: 0 0 20px;
+        width: 20px;
+        height: 20px;
+        min-width: 20px;
+        min-height: 20px;
+        margin: 0;
+        box-shadow: none;
+    }
+
+    .checkout-index-index .modal-popup .form-shipping-address .field.choice label {
+        flex: 1 1 auto;
+        margin: 0;
+        color: #374151;
+        font-size: 14px;
+        line-height: 1.4;
     }
 
     .checkout-index-index .modal-popup .modal-footer {

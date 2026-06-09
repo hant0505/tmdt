@@ -131,6 +131,12 @@ class LayoutProcessorPlugin
             $fieldset['postcode']['config']['required'] = false;
         }
 
+        if (isset($fieldset['save_in_address_book']) && is_array($fieldset['save_in_address_book'])) {
+            $fieldset['save_in_address_book']['visible'] = false;
+            $fieldset['save_in_address_book']['value'] = 1;
+            $fieldset['save_in_address_book']['default'] = 1;
+        }
+
         return $jsLayout;
     }
 
