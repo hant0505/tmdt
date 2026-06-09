@@ -9,6 +9,8 @@
                 <argument name="template" xsi:type="string">Magento_Checkout::cart/tekntek-cart.phtml</argument>
             </action>
         </referenceBlock>
+        <referenceBlock name="checkout.cart.methods.multishipping" remove="true"/>
+        <referenceContainer name="checkout.cart.methods.multishipping" remove="true"/>
         <referenceBlock name="checkout.cart.totals">
             <action method="setTemplate">
                 <argument name="template" xsi:type="string">Magento_Checkout::cart/totals.phtml</argument>

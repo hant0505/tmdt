@@ -280,3 +280,16 @@ body.customer-address-index a.action.add {
     z-index: 41 !important;
     pointer-events: auto !important;
 }
+
+@media (max-width: 767px) {
+    body.customer-address-index .page-main .columns > .sidebar-main {
+        position: relative !important;
+        z-index: 20 !important;
+    }
+
+    body.customer-address-index .column.main,
+    body.customer-address-index .block-addresses-default,
+    body.customer-address-index .block-addresses-list {
+        z-index: auto !important;
+    }
+}

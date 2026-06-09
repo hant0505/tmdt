@@ -363,6 +363,7 @@ nav.navigation,
 }
 
 .tekntek-isolated-header .ttk-icon-layer.is-open {
+    display: block !important;
     opacity: 1;
     transform: translateY(0);
     visibility: visible;
@@ -396,10 +397,13 @@ nav.navigation,
     padding: 0;
     display: grid;
     grid-template-columns: repeat(12, minmax(0, 1fr));
+    align-items: stretch;
     gap: 10px;
 }
 
 .tekntek-isolated-header .ttk-icon-nav li {
+    display: flex;
+    min-width: 0;
     text-align: center;
     opacity: 0;
     transform: translateY(-6px);
@@ -419,9 +423,11 @@ nav.navigation,
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-start;
+    justify-content: center;
     gap: 6px;
-    min-height: 62px;
+    width: 100%;
+    min-height: 74px;
+    height: 100%;
     padding: 8px 7px 7px;
     border-radius: 8px;
     border: 1px solid rgba(191, 219, 254, 0.92);
@@ -477,11 +483,16 @@ nav.navigation,
 }
 
 .tekntek-isolated-header .ttk-icon-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 24px;
     font-size: 10px;
     line-height: 1.12;
     font-weight: 600;
     letter-spacing: -0.1px;
     text-align: center;
+    overflow-wrap: anywhere;
     color: #334155;
     position: relative;
     z-index: 1;
@@ -511,11 +522,12 @@ body.catalog-category-view .tekntek-isolated-header .ttk-icon-nav ul {
 
 body.catalog-category-view .tekntek-isolated-header .ttk-icon-nav a {
     color: #334155 !important;
-    min-height: 62px;
+    min-height: 74px;
+    height: 100%;
     padding: 8px 7px 7px;
     border-radius: 8px;
     gap: 6px;
-    justify-content: flex-start;
+    justify-content: center;
     box-shadow: 0 8px 16px rgba(37, 99, 235, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.92);
 }
 
@@ -549,6 +561,10 @@ body.catalog-category-view .tekntek-isolated-header .ttk-icon-nav svg * {
 }
 
 body.catalog-category-view .tekntek-isolated-header .ttk-icon-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 24px;
     font-size: 10px;
     line-height: 1.12;
     font-weight: 600;
@@ -654,9 +670,53 @@ body.catalog-category-view .tekntek-isolated-header .ttk-icon-nav a:hover .ttk-i
         font-weight: 700;
     }
 }
+
+@media (max-width: 767px) {
+    body.customer-account-index .tekntek-isolated-header .ttk-main-header {
+        padding: 6px 8px !important;
+    }
+
+    body.customer-account-index .tekntek-isolated-header .ttk-main-header-inner {
+        gap: 6px !important;
+        min-height: 0 !important;
+        padding: 8px !important;
+        padding-top: 48px !important;
+        border-radius: 10px !important;
+    }
+
+    body.customer-account-index .tekntek-isolated-header .ttk-logo-link {
+        min-height: 34px !important;
+    }
+
+    body.customer-account-index .tekntek-isolated-header .ttk-logo {
+        max-width: 112px !important;
+        max-height: 34px !important;
+    }
+
+    body.customer-account-index .tekntek-isolated-header .ttk-right-links {
+        min-height: 32px !important;
+        gap: 12px !important;
+    }
+
+    body.customer-account-index .tekntek-isolated-header .ttk-right-links a {
+        min-height: 32px !important;
+        font-size: 13px !important;
+    }
+
+    body.customer-account-index .tekntek-isolated-header .ttk-search-form {
+        height: 42px !important;
+        margin-top: 0 !important;
+    }
+
+    body.customer-account-index .tekntek-isolated-header .ttk-search-input {
+        min-height: 40px !important;
+        font-size: 14px !important;
+    }
+}
+
 </style>
 
-<div class="tekntek-isolated-header">
+<div class="tekntek-isolated-header" data-mage-init='{"Magento_Theme/js/tekntek-header-menu":{}}'>
     <header class="ttk-main-header">
         <div class="ttk-main-header-inner">
             <a class="ttk-logo-link" href="<?= $block->escapeUrl($block->getUrl('')) ?>" aria-label="TeknTek">
@@ -664,7 +724,7 @@ body.catalog-category-view .tekntek-isolated-header .ttk-icon-nav a:hover .ttk-i
             </a>
 
             <form class="form minisearch ttk-search-form" id="search_mini_form" action="<?= $block->escapeUrl($block->getUrl('catalogsearch/result')) ?>" method="get">
-                <button class="ttk-all-products-btn" id="ttk-all-products-toggle" type="button" aria-expanded="false" aria-controls="ttk-icon-layer">All products</button>
+                <button class="ttk-all-products-btn" id="ttk-all-products-toggle" type="button" aria-expanded="false" aria-controls="ttk-icon-layer">Menu</button>
                 <input class="ttk-search-input"
                        id="search"
                        type="text"
@@ -719,58 +779,6 @@ body.catalog-category-view .tekntek-isolated-header .ttk-icon-nav a:hover .ttk-i
 </div>
 
 <script>
-(function () {
-    var allProductsToggle = document.getElementById('ttk-all-products-toggle');
-    var categoryLayer = document.getElementById('ttk-icon-layer');
-    var closeLayerTimer = null;
-
-    if (!allProductsToggle || !categoryLayer) {
-        return;
-    }
-
-    function openLayer() {
-        if (closeLayerTimer) {
-            window.clearTimeout(closeLayerTimer);
-            closeLayerTimer = null;
-        }
-        categoryLayer.hidden = false;
-        window.requestAnimationFrame(function () {
-            categoryLayer.classList.add('is-open');
-            allProductsToggle.setAttribute('aria-expanded', 'true');
-        });
-    }
-
-    function closeLayer() {
-        categoryLayer.classList.remove('is-open');
-        allProductsToggle.setAttribute('aria-expanded', 'false');
-        if (closeLayerTimer) {
-            window.clearTimeout(closeLayerTimer);
-        }
-        closeLayerTimer = window.setTimeout(function () {
-            if (!categoryLayer.classList.contains('is-open')) {
-                categoryLayer.hidden = true;
-            }
-        }, 240);
-    }
-
-    allProductsToggle.addEventListener('click', function (event) {
-        event.preventDefault();
-        if (categoryLayer.classList.contains('is-open')) {
-            closeLayer();
-        } else {
-            openLayer();
-        }
-    });
-
-    document.addEventListener('click', function (event) {
-        var clickInsideLayer = categoryLayer.contains(event.target);
-        var clickOnToggle = allProductsToggle.contains(event.target);
-        if (!clickInsideLayer && !clickOnToggle && categoryLayer.classList.contains('is-open')) {
-            closeLayer();
-        }
-    });
-})();
-
 (function () {
     var searchForm = document.getElementById('search_mini_form');
     var searchInput = document.getElementById('search');

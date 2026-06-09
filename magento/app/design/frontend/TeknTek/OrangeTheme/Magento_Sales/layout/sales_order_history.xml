@@ -6,6 +6,7 @@
         <css src="Magento_Customer::css/account-order-fixes.css"/>
     </head>
     <body>
+        <referenceBlock name="sale.reorder.sidebar" remove="true"/>
         <referenceBlock name="sales.order.history" template="Magento_Sales::order/history.phtml"/>
     </body>
 </page>
