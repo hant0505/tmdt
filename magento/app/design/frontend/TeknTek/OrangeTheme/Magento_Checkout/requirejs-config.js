@@ -19,9 +19,6 @@ var config = {
             'Magento_Checkout/js/view/shipping-address/list': {
                 'Magento_Checkout/js/view/shipping-address/list-visibility-mixin': true
             },
-            'Magento_Checkout/js/view/shipping-methods/default': {
-                'Magento_Checkout/js/view/shipping-methods-mixin': true
-            },
             'Magento_OfflinePayments/js/view/payment/method-renderer/cashondelivery-method': {
                 'Magento_Checkout/js/view/payment/cashondelivery-mixin': true
             },

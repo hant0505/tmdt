@@ -2747,3 +2747,126 @@ body {
         padding-right: 14px;
     }
 }
+
+/* Checkout order summary polish */
+.checkout-index-index .opc-block-summary {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 24px 24px 20px;
+    border: 1px solid #d7dce5;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #07152c;
+    gap: 18px;
+}
+
+.checkout-index-index .opc-block-summary > .title {
+    margin: 0 0 16px;
+    padding-bottom: 26px;
+    border-bottom: 1px solid #cfd5dd;
+    color: #07152c;
+    font-size: 26px;
+    line-height: 1.12;
+    font-weight: 700;
+}
+
+.checkout-index-index .opc-block-summary .table-totals,
+.checkout-index-index .opc-block-summary .table-totals tbody {
+    display: block;
+    width: 100%;
+}
+
+.checkout-index-index .opc-block-summary .table-totals tr {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: 14px;
+    align-items: start;
+    width: 100%;
+}
+
+.checkout-index-index .opc-block-summary .table-totals .mark,
+.checkout-index-index .opc-block-summary .table-totals .amount {
+    display: block;
+    width: auto;
+    max-width: none;
+    padding: 6px 0;
+    border: 0;
+    color: #07152c;
+    font-size: 18px;
+    line-height: 1.28;
+    font-weight: 400;
+}
+
+.checkout-index-index .opc-block-summary .table-totals .amount {
+    min-width: 76px;
+    text-align: right;
+    white-space: nowrap;
+}
+
+.checkout-index-index .opc-block-summary .totals.shipping .mark .label,
+.checkout-index-index .opc-block-summary .totals.shipping .mark .value {
+    display: block;
+    max-width: 100%;
+    overflow-wrap: normal;
+    word-break: normal;
+}
+
+.checkout-index-index .opc-block-summary .totals.shipping .mark .value {
+    margin-top: 2px;
+    color: #6b7280;
+    font-size: 18px;
+    line-height: 1.25;
+}
+
+.checkout-index-index .opc-block-summary .grand.totals .mark,
+.checkout-index-index .opc-block-summary .grand.totals .amount {
+    padding-top: 16px;
+    color: #07152c;
+    font-size: 19px;
+    line-height: 1.25;
+    font-weight: 700;
+}
+
+.checkout-index-index .opc-block-summary .items-in-cart {
+    margin-top: 18px;
+    border-top: 1px solid #d7dce5;
+}
+
+.checkout-index-index .opc-block-summary .items-in-cart > .title {
+    padding: 18px 0 8px;
+    color: #07152c;
+    font-size: 18px;
+    line-height: 1.25;
+    font-weight: 400;
+}
+
+@media (max-width: 640px) {
+    .checkout-index-index .opc-block-summary {
+        padding: 18px 16px;
+    }
+
+    .checkout-index-index .opc-block-summary > .title {
+        padding-bottom: 18px;
+        font-size: 22px;
+    }
+
+    .checkout-index-index .opc-block-summary .table-totals tr {
+        column-gap: 10px;
+    }
+
+    .checkout-index-index .opc-block-summary .table-totals .mark,
+    .checkout-index-index .opc-block-summary .table-totals .amount,
+    .checkout-index-index .opc-block-summary .totals.shipping .mark .value {
+        font-size: 15px;
+    }
+
+    .checkout-index-index .opc-block-summary .table-totals .amount {
+        min-width: 68px;
+    }
+
+    .checkout-index-index .opc-block-summary .grand.totals .mark,
+    .checkout-index-index .opc-block-summary .grand.totals .amount {
+        font-size: 17px;
+    }
+}
+

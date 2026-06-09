@@ -5,8 +5,9 @@ define([
     'Magento_Checkout/js/model/quote',
     'mage/url',
     'Magento_Customer/js/model/customer',
-    'Magento_Customer/js/customer-data'
-], function ($, ko, addressList, quote, urlBuilder, customer, customerData) {
+    'Magento_Customer/js/customer-data',
+    'Magento_Checkout/js/checkout-data'
+], function ($, ko, addressList, quote, urlBuilder, customer, customerData, checkoutData) {
     'use strict';
 
     var debugPrefix = '[TeknTek Checkout Debug]';
@@ -51,6 +52,54 @@ define([
             carrier_title: method.carrier_title,
             method_title: method.method_title
         };
+    }
+
+
+    function getStoredShippingRateKey() {
+        if (!checkoutData || typeof checkoutData.getSelectedShippingRate !== 'function') {
+            return '';
+        }
+
+        return (checkoutData.getSelectedShippingRate() || '').toString();
+    }
+
+    function getRateKey(rate) {
+        if (!rate) {
+            return '';
+        }
+
+        return [rate.carrier_code || '', rate.method_code || ''].join('_');
+    }
+
+    function restoreSelectedShippingMethod(component, rates) {
+        var selected = quote && typeof quote.shippingMethod === 'function' ? quote.shippingMethod() : null,
+            selectedKey = getStoredShippingRateKey(),
+            matchedRate = null;
+
+        if (selected || !rates || !rates.length || !selectedKey || !component || typeof component.selectShippingMethod !== 'function') {
+            return;
+        }
+
+        rates.some(function (rate) {
+            if (getRateKey(rate) === selectedKey) {
+                matchedRate = rate;
+                return true;
+            }
+            return false;
+        });
+
+        if (!matchedRate) {
+            debugLog('restoreSelectedShippingMethod.missingRate', {
+                selectedKey: selectedKey,
+                availableRates: rates.map(function (rate) {
+                    return getRateKey(rate);
+                })
+            });
+            return;
+        }
+
+        component.selectShippingMethod(matchedRate);
+        debugLog('restoreSelectedShippingMethod.restored', getMethodSummary(matchedRate));
     }
 
     function isNewCustomerAddress(address) {
@@ -426,6 +475,8 @@ define([
                 }
 
                 if (this.rates && this.rates.subscribe) {
+                    restoreSelectedShippingMethod(this, this.rates());
+
                     this.rates.subscribe(function (rates) {
                         debugLog('shippingRates.changed', {
                             count: rates ? rates.length : 0,
@@ -433,7 +484,8 @@ define([
                                 return getMethodSummary(rate);
                             })
                         });
-                    });
+                        restoreSelectedShippingMethod(this, rates);
+                    }, this);
                 }
 
                 this.pruneDuplicateNewCustomerAddresses();
